@@ -1,0 +1,35 @@
+{
+  "suite": "mixed_ua_v4_balanced",
+  "n": 192,
+  "repeats": 3,
+  "decoding": "T=0 seed=42",
+  "systems": {
+    "router_matrix_fewshot": {
+      "source": "results/week_6_router_fewshot/",
+      "overall": 0.8425,
+      "p50_ms": 441.3,
+      "note": "leakage-fixed rules + social few-shot"
+    },
+    "router_matrix_baseline_aug7": {
+      "source": "results/week_5_router_v4/",
+      "overall": 0.8163,
+      "p50_ms": 425.1,
+      "note": "old rules, baseline alignment prompt"
+    },
+    "aya": {
+      "source": "results/week_5_router_v4/scores_mean_sd_aya_v4_rescored.json",
+      "overall": 0.7852,
+      "p50_ms": 866.9
+    },
+    "mamay4": {
+      "source": "results/week_6_v4_solos/",
+      "overall": 0.7617,
+      "p50_ms": 1124.7
+    },
+    "lapa": {
+      "source": "results/week_6_v4_solos/",
+      "overall": 0.7315,
+      "p50_ms": 1680.7
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "suite": "mixed_ua_v4_balanced",
+  "n_items": 192,
+  "n_repeats": 3,
+  "compare_to": "router_matrix_fewshot",
+  "escalate_rate": 0.0156,
+  "escalated_per_pass": 3,
+  "escalate_ids": [
+    "ualign-social-2654",
+    "ualign-social-2724",
+    "ualign-social-3310"
+  ],
+  "policy": "social alignment only: digit 2 or missing digit → one Mamay-4B retry; ethics never escalated; no Mamay-12B",
+  "quality": {
+    "s1_fewshot_overall": 0.8425,
+    "s2_micro_overall": 0.8423,
+    "delta_overall": -0.0002,
+    "alignment_both": 0.75
+  },
+  "gpu_seconds_per_pass_mean": {
+    "s1_fewshot": 305.833,
+    "s2_micro": 306.08,
+    "delta": 0.247
+  },
+  "note": "Retry did not move the alignment bucket (still 0.75). Extra cost is ~0.25 GPU-s / 192 (~+0.08%)."
+}

@@ -1,0 +1,98 @@
+{
+  "system": "router_cascade_micro_fewshot",
+  "bench_tag": "mixed_ua_v4_balanced_t0_s42_rep2",
+  "n": 192,
+  "wrote": "/home/onyshchuk/Diploma/results/week_6_cascade_micro/router_cascade_micro_fewshot_mixed_ua_v4_balanced_t0_s42_rep2_20260820T084056Z.jsonl",
+  "prompt_variant": "fewshot",
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  },
+  "cascade": {
+    "enabled": true,
+    "kind": "micro",
+    "buckets": [
+      "alignment",
+      "knowledge"
+    ],
+    "escalated": 3,
+    "escalate_rate": 0.0156
+  },
+  "resource_protocol": {
+    "note": "Prefer one model live at a time for fair weight-VRAM. With gpu_memory_utilization≈0.9, nvidia-smi shows KV-cache reservation, not bare weight footprint. gpu_seconds ≈ wall latency (1 GPU).",
+    "vram_sample_interval_s": 0.5
+  },
+  "vram_before": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44650.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44680.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 12.0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44586.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44424.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    }
+  ],
+  "vram_after": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44650.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44680.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 48.0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44586.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44424.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    }
+  ],
+  "vram": {
+    "n_samples": 553,
+    "steady_total_vram_mb": 178340.0,
+    "peak_total_vram_mb": 178340.0,
+    "peak_single_gpu_mb": 44680.0,
+    "steady_total_vram_gb": 174.16,
+    "peak_total_vram_gb": 174.16,
+    "peak_single_gpu_gb": 43.633
+  },
+  "gpu_seconds_total": 306.45,
+  "gpu_seconds_per_prompt": 1.5961,
+  "latency_avg_ms": 1596.1
+}

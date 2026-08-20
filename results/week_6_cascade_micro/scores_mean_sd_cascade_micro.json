@@ -1,0 +1,167 @@
+{
+  "n_repeats": 3,
+  "systems": {
+    "router_cascade_micro_fewshot": {
+      "bucket.alignment.latency_p50": {
+        "mean": 190.0667,
+        "sd": 1.9009,
+        "n": 3,
+        "values": [
+          190.0,
+          192.0,
+          188.2
+        ]
+      },
+      "bucket.alignment.quality": {
+        "mean": 0.75,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.75,
+          0.75,
+          0.75
+        ]
+      },
+      "bucket.chat.latency_p50": {
+        "mean": 3932.7333,
+        "sd": 5.2539,
+        "n": 3,
+        "values": [
+          3933.6,
+          3937.5,
+          3927.1
+        ]
+      },
+      "bucket.chat.quality": {
+        "mean": 0.9844,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.9844,
+          0.9844,
+          0.9844
+        ]
+      },
+      "bucket.code.latency_p50": {
+        "mean": 475.1333,
+        "sd": 0.3215,
+        "n": 3,
+        "values": [
+          474.9,
+          475.5,
+          475.0
+        ]
+      },
+      "bucket.code.quality": {
+        "mean": 0.9688,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.9688,
+          0.9688,
+          0.9688
+        ]
+      },
+      "bucket.instruct.latency_p50": {
+        "mean": 704.7667,
+        "sd": 0.9074,
+        "n": 3,
+        "values": [
+          703.8,
+          705.6,
+          704.9
+        ]
+      },
+      "bucket.instruct.quality": {
+        "mean": 0.7812,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.7812,
+          0.7812,
+          0.7812
+        ]
+      },
+      "bucket.knowledge.latency_p50": {
+        "mean": 252.4667,
+        "sd": 0.9713,
+        "n": 3,
+        "values": [
+          253.3,
+          251.4,
+          252.7
+        ]
+      },
+      "bucket.knowledge.quality": {
+        "mean": 0.75,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.75,
+          0.75,
+          0.75
+        ]
+      },
+      "bucket.translate.latency_p50": {
+        "mean": 517.9333,
+        "sd": 0.3215,
+        "n": 3,
+        "values": [
+          517.8,
+          518.3,
+          517.7
+        ]
+      },
+      "bucket.translate.quality": {
+        "mean": 0.8195,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.8195,
+          0.8195,
+          0.8195
+        ]
+      },
+      "latency_avg_ms": {
+        "mean": 1594.1667,
+        "sd": 1.7214,
+        "n": 3,
+        "values": [
+          1593.6,
+          1596.1,
+          1592.8
+        ]
+      },
+      "latency_p50_ms": {
+        "mean": 441.1667,
+        "sd": 0.1528,
+        "n": 3,
+        "values": [
+          441.3,
+          441.2,
+          441.0
+        ]
+      },
+      "overall_mean": {
+        "mean": 0.8423,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.8423,
+          0.8423,
+          0.8423
+        ]
+      },
+      "overall_mean_macro": {
+        "mean": 0.8423,
+        "sd": 0.0,
+        "n": 3,
+        "values": [
+          0.8423,
+          0.8423,
+          0.8423
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+[
+  {
+    "file": "results/week_6_cascade_micro/router_cascade_micro_fewshot_mixed_ua_v4_balanced_t0_s42_rep1_20260820T083549Z.jsonl",
+    "n": 192,
+    "http_ok": 192,
+    "models": {
+      "mamay4": 66,
+      "lapa": 62,
+      "aya": 32,
+      "qwen7": 32
+    },
+    "intents": {
+      "chat": 31,
+      "knowledge": 33,
+      "translate": 32,
+      "instruct": 32,
+      "code": 32,
+      "alignment": 32
+    },
+    "prompt_variant": {
+      "fewshot": 192
+    },
+    "escalated": 3,
+    "escalate_rate": 0.0156,
+    "escalate_ids": [
+      "ualign-social-2654",
+      "ualign-social-2724",
+      "ualign-social-3310"
+    ]
+  },
+  {
+    "file": "results/week_6_cascade_micro/router_cascade_micro_fewshot_mixed_ua_v4_balanced_t0_s42_rep2_20260820T084056Z.jsonl",
+    "n": 192,
+    "http_ok": 192,
+    "models": {
+      "mamay4": 66,
+      "lapa": 62,
+      "aya": 32,
+      "qwen7": 32
+    },
+    "intents": {
+      "chat": 31,
+      "knowledge": 33,
+      "translate": 32,
+      "instruct": 32,
+      "code": 32,
+      "alignment": 32
+    },
+    "prompt_variant": {
+      "fewshot": 192
+    },
+    "escalated": 3,
+    "escalate_rate": 0.0156,
+    "escalate_ids": [
+      "ualign-social-2654",
+      "ualign-social-2724",
+      "ualign-social-3310"
+    ]
+  },
+  {
+    "file": "results/week_6_cascade_micro/router_cascade_micro_fewshot_mixed_ua_v4_balanced_t0_s42_rep3_20260820T084602Z.jsonl",
+    "n": 192,
+    "http_ok": 192,
+    "models": {
+      "mamay4": 66,
+      "lapa": 62,
+      "aya": 32,
+      "qwen7": 32
+    },
+    "intents": {
+      "chat": 31,
+      "knowledge": 33,
+      "translate": 32,
+      "instruct": 32,
+      "code": 32,
+      "alignment": 32
+    },
+    "prompt_variant": {
+      "fewshot": 192
+    },
+    "escalated": 3,
+    "escalate_rate": 0.0156,
+    "escalate_ids": [
+      "ualign-social-2654",
+      "ualign-social-2724",
+      "ualign-social-3310"
+    ]
+  }
+]
