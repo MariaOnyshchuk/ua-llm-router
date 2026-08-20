@@ -1,0 +1,58 @@
+{
+  "rows": [
+    {
+      "system": "mamay12",
+      "n": 160,
+      "quality_macro": 0.8398,
+      "quality_micro": 0.7744,
+      "latency_avg_ms": 1467.3,
+      "latency_p50_ms": 921.5,
+      "latency_p95_ms": 4239.8,
+      "gpu_seconds_per_prompt": 1.4673,
+      "peak_vram_gb": null,
+      "quality_per_gb": null,
+      "decoding": null
+    },
+    {
+      "system": "mamay4",
+      "n": 160,
+      "quality_macro": 0.8117,
+      "quality_micro": 0.7281,
+      "latency_avg_ms": 1555.5,
+      "latency_p50_ms": 916.5,
+      "latency_p95_ms": 7046.3,
+      "gpu_seconds_per_prompt": 1.5555,
+      "peak_vram_gb": null,
+      "quality_per_gb": null,
+      "decoding": null
+    },
+    {
+      "system": "qwen",
+      "n": 160,
+      "quality_macro": 0.7582,
+      "quality_micro": 0.6659,
+      "latency_avg_ms": 732.1,
+      "latency_p50_ms": 304.7,
+      "latency_p95_ms": 3868.1,
+      "gpu_seconds_per_prompt": 0.7321,
+      "peak_vram_gb": null,
+      "quality_per_gb": null,
+      "decoding": null
+    },
+    {
+      "system": "router_small",
+      "n": 160,
+      "quality_macro": 0.7689,
+      "quality_micro": 0.6918,
+      "latency_avg_ms": 1697.5,
+      "latency_p50_ms": 966.8,
+      "latency_p95_ms": 7445.6,
+      "gpu_seconds_per_prompt": 1.6975,
+      "peak_vram_gb": null,
+      "quality_per_gb": null,
+      "decoding": null
+    }
+  ],
+  "scores": "results/scores_mixed_ua_v2.json",
+  "n_meta": 0
+}

@@ -1,0 +1,87 @@
+{
+  "system": "mamay4",
+  "bench_tag": "mixed_ua_v2_t0_s42",
+  "n": 160,
+  "wrote": "/home/onyshchuk/Diploma/results/mamay4_mixed_ua_v2_t0_s42_20260728T211019Z.jsonl",
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  },
+  "resource_protocol": {
+    "note": "Prefer one model live at a time for fair VRAM. gpu_seconds ≈ wall latency with 1 GPU assumed. VRAM from nvidia-smi sampling during the run.",
+    "vram_sample_interval_s": 0.5
+  },
+  "vram_before": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44644.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    }
+  ],
+  "vram_after": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44650.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 14.0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    }
+  ],
+  "vram": {
+    "n_samples": 461,
+    "steady_total_vram_mb": 44656.0,
+    "peak_total_vram_mb": 44656.0,
+    "peak_single_gpu_mb": 44650.0,
+    "steady_total_vram_gb": 43.609,
+    "peak_total_vram_gb": 43.609,
+    "peak_single_gpu_gb": 43.604
+  },
+  "gpu_seconds_total": 254.594,
+  "gpu_seconds_per_prompt": 1.5912,
+  "latency_avg_ms": 1591.2
+}
