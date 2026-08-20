@@ -1,0 +1,87 @@
+{
+  "definition": {
+    "http_success": "http_status==200 and no error",
+    "full_success": "score == 1.0",
+    "any_credit": "score > 0"
+  },
+  "n": 192,
+  "http_ok": 192,
+  "full_success": 131,
+  "any_credit": 163,
+  "zero": 29,
+  "mean_score": 0.8163,
+  "by_model": {
+    "mamay4": {
+      "n": 64,
+      "full": 57,
+      "any_credit": 58,
+      "zero": 6,
+      "mean": 0.8984
+    },
+    "lapa": {
+      "n": 63,
+      "full": 42,
+      "any_credit": 42,
+      "zero": 21,
+      "mean": 0.6667
+    },
+    "aya": {
+      "n": 32,
+      "full": 1,
+      "any_credit": 32,
+      "zero": 0,
+      "mean": 0.8195
+    },
+    "qwen7": {
+      "n": 33,
+      "full": 31,
+      "any_credit": 31,
+      "zero": 2,
+      "mean": 0.9394
+    }
+  },
+  "by_bucket": {
+    "chat": {
+      "n": 32,
+      "full": 31,
+      "any_credit": 32,
+      "zero": 0,
+      "mean": 0.9844
+    },
+    "translate": {
+      "n": 32,
+      "full": 1,
+      "any_credit": 32,
+      "zero": 0,
+      "mean": 0.8195
+    },
+    "instruct": {
+      "n": 32,
+      "full": 25,
+      "any_credit": 25,
+      "zero": 7,
+      "mean": 0.7812
+    },
+    "knowledge": {
+      "n": 32,
+      "full": 24,
+      "any_credit": 24,
+      "zero": 8,
+      "mean": 0.75
+    },
+    "code": {
+      "n": 32,
+      "full": 31,
+      "any_credit": 31,
+      "zero": 1,
+      "mean": 0.9688
+    },
+    "alignment": {
+      "n": 32,
+      "full": 19,
+      "any_credit": 19,
+      "zero": 13,
+      "mean": 0.5938
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "note": "Lab GPUs are shared/university \u2014 cash cost \u2248 electricity only. Cloud/API are opportunity / counterfactual.",
+  "v4_router_1pass": {
+    "n": 192,
+    "prompt_tokens": 11166,
+    "completion_tokens": 7304,
+    "total_tokens": 18470,
+    "gpu_seconds": 286.4,
+    "wall_min_1pass": 4.85,
+    "electricity_kwh_est": 0.0396,
+    "cloud_resident_usd_at_0.8": 0.26,
+    "api_gpt4o_mini_usd": 0.0061
+  },
+  "v4_router_3rep_job": {
+    "wall_min": 14.6,
+    "tokens": 55410,
+    "gpu_seconds": 859,
+    "resident_gpu_h": 0.9733333333333333,
+    "active_gpu_h": 0.2386111111111111,
+    "electricity_kwh_est": 0.1192,
+    "electricity_uah_at_4.32": 0.515,
+    "cloud_resident_usd_0.4_0.8_1.2": [
+      0.39,
+      0.78,
+      1.17
+    ],
+    "api_3x_usd": {
+      "GPT-4o-mini": 0.0182,
+      "GPT-4o": 0.3029,
+      "Claude Haiku-class": 0.1144
+    }
+  },
+  "full_corpus_14644_router_est": {
+    "hours_1pass": 6.2,
+    "hours_3pass": 18.5,
+    "cloud_resident_3x_usd_at_0.8": 59.0,
+    "api_gpt4o_mini_1x_usd": 0.46
+  }
+}

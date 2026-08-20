@@ -1,0 +1,140 @@
+{
+  "misroutes": [
+    {
+      "id": "chat-004",
+      "gold": "chat",
+      "intent": "knowledge",
+      "model": "lapa",
+      "score": 1.0,
+      "prompt": "Розкажи один цікавий факт про Київ у двох реченнях."
+    },
+    {
+      "id": "chat-017",
+      "gold": "chat",
+      "intent": "knowledge",
+      "model": "lapa",
+      "score": 1.0,
+      "prompt": "Поясни бабусі, що таке ChatGPT, дуже просто і тепло."
+    },
+    {
+      "id": "if-008",
+      "gold": "instruct",
+      "intent": "knowledge",
+      "model": "lapa",
+      "score": 1.0,
+      "prompt": "Відповідай ТІЛЬКИ українською мовою, навіть якщо запитання іншою мовою: What is the capital of Ukraine?"
+    },
+    {
+      "id": "if-013",
+      "gold": "instruct",
+      "intent": "knowledge",
+      "model": "lapa",
+      "score": 1.0,
+      "prompt": "Відповідь рівно одним реченням українською, що починається зі слова 'Отже'. Що таке HTTP?"
+    },
+    {
+      "id": "if-020",
+      "gold": "instruct",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "Напиши відповідь ВЕЛИКИМИ ЛІТЕРАМИ українською одним словом: так чи ні — чи 2+2=4?"
+    },
+    {
+      "id": "if-021",
+      "gold": "instruct",
+      "intent": "knowledge",
+      "model": "lapa",
+      "score": 1.0,
+      "prompt": "Поверни ТІЛЬКИ ISO дату 2026-08-07 як рядок без лапок і без іншого тексту."
+    },
+    {
+      "id": "if-032",
+      "gold": "instruct",
+      "intent": "code",
+      "model": "qwen7",
+      "score": 0.0,
+      "prompt": "Поверни ТІЛЬКИ Markdown код-блок з мовою python і рядком print(1) всередині. Нічого поза блоком."
+    },
+    {
+      "id": "know-002",
+      "gold": "knowledge",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "У якому році Україна проголосила незалежність?"
+    },
+    {
+      "id": "know-003",
+      "gold": "knowledge",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "Яка найдовша річка в Україні?"
+    },
+    {
+      "id": "know-004",
+      "gold": "knowledge",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "Скільки областей в Україні (без урахування тимчасово окупованих територій як окремих одиниць)?"
+    },
+    {
+      "id": "know-005",
+      "gold": "knowledge",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "Хто автор роману 'Кайдашева сім'я'?"
+    },
+    {
+      "id": "know-006",
+      "gold": "knowledge",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "Яка грошова одиниця України?"
+    },
+    {
+      "id": "know-008",
+      "gold": "knowledge",
+      "intent": "chat",
+      "model": "mamay4",
+      "score": 1.0,
+      "prompt": "Яке найбільше місто на заході України?"
+    }
+  ],
+  "misroute_summary": {
+    "n": 13,
+    "flows": {
+      "chat->knowledge/lapa": 2,
+      "instruct->knowledge/lapa": 3,
+      "instruct->chat/mamay4": 1,
+      "instruct->code/qwen7": 1,
+      "knowledge->chat/mamay4": 6
+    },
+    "fixed_by_current_rules": [
+      "chat-004",
+      "if-008",
+      "if-013",
+      "if-020",
+      "if-021",
+      "if-032",
+      "know-002",
+      "know-003",
+      "know-004",
+      "know-005",
+      "know-006",
+      "know-008"
+    ],
+    "still_mismatched": [
+      [
+        "chat-017",
+        "chat",
+        "knowledge",
+        "lapa"
+      ]
+    ]
+  }
+}

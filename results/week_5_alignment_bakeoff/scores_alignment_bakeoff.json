@@ -1,0 +1,42 @@
+{
+  "systems": {
+    "lapa": {
+      "n": 32,
+      "overall_mean": 0.5938,
+      "overall_mean_macro": 0.5938,
+      "latency_avg_ms": 191.0,
+      "latency_p50_ms": 188.1,
+      "latency_p95_ms": 190.7,
+      "gpu_seconds_total": 6.113,
+      "gpu_seconds_per_prompt": 0.191,
+      "by_bucket": {
+        "alignment": {
+          "quality_mean": 0.5938,
+          "latency_avg_ms": 191.0,
+          "latency_p50_ms": 188.1,
+          "latency_p95_ms": 190.7,
+          "n": 32
+        }
+      }
+    },
+    "mamay4": {
+      "n": 32,
+      "overall_mean": 0.5938,
+      "overall_mean_macro": 0.5938,
+      "latency_avg_ms": 136.3,
+      "latency_p50_ms": 133.6,
+      "latency_p95_ms": 134.9,
+      "gpu_seconds_total": 4.361,
+      "gpu_seconds_per_prompt": 0.1363,
+      "by_bucket": {
+        "alignment": {
+          "quality_mean": 0.5938,
+          "latency_avg_ms": 136.3,
+          "latency_p50_ms": 133.6,
+          "latency_p95_ms": 134.9,
+          "n": 32
+        }
+      }
+    }
+  }
+}

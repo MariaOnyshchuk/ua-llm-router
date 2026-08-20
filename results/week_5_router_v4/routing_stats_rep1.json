@@ -1,0 +1,33 @@
+{
+  "suite": "mixed_ua_v4_balanced",
+  "n_items": 192,
+  "n_repeats": 3,
+  "routing_identical_across_reps": true,
+  "tasks_per_model": {
+    "mamay4": 64,
+    "lapa": 63,
+    "aya": 32,
+    "qwen7": 33
+  },
+  "intent_counts": {
+    "chat": 37,
+    "knowledge": 31,
+    "translate": 32,
+    "instruct": 27,
+    "code": 33,
+    "alignment": 32
+  },
+  "bucket_x_model": {
+    "alignment|lapa": 32,
+    "chat|lapa": 2,
+    "chat|mamay4": 30,
+    "code|qwen7": 32,
+    "instruct|lapa": 3,
+    "instruct|mamay4": 28,
+    "instruct|qwen7": 1,
+    "knowledge|lapa": 26,
+    "knowledge|mamay4": 6,
+    "translate|aya": 32
+  },
+  "bucket_intent_mismatches": 13
+}
