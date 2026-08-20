@@ -1,0 +1,51 @@
+# Mixed Ukrainian workload — v0 schema
+#
+# One JSON object per line (JSONL). Fields:
+#   id          string   unique, e.g. "tr-001"
+#   bucket      string   one of: chat | translate | instruct | knowledge | code
+#   prompt      string   user message (Ukrainian or bilingual OK)
+#   reference   string   optional gold answer / translation target
+#   notes       string   optional
+#
+
+
+{"id":"chat-001","bucket":"chat","prompt":"Привіт! Коротко пожартуй українською про каву.","reference":"","notes":""}
+{"id":"chat-002","bucket":"chat","prompt":"Порадь коротко, що приготувати на вечерю з того, що зазвичай є вдома.","reference":"","notes":""}
+{"id":"chat-003","bucket":"chat","prompt":"Напиши коротке дружнє повідомлення другу, якого давно не бачив.","reference":"","notes":""}
+{"id":"chat-004","bucket":"chat","prompt":"Розкажи один цікавий факт про Київ у двох реченнях.","reference":"","notes":""}
+{"id":"chat-005","bucket":"chat","prompt":"Придумай коротку відповідь на питання 'Як справи?' у стилі втомленого, але життєрадісного програміста.","reference":"","notes":""}
+{"id":"chat-006","bucket":"chat","prompt":"Дай коротку пораду, як заспокоїтися перед іспитом.","reference":"","notes":""}
+{"id":"chat-007","bucket":"chat","prompt":"Напиши короткий тост на день народження колеги.","reference":"","notes":""}
+{"id":"chat-008","bucket":"chat","prompt":"Порекомендуй книгу для відпочинку одним реченням і поясни чому.","reference":"","notes":""}
+{"id":"tr-001","bucket":"translate","prompt":"Переклади українською: The committee postponed the vote until Monday.","reference":"Комітет відклав голосування до понеділка.","notes":""}
+{"id":"tr-002","bucket":"translate","prompt":"Переклади англійською: Наша команда завершила проєкт на два тижні раніше запланованого терміну.","reference":"Our team finished the project two weeks ahead of schedule.","notes":""}
+{"id":"tr-003","bucket":"translate","prompt":"Переклади українською: Please find the attached invoice for services rendered in June.","reference":"Будь ласка, ознайомтесь із доданим рахунком-фактурою за послуги, надані в червні.","notes":""}
+{"id":"tr-004","bucket":"translate","prompt":"Переклади англійською: Через дощ захід перенесли до найближчого павільйону.","reference":"Due to the rain, the event was moved to the nearest pavilion.","notes":""}
+{"id":"tr-005","bucket":"translate","prompt":"Переклади українською: The new policy will take effect starting next quarter.","reference":"Нова політика набуде чинності з наступного кварталу.","notes":""}
+{"id":"tr-006","bucket":"translate","prompt":"Переклади англійською: Лапа — це відкрита мовна модель, розроблена для української мови.","reference":"Lapa is an open-source language model developed for the Ukrainian language.","notes":""}
+{"id":"tr-007","bucket":"translate","prompt":"Переклади українською: We appreciate your patience while we resolve this issue.","reference":"Дякуємо за терпіння, поки ми вирішуємо цю проблему.","notes":""}
+{"id":"tr-008","bucket":"translate","prompt":"Переклади англійською: Дослідники порівняли ефективність кількох невеликих моделей на змішаному наборі завдань.","reference":"Researchers compared the efficiency of several small models on a mixed task set.","notes":""}
+{"id":"if-001","bucket":"instruct","prompt":"Поверни ТІЛЬКИ валідний JSON з полями name (рядок) і score (число від 0 до 10). name=demo, score=7.","reference":"{\"name\":\"demo\",\"score\":7}","notes":""}
+{"id":"if-002","bucket":"instruct","prompt":"Дай відповідь рівно трьома пунктами списку, без вступу та висновку: переваги відкритих LLM.","reference":"","notes":"format check: exactly 3 bullets, no extra text"}
+{"id":"if-003","bucket":"instruct","prompt":"Відповідай ЛИШЕ одним словом: 'так' або 'ні'. Чи є Київ столицею України?","reference":"так","notes":""}
+{"id":"if-004","bucket":"instruct","prompt":"Поверни ТІЛЬКИ валідний JSON-масив з трьома рядками-назвами українських міст, без жодного іншого тексту.","reference":"","notes":"format check: valid JSON array of 3 strings"}
+{"id":"if-005","bucket":"instruct","prompt":"Напиши відповідь рівно у 20 словах, не більше і не менше, про користь читання.","reference":"","notes":"word-count check: exactly 20"}
+{"id":"if-006","bucket":"instruct","prompt":"Поверни ТІЛЬКИ число (без тексту): скільки буде 17 + 25?","reference":"42","notes":""}
+{"id":"if-007","bucket":"instruct","prompt":"Оформи відповідь у вигляді таблиці Markdown з двома колонками (Модель, Розмір) для трьох моделей: Lapa, Mamay, Gemma.","reference":"","notes":"format check: markdown table, 2 columns, 3 rows"}
+{"id":"if-008","bucket":"instruct","prompt":"Відповідай ТІЛЬКИ українською мовою, навіть якщо запитання іншою мовою: What is the capital of Ukraine?","reference":"Київ","notes":""}
+{"id":"know-001","bucket":"knowledge","prompt":"Хто така Леся Українка? Відповідь одним коротким реченням.","reference":"","notes":""}
+{"id":"know-002","bucket":"knowledge","prompt":"У якому році Україна проголосила незалежність?","reference":"1991","notes":""}
+{"id":"know-003","bucket":"knowledge","prompt":"Яка найдовша річка в Україні?","reference":"Дніпро","notes":""}
+{"id":"know-004","bucket":"knowledge","prompt":"Скільки областей в Україні (без урахування тимчасово окупованих територій як окремих одиниць)?","reference":"24","notes":""}
+{"id":"know-005","bucket":"knowledge","prompt":"Хто автор роману 'Кайдашева сім'я'?","reference":"Іван Нечуй-Левицький","notes":""}
+{"id":"know-006","bucket":"knowledge","prompt":"Яка грошова одиниця України?","reference":"гривня","notes":""}
+{"id":"know-007","bucket":"knowledge","prompt":"Коротко, що таке CRISP-DM?","reference":"","notes":"open-ended, judge for factual correctness"}
+{"id":"know-008","bucket":"knowledge","prompt":"Яке найбільше місто на заході України?","reference":"Львів","notes":""}
+{"id":"code-001","bucket":"code","prompt":"Напиши функцію Python add(a, b), що повертає суму. Тільки код, без пояснень.","reference":"def add(a, b):\n    return a + b","notes":""}
+{"id":"code-002","bucket":"code","prompt":"Напиши функцію Python is_even(n), що повертає True, якщо число парне. Тільки код.","reference":"def is_even(n):\n    return n % 2 == 0","notes":""}
+{"id":"code-003","bucket":"code","prompt":"Напиши функцію Python reverse_string(s), що повертає рядок у зворотному порядку. Тільки код.","reference":"def reverse_string(s):\n    return s[::-1]","notes":""}
+{"id":"code-004","bucket":"code","prompt":"Напиши функцію Python max_of_list(lst), що повертає найбільший елемент списку без вбудованої функції max(). Тільки код.","reference":"def max_of_list(lst):\n    result = lst[0]\n    for x in lst[1:]:\n        if x > result:\n            result = x\n    return result","notes":""}
+{"id":"code-005","bucket":"code","prompt":"Напиши функцію Python count_vowels(s), що рахує голосні літери (a,e,i,o,u) у рядку. Тільки код.","reference":"def count_vowels(s):\n    return sum(1 for c in s.lower() if c in 'aeiou')","notes":""}
+{"id":"code-006","bucket":"code","prompt":"Напиши функцію Python fibonacci(n), що повертає n-те число Фібоначчі (0-індексація). Тільки код.","reference":"def fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a","notes":""}
+{"id":"code-007","bucket":"code","prompt":"Напиши функцію Python is_palindrome(s), що перевіряє, чи є рядок паліндромом (ігноруючи регістр). Тільки код.","reference":"def is_palindrome(s):\n    s = s.lower()\n    return s == s[::-1]","notes":""}
+{"id":"code-008","bucket":"code","prompt":"Напиши функцію Python flatten(lst), що перетворює список списків на плоский список. Тільки код.","reference":"def flatten(lst):\n    result = []\n    for sub in lst:\n        result.extend(sub)\n    return result","notes":""}

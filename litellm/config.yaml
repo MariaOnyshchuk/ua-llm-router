@@ -1,0 +1,65 @@
+# LiteLLM — matrix router backends (eval: fallbacks OFF)
+# Ports: lapa :8001 | mamay12 :8002 | mamay4 :8003 | qwen :8004 (legacy only)
+# Tunnels: ssh -N -L 8001:localhost:8001 -L 8002:localhost:8002 \
+#   -L 8003:localhost:8003 -L 8004:localhost:8004 ucu-lab-2240
+
+model_list:
+  # --- Default / code / instruct / chat ---
+  - model_name: mamay4
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0
+      api_base: http://localhost:8003/v1
+      api_key: sk-none
+
+  # --- Translate specialist (bake-off winner) ---
+  - model_name: mamay12
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v2.0
+      api_base: http://localhost:8002/v1
+      api_key: sk-none
+
+  # --- Knowledge + alignment specialist (bake-off winner) ---
+  - model_name: lapa
+    litellm_params:
+      model: openai/lapa-llm/lapa-v0.1.2-instruct
+      api_base: http://localhost:8001/v1
+      api_key: sk-none
+
+  # --- Cross-lineage third specialist (Cohere Aya Expanse 8B) ---
+  - model_name: aya
+    litellm_params:
+      model: openai/CohereLabs/aya-expanse-8b
+      api_base: http://localhost:8005/v1
+      api_key: sk-none
+
+  # --- Larger code specialist (current router target; bake-off pending) ---
+  - model_name: qwen7
+    litellm_params:
+      model: openai/Qwen/Qwen2.5-Coder-7B-Instruct
+      api_base: http://localhost:8004/v1
+      api_key: sk-none
+
+  # --- Legacy 3B code specialist (keep for ablations) ---
+  - model_name: qwen
+    litellm_params:
+      model: openai/Qwen/Qwen2.5-Coder-3B-Instruct
+      api_base: http://localhost:8004/v1
+      api_key: sk-none
+
+  - model_name: mamay
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0
+      api_base: http://localhost:8003/v1
+      api_key: sk-none
+
+  - model_name: auto
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0
+      api_base: http://localhost:8003/v1
+      api_key: sk-none
+
+# Fallbacks OFF for evaluation — a dead backend must fail loud.
+# Demo stack: litellm/config.demo.yaml
+
+general_settings:
+  master_key: sk-diploma-dev

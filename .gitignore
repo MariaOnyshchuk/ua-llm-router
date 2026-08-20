@@ -1,0 +1,11 @@
+vendor/
+.venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+logs/
+.cursor/
+.DS_Store
+*.pid

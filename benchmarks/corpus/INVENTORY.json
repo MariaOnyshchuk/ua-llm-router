@@ -1,0 +1,38 @@
+{
+  "zno": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/zno_knowledge_full.jsonl",
+    "n": 4776,
+    "skipped_ineligible": 2604
+  },
+  "flores": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/flores_translate_full.jsonl",
+    "n": 4018,
+    "splits": {
+      "dev": 997,
+      "devtest": 1012
+    }
+  },
+  "ualign": {
+    "ethics": {
+      "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/ualign_ethics_full.jsonl",
+      "n": 1700
+    },
+    "social": {
+      "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/ualign_social_full.jsonl",
+      "n": 3682
+    },
+    "n_total": 5382
+  },
+  "uacode": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/uacode_problems_full.jsonl",
+    "n_unique_problems": 468,
+    "hf_rows": 7499,
+    "by_complexity": {
+      "1": 95,
+      "3": 95,
+      "2": 95,
+      "4": 95,
+      "5": 88
+    }
+  }
+}

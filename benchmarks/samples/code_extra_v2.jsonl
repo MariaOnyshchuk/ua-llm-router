@@ -1,0 +1,2 @@
+{"id":"code-031","bucket":"code","prompt":"Напиши функцію Python last(lst), що повертає останній елемент списку (або None, якщо список порожній). Тільки код.","reference":"","notes":"hand tests: last([1,2,3])=3, last([])=None"}
+{"id":"code-032","bucket":"code","prompt":"Напиши функцію Python square(n), що повертає n*n. Тільки код.","reference":"","notes":"hand tests: square(4)=16, square(-3)=9"}

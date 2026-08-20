@@ -1,0 +1,24 @@
+{"id":"if-009","bucket":"instruct","prompt":"Поверни ТІЛЬКИ валідний JSON: {\"city\":\"Lviv\",\"temp_c\":18}. Без іншого тексту.","reference":"{\"city\":\"Lviv\",\"temp_c\":18}","notes":"hand"}
+{"id":"if-010","bucket":"instruct","prompt":"Відповідай ЛИШЕ одним словом українською: понеділок, вівторок або середа. Який день іде першим у тижні?","reference":"понеділок","notes":"hand"}
+{"id":"if-011","bucket":"instruct","prompt":"Виведи рівно 4 рядки, кожен починається з '- ', зі списком мов програмування. Без вступу.","reference":"","notes":"hand format: 4 bullets"}
+{"id":"if-012","bucket":"instruct","prompt":"Поверни ТІЛЬКИ число: скільки секунд у двох хвилинах?","reference":"120","notes":"hand"}
+{"id":"if-013","bucket":"instruct","prompt":"Відповідь рівно одним реченням українською, що починається зі слова 'Отже'. Що таке HTTP?","reference":"","notes":"hand starts with Отже"}
+{"id":"if-014","bucket":"instruct","prompt":"Поверни ТІЛЬКИ YAML з ключами name і role; name=Anna, role=student. Без markdown-огорож.","reference":"name: Anna\nrole: student","notes":"hand"}
+{"id":"if-015","bucket":"instruct","prompt":"Напиши рівно 15 слів українською про користь спорту. Не більше і не менше.","reference":"","notes":"hand word-count 15"}
+{"id":"if-016","bucket":"instruct","prompt":"Поверни ТІЛЬКИ список через кому без пробілів після ком: три кольори українською.","reference":"","notes":"hand"}
+{"id":"if-017","bucket":"instruct","prompt":"Відповідай ЛИШЕ 'А' або 'Б'. А) Київ Б) Одеса — столиця України?","reference":"А","notes":"hand"}
+{"id":"if-018","bucket":"instruct","prompt":"Оформи Markdown-таблицю з колонками (Мова, Країна) для: українська/Україна, польська/Польща. Тільки таблиця.","reference":"","notes":"hand md table"}
+{"id":"if-019","bucket":"instruct","prompt":"Поверни ТІЛЬКИ валідний JSON-масив із двох чисел: 3 і 5.","reference":"[3,5]","notes":"hand"}
+{"id":"if-020","bucket":"instruct","prompt":"Напиши відповідь ВЕЛИКИМИ ЛІТЕРАМИ українською одним словом: так чи ні — чи 2+2=4?","reference":"ТАК","notes":"hand"}
+{"id":"if-021","bucket":"instruct","prompt":"Поверни ТІЛЬКИ ISO дату 2026-08-07 як рядок без лапок і без іншого тексту.","reference":"2026-08-07","notes":"hand"}
+{"id":"if-022","bucket":"instruct","prompt":"Дай рівно два речення. Перше починається з 'Спочатку', друге з 'Потім'. Як заварити чай.","reference":"","notes":"hand"}
+{"id":"if-023","bucket":"instruct","prompt":"Поверни ТІЛЬКИ email у форматі user@example.com — вигаданий, але валідний вигляд.","reference":"","notes":"hand"}
+{"id":"if-024","bucket":"instruct","prompt":"Відповідай ЛИШЕ українською. Перелічи рівно 3 області України через крапку з комою.","reference":"","notes":"hand"}
+{"id":"if-025","bucket":"instruct","prompt":"Поверни ТІЛЬКИ число з плаваючою крапкою: 1/4 як десятковий дріб.","reference":"0.25","notes":"hand"}
+{"id":"if-026","bucket":"instruct","prompt":"Напиши рівно один рядок у форматі KEY=VALUE для PORT=8080. Без пробілів навколо =.","reference":"PORT=8080","notes":"hand"}
+{"id":"if-027","bucket":"instruct","prompt":"Поверни ТІЛЬКИ валідний JSON об'єкт з булевим полем ok=true.","reference":"{\"ok\":true}","notes":"hand"}
+{"id":"if-028","bucket":"instruct","prompt":"Виведи нумерований список рівно з 2 пунктів (1. 2.) про переваги сну. Без вступу.","reference":"","notes":"hand"}
+{"id":"if-029","bucket":"instruct","prompt":"Відповідай ЛИШЕ одним символом: '+' або '-'. Який знак у суми 5+(-3)? Поверни знак результату відносно нуля... ні: поверни оператор додавання з виразу 5+3.","reference":"+","notes":"hand"}
+{"id":"if-030","bucket":"instruct","prompt":"Поверни ТІЛЬКИ рядок у подвійних лапках: \"готово\".","reference":"\"готово\"","notes":"hand"}
+{"id":"if-031","bucket":"instruct","prompt":"Напиши відповідь рівно 3 словами українською на питання: який колір неба в ясний день?","reference":"","notes":"hand exactly 3 words"}
+{"id":"if-032","bucket":"instruct","prompt":"Поверни ТІЛЬКИ Markdown код-блок з мовою python і рядком print(1) всередині. Нічого поза блоком.","reference":"","notes":"hand fenced python"}

@@ -1,0 +1,63 @@
+# LiteLLM — deployment / demo (fallbacks ON)
+# Matrix targets: mamay4 / lapa / aya / qwen7 (+ qwen3 legacy)
+
+model_list:
+  - model_name: mamay4
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0
+      api_base: http://localhost:8003/v1
+      api_key: sk-none
+
+  - model_name: mamay12
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v2.0
+      api_base: http://localhost:8002/v1
+      api_key: sk-none
+
+  - model_name: lapa
+    litellm_params:
+      model: openai/lapa-llm/lapa-v0.1.2-instruct
+      api_base: http://localhost:8001/v1
+      api_key: sk-none
+
+  - model_name: aya
+    litellm_params:
+      model: openai/CohereLabs/aya-expanse-8b
+      api_base: http://localhost:8005/v1
+      api_key: sk-none
+
+  - model_name: qwen7
+    litellm_params:
+      model: openai/Qwen/Qwen2.5-Coder-7B-Instruct
+      api_base: http://localhost:8004/v1
+      api_key: sk-none
+
+  - model_name: qwen
+    litellm_params:
+      model: openai/Qwen/Qwen2.5-Coder-3B-Instruct
+      api_base: http://localhost:8004/v1
+      api_key: sk-none
+
+  - model_name: mamay
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0
+      api_base: http://localhost:8003/v1
+      api_key: sk-none
+
+  - model_name: auto
+    litellm_params:
+      model: openai/INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0
+      api_base: http://localhost:8003/v1
+      api_key: sk-none
+
+router_settings:
+  fallbacks:
+    - mamay4: [mamay12, lapa]
+    - mamay12: [mamay4, lapa]
+    - lapa: [mamay12, mamay4]
+    - aya: [mamay4, lapa]
+    - qwen7: [mamay4]
+    - qwen: [mamay4]
+
+general_settings:
+  master_key: sk-diploma-dev
