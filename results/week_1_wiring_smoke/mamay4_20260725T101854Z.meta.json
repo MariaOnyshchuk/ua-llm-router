@@ -1,0 +1,56 @@
+{
+  "system": "mamay4",
+  "wrote": "/home/onyshchuk/Diploma/results/mamay4_20260725T101854Z.jsonl",
+  "vram_before": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 42248.0,
+      "memory_total_mb": 49140.0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 17964.0,
+      "memory_total_mb": 49140.0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 15356.0,
+      "memory_total_mb": 49140.0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0
+    }
+  ],
+  "vram_after": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 42248.0,
+      "memory_total_mb": 49140.0
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 17966.0,
+      "memory_total_mb": 49140.0
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 15356.0,
+      "memory_total_mb": 49140.0
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 2.0,
+      "memory_total_mb": 49140.0
+    }
+  ]
+}

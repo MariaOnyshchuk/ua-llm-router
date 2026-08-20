@@ -1,0 +1,28 @@
+{
+  "systems": {
+    "lapa": {
+      "n": 40,
+      "overall_mean": 0.8286,
+      "avg_latency_ms": 6222.6,
+      "by_bucket": {
+        "chat": 1.0,
+        "code": 1.0,
+        "instruct": 0.875,
+        "knowledge": 0.875,
+        "translate": 0.3932
+      }
+    },
+    "router": {
+      "n": 40,
+      "overall_mean": 0.828,
+      "avg_latency_ms": 6213.6,
+      "by_bucket": {
+        "chat": 1.0,
+        "code": 1.0,
+        "instruct": 0.875,
+        "knowledge": 0.875,
+        "translate": 0.39
+      }
+    }
+  }
+}

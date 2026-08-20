@@ -1,0 +1,125 @@
+{
+  "routing": {
+    "n": 40,
+    "intent_accuracy": 0.8,
+    "model_oracle_accuracy": 1.0,
+    "unique_backends_used": 2,
+    "by_bucket": {
+      "chat": {
+        "intent_ok": 7,
+        "model_ok": 8,
+        "n": 8,
+        "intent_acc": 0.875,
+        "model_acc": 1.0
+      },
+      "code": {
+        "intent_ok": 8,
+        "model_ok": 8,
+        "n": 8,
+        "intent_acc": 1.0,
+        "model_acc": 1.0
+      },
+      "instruct": {
+        "intent_ok": 7,
+        "model_ok": 8,
+        "n": 8,
+        "intent_acc": 0.875,
+        "model_acc": 1.0
+      },
+      "knowledge": {
+        "intent_ok": 2,
+        "model_ok": 8,
+        "n": 8,
+        "intent_acc": 0.25,
+        "model_acc": 1.0
+      },
+      "translate": {
+        "intent_ok": 8,
+        "model_ok": 8,
+        "n": 8,
+        "intent_acc": 1.0,
+        "model_acc": 1.0
+      }
+    },
+    "intent_mismatches": [
+      {
+        "id": "chat-004",
+        "bucket": "chat",
+        "intent": "knowledge",
+        "model": "mamay4",
+        "reason": "knowledge cues → Mamay-4B"
+      },
+      {
+        "id": "if-003",
+        "bucket": "instruct",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      },
+      {
+        "id": "know-002",
+        "bucket": "knowledge",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      },
+      {
+        "id": "know-003",
+        "bucket": "knowledge",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      },
+      {
+        "id": "know-004",
+        "bucket": "knowledge",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      },
+      {
+        "id": "know-005",
+        "bucket": "knowledge",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      },
+      {
+        "id": "know-006",
+        "bucket": "knowledge",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      },
+      {
+        "id": "know-008",
+        "bucket": "knowledge",
+        "intent": "chat",
+        "model": "mamay4",
+        "reason": "default UA chat → Mamay-4B"
+      }
+    ]
+  },
+  "code_bucket_ab": {
+    "mamay4": {
+      "n": 8,
+      "mean_score": 1.0,
+      "failures": [],
+      "latency_avg_ms": 2065.0
+    },
+    "qwen_via_router": {
+      "n": 8,
+      "mean_score": 0.875,
+      "failures": [
+        "code-006"
+      ],
+      "latency_avg_ms": 3141.0
+    },
+    "mamay12": {
+      "n": 8,
+      "mean_score": 1.0,
+      "failures": [],
+      "latency_avg_ms": 2409.9
+    }
+  }
+}
