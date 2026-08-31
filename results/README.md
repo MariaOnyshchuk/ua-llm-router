@@ -15,6 +15,11 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`week_6_v4_solos/`](week_6_v4_solos/) | 20 Aug | **Mamay-4B + Lapa** full `mixed_ua_v4` 192×3 baseline; `scores_mean_sd_v4_solos.json`. |
 | [`week_6_router_fewshot/`](week_6_router_fewshot/) | 20 Aug | Matrix router ×3 with social few-shot + leakage-fixed rules (0.842). |
 | [`week_6_cascade_micro/`](week_6_cascade_micro/) | 20 Aug | Social-2 → Mamay-4B retry; escalate 1.56%, no quality gain. |
+| [`week_7_router_best/`](week_7_router_best/) | 21 Aug | Gold-bucket best specialists on v4: 0.848 / p50 633 vs rules 0.842 / 441. |
+| [`week_7_rules_v2/`](week_7_rules_v2/) | 21 Aug | Rules v2 (chat→Aya, code→Mamay-4B) on v4: **0.848**, matches oracle. |
+| [`week_7_v5/`](week_7_v5/) | 21 Aug | v4+32 HumanEval (224); rules v2 overall 0.796 (HE 19/32; chat hurt by max_tokens=512). |
+| [`week_7_ensemble/`](week_7_ensemble/) | 31 Aug | Majority vote on alignment+ZNO; overall **0.843** vs rules v2 0.848; 3 flips net −1. |
+| [`week_8_quant/`](week_8_quant/) | 31 Aug | Rules v2 on bitsandbytes 4-bit Mamay/Lapa/Aya: **0.830**, slower than bf16 0.848. |
 | [`_empty_failed_stubs/`](_empty_failed_stubs/) | — | Zero-byte / aborted runs. Safe to ignore or delete. |
 
 ## Start here for claims

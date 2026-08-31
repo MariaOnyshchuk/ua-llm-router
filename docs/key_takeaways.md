@@ -1,6 +1,6 @@
 # Key takeaways — Ukrainian LLM router (diploma)
 
-*Last updated: 2026-08-20*
+*Last updated: 2026-08-31*
 
 ## One-sentence claim
 
@@ -12,11 +12,12 @@ A **rules-based multi-lineage router** (Mamay-4B + Lapa + Aya + Qwen-Coder-7B) o
 
 | Bucket | Model | Port |
 |--------|-------|------|
-| code | Qwen2.5-Coder-7B (`qwen7`) | 8004 |
+| code | Qwen2.5-Coder-7B (`qwen7`) — **optional**; v2 rules send code to Mamay-4B | 8004 |
 | translate | Aya Expanse 8B (`aya`) | 8005 |
 | knowledge | Lapa-12B (`lapa`) | 8001 |
 | alignment | Lapa-12B (`lapa`) — **keep**; fix **prompt**, don’t swap model | 8001 |
-| instruct / chat | Mamay-4B (`mamay4`) | 8003 |
+| instruct | Mamay-4B (`mamay4`) | 8003 |
+| chat | Aya Expanse 8B (`aya`) — v2 default | 8005 |
 
 Code: `router/intent_rules.py`.
 
@@ -42,7 +43,11 @@ Full-corpus eval was deferred on purpose (time + imbalance + UA-Code unscored wi
 
 | System | Overall | p50 | chat | code | translate | instruct | knowledge | alignment |
 |--------|--------:|----:|-----:|-----:|----------:|---------:|----------:|----------:|
-| **Router + few-shot** | **0.842** | **441** | 0.984 | **0.969** | **0.821** | 0.781 | **0.750** | **0.750** |
+| **Rules v2 + few-shot** (chat→Aya, code→Mamay-4B) | **0.848** | 633 | **1.000** | **0.984** | 0.820 | 0.781 | **0.750** | **0.750** |
+| Ensemble vote (align+ZNO, 1×) | 0.843 | 1201 | **1.000** | **0.984** | 0.822 | 0.781 | 0.688 | **0.781** |
+| Rules v2 **4-bit bnb** (1×) | 0.830 | 1115 | **1.000** | **1.000** | 0.795 | 0.719 | 0.719 | **0.750** |
+| **Oracle best + few-shot** | **0.848** | 633 | **1.000** | **0.984** | **0.821** | 0.781 | **0.750** | **0.750** |
+| Router v1 + few-shot (code→Qwen) | 0.842 | **441** | 0.984 | 0.969 | **0.821** | 0.781 | **0.750** | **0.750** |
 | Router + micro-cascade | 0.842 | 441 | 0.984 | 0.969 | 0.820 | 0.781 | 0.750 | 0.750 |
 | Router (matrix, Aug 7) | 0.816 | **425** | 0.984 | **0.969** | 0.820 | 0.781 | **0.750** | 0.594 |
 | Aya Expanse 8B alone | 0.785 | 867 | **1.000** | 0.953 | **0.821** | 0.781 | 0.562 | 0.594 |
@@ -50,15 +55,18 @@ Full-corpus eval was deferred on purpose (time + imbalance + UA-Code unscored wi
 | Lapa-12B alone | 0.732 | 1681 | 0.984 | 0.938 | 0.436 | 0.688 | **0.750** | 0.594 |
 
 - **Same-suite** Mamay-4B / Lapa solos are in `results/week_6_v4_solos/` (baseline prompts). Router **beats both** on overall quality **and** p50.
-- Few-shot router vs Aug 7 baseline: **+0.026** overall; alignment **0.594 → 0.750**; other buckets hold. Uses **leakage-fixed** rules (traffic: mamay4 63 · lapa 65 · qwen7 32 · aya 32).
+- Few-shot **rules** router vs Aug 7 baseline: **+0.026** overall; alignment **0.594 → 0.750**; traffic mamay4 63 · lapa 65 · qwen7 32 · aya 32.
+- Gold-bucket oracle and **rules v2** (chat→Aya, code→Mamay-4B, no Qwen) both land **0.848 / 633 ms** on v4 — the regex table captures the oracle (only leftover: `chat-017`→knowledge). Details: [`docs/week_7_router_best.md`](week_7_router_best.md), [`docs/week_7_rules_v2.md`](week_7_rules_v2.md).
 - Vs Aya: few-shot router **+0.057** overall, mainly knowledge + alignment; ~2× faster at p50.
 - Lapa loses overall because **translate 0.436** (and slower code); knowledge/alignment at baseline match the old router.
 - Micro-cascade (social `2`/no-digit → one Mamay-4B retry): **3/192 = 1.56%** escalate, **Δquality ≈ 0**, **+~0.25 GPU-s / pass**. Not worth the extra hop on this suite.
+- Discrete ensemble (Lapa+Mamay-4B+Aya vote on alignment + ZNO): **56/192** voted, **3 flipped**, overall **0.848 → 0.843**, p50 **633 → 1201**, **+59 GPU-s**. Majority overwrote two correct Lapa ZNO answers; one social item improved. **Skip for the product.** Details: [`docs/week_7_ensemble.md`](week_7_ensemble.md).
+- bitsandbytes 4-bit of the three specialists (same rules v2, same util 0.90): overall **0.848 → 0.830**, p50 **633 → 1115**, GPU-s **~295 → 473**. nvidia-smi still ~44 GB/GPU (KV reservation). **Keep bf16.** Details: [`docs/week_8_quant.md`](week_8_quant.md).
 
 **HTTP:** 192/192 OK on week-6 runs.  
 **Cost:** solos ~40 min wall (2 GPUs); few-shot router ~15 min (4 GPUs); cascade ~15 min.
 
-Artifacts: `results/week_6_v4_solos/`, `results/week_6_router_fewshot/`, `results/week_6_cascade_micro/`, `results/week_5_router_v4/`.  
+Artifacts: `results/week_6_v4_solos/`, `results/week_6_router_fewshot/`, `results/week_6_cascade_micro/`, `results/week_7_router_best/`, `results/week_5_router_v4/`.  
 **Full week-6 tables:** [`docs/week_6_takeaways.md`](week_6_takeaways.md).
 
 ### B. Context — single Mamay / Lapa on `mixed_ua_v3` (~182×3)
@@ -201,7 +209,8 @@ See **§E**. Baseline Lapa (and Mamay-4B) map social “1 — очікувано
 | 1b | Better social prompt (keep 1-class few-shot, clearer 2-class contrast) | **Do next** (same 32 items) |
 | 2 | Wire improved alignment prompt into eval/router path; re-run router v4 (+ leakage fix) | **Done** — `--align-prompt fewshot` → 0.842 / alignment 0.750 |
 | 3 | **Selective cascade** (social 2 → Mamay-4B retry, no Mamay-12) | **Done** — 1.56% escalate, Δquality ≈ 0 |
-| 4 | **Ensemble / multi-agent** always-on | **S3 upper bound only**, skip if calendar tight |
+| 4 | **Ensemble / multi-agent** on discrete labels | **Done** — 0.843 vs 0.848; 3 flips net −1; skip product |
+| 5 | **Quantize** Mamay-4B / Lapa / Aya (bitsandbytes 4-bit) | **Done** — 0.830 / slower; keep bf16 |
 | — | Full Mamay-4B / Lapa solo on v4 192×3 | **Done** (`week_6_v4_solos`) |
 | — | Full ~14k corpus ×3 | Optional later; ~18 h router wall estimate |
 
