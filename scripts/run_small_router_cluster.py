@@ -23,40 +23,21 @@ import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from router.backends import BACKENDS  # noqa: E402
 from router.cascade import (  # noqa: E402
     CASCADE_BUCKETS,
     confidence_for_bucket,
     should_retry_mamay4_micro,
 )
-from router.intent_rules import ROUTER_MODELS, route_intent  # noqa: E402
+from router.client import sync_chat  # noqa: E402
+from router.ensemble import (  # noqa: E402
+    ENSEMBLE_VOTERS,
+    extract_vote_label,
+    majority_winner,
+    should_ensemble_vote,
+)
+from router.intent_rules import BEST_BY_BUCKET, ROUTER_MODELS, route_intent  # noqa: E402
 from scripts.alignment_prompt_variants import apply_alignment_variant  # noqa: E402
-
-BACKENDS = {
-    "mamay4": (
-        "http://127.0.0.1:8003/v1",
-        "INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0",
-    ),
-    "qwen": (
-        "http://127.0.0.1:8004/v1",
-        "Qwen/Qwen2.5-Coder-3B-Instruct",
-    ),
-    "qwen7": (
-        "http://127.0.0.1:8004/v1",
-        "Qwen/Qwen2.5-Coder-7B-Instruct",
-    ),
-    "mamay12": (
-        "http://127.0.0.1:8002/v1",
-        "INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v2.0",
-    ),
-    "lapa": (
-        "http://127.0.0.1:8001/v1",
-        "lapa-llm/lapa-v0.1.2-instruct",
-    ),
-    "aya": (
-        "http://127.0.0.1:8005/v1",
-        "CohereLabs/aya-expanse-8b",
-    ),
-}
 
 # Pinned decoding — do not change between systems without bumping run tags.
 TEMPERATURE = 0.0
@@ -195,35 +176,24 @@ def chat(
     temperature = TEMPERATURE if temperature is None else temperature
     seed = SEED if seed is None else seed
     max_tokens = MAX_TOKENS if max_tokens is None else max_tokens
-    t0 = time.perf_counter()
-    resp = client.post(
-        f"{base}/chat/completions",
-        json={
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "seed": seed,
-        },
+    alias = next(
+        (name for name, target in BACKENDS.items() if target == (base, model)),
+        "",
     )
-    ms = (time.perf_counter() - t0) * 1000
-    body = resp.json() if "json" in resp.headers.get("content-type", "") else {"raw": resp.text}
-    content = ""
-    if resp.is_success:
-        content = ((body.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
-    return {
-        "http_status": resp.status_code,
-        "latency_ms": round(ms, 1),
-        "gpu_seconds": round(ms / 1000.0, 4),  # 1 GPU assumed
-        "content": content,
-        "usage": body.get("usage") if isinstance(body, dict) else None,
-        "error": None if resp.is_success else body,
-        "decoding": {
-            "temperature": temperature,
-            "seed": seed,
-            "max_tokens": max_tokens,
-        },
+    result = sync_chat(
+        client,
+        alias,
+        prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        seed=seed,
+    )
+    result["decoding"] = {
+        "temperature": temperature,
+        "seed": seed,
+        "max_tokens": max_tokens,
     }
+    return result
 
 
 def run_system(
@@ -235,6 +205,7 @@ def run_system(
     vram_interval_s: float = 0.5,
     cascade: bool = False,
     cascade_kind: str = "legacy",
+    ensemble: bool = False,
     align_prompt: str = "baseline",
     out_dir: Path | None = None,
 ) -> Path:
@@ -248,6 +219,8 @@ def run_system(
     vram_before = sampler.samples[0]
     latencies: list[float] = []
     escalate_count = 0
+    ensemble_voted = 0
+    ensemble_flipped = 0
 
     with httpx.Client(timeout=180.0) as client, out.open("w", encoding="utf-8") as fout:
         for i, item in enumerate(items, 1):
@@ -321,6 +294,51 @@ def run_system(
                     else:
                         cascade_meta["final_model"] = alias
 
+            ensemble_meta = None
+            if ensemble and should_ensemble_vote(tagged):
+                ensemble_voted += 1
+                first_alias = alias
+                ballots: list[tuple[str, str | None, dict]] = [
+                    (alias, extract_vote_label(tagged, result.get("content") or ""), result)
+                ]
+                extra_ms = 0.0
+                for voter in ENSEMBLE_VOTERS:
+                    if voter == first_alias:
+                        continue
+                    vb, vm = BACKENDS[voter]
+                    extra = chat(client, vb, vm, prompt)
+                    extra_ms += float(extra["latency_ms"])
+                    ballots.append(
+                        (voter, extract_vote_label(tagged, extra.get("content") or ""), extra)
+                    )
+                win_alias, win_lab, win_res = majority_winner(ballots, first_alias)
+                summed = round(float(result["latency_ms"]) + extra_ms, 1)
+                ensemble_meta = {
+                    "kind": "majority_discrete",
+                    "voted": True,
+                    "first_model": first_alias,
+                    "ballots": {a: lab for a, lab, _ in ballots},
+                    "winner_label": win_lab,
+                    "winner_model": win_alias,
+                    "flipped": win_alias != first_alias,
+                }
+                if win_alias != first_alias:
+                    ensemble_flipped += 1
+                    result = dict(win_res)
+                    router_meta = {
+                        **router_meta,
+                        "model": win_alias,
+                        "intent": router_meta.get("intent"),
+                        "reason": f"ensemble majority {win_lab} ← {first_alias}",
+                        "backend_model": BACKENDS[win_alias][1],
+                        "api_base": BACKENDS[win_alias][0],
+                    }
+                result["latency_ms"] = summed
+                result["gpu_seconds"] = round(summed / 1000.0, 4)
+                result["ensemble_first_content"] = (ballots[0][2].get("content") or "")[:500]
+            elif ensemble:
+                ensemble_meta = {"kind": "majority_discrete", "voted": False}
+
             latencies.append(float(result["latency_ms"]))
             row = {
                 "id": tagged.get("id"),
@@ -328,11 +346,15 @@ def run_system(
                 "prompt": prompt,
                 "reference": tagged.get("reference", ""),
                 "notes": tagged.get("notes", ""),
+                "he_prompt": tagged.get("he_prompt", ""),
+                "he_test": tagged.get("he_test", ""),
+                "he_entry_point": tagged.get("he_entry_point", ""),
                 "system": name,
                 "prompt_variant": align_prompt,
                 "model_requested": router_meta.get("model", alias),
                 "router": router_meta,
                 "cascade": cascade_meta,
+                "ensemble": ensemble_meta,
                 **result,
             }
             fout.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -342,6 +364,11 @@ def run_system(
             if cascade_meta and cascade_meta.get("escalated"):
                 dest_model = cascade_meta.get("final_model") or "retry"
                 tag = f" [ESCALATED→{dest_model}]"
+            if ensemble_meta and ensemble_meta.get("voted"):
+                tag += (
+                    f" [VOTE {ensemble_meta.get('ballots')} → "
+                    f"{ensemble_meta.get('winner_model')}:{ensemble_meta.get('winner_label')}]"
+                )
             print(
                 f"[{i}/{len(items)}] {item['id']} → {row['model_requested']} "
                 f"{result['http_status']} {result['latency_ms']}ms{tag} | {preview}"
@@ -366,6 +393,14 @@ def run_system(
             "buckets": sorted(CASCADE_BUCKETS),
             "escalated": escalate_count,
             "escalate_rate": round(escalate_count / max(1, len(items)), 4),
+        },
+        "ensemble": {
+            "enabled": ensemble,
+            "voters": list(ENSEMBLE_VOTERS),
+            "voted": ensemble_voted,
+            "vote_rate": round(ensemble_voted / max(1, len(items)), 4),
+            "flipped": ensemble_flipped,
+            "flip_rate": round(ensemble_flipped / max(1, ensemble_voted), 4),
         },
         "resource_protocol": {
             "note": (
@@ -409,6 +444,8 @@ def main() -> None:
         "router_small",
         "router_cascade",
         "router_cascade_micro",
+        "router_best",  # gold-bucket → v4 specialist winners (oracle, not rules)
+        "router_ensemble",  # rules v2 + majority vote on alignment + ZNO
     ]
     p.add_argument("mode_pos", nargs="?", default=None, choices=MODE_CHOICES)
     p.add_argument(
@@ -457,6 +494,12 @@ def main() -> None:
         help="Repeat the whole system run N times (for mean±sd). Same seed unless --seed-jitter.",
     )
     p.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help="Override decoding max_tokens (default 256). Use 512 for HumanEval completions.",
+    )
+    p.add_argument(
         "--seed-jitter",
         action="store_true",
         help="Use seed, seed+1, … across repeats (otherwise identical seed measures residual GPU noise).",
@@ -488,10 +531,12 @@ def main() -> None:
         "mamay12": ["mamay12"],
         "lapa": ["lapa"],
         "aya": ["aya"],
-        "router_matrix": ["mamay4", "lapa", "aya", "qwen7"],
+        "router_matrix": ["mamay4", "lapa", "aya"],  # v2 rules: no qwen7
         "router_small": ["mamay4", "qwen"],
         "router_cascade": ["mamay4", "mamay12"],
         "router_cascade_micro": ["mamay4", "lapa", "aya", "qwen7"],
+        "router_best": ["mamay4", "lapa", "aya"],  # no qwen7: code→mamay4, chat→aya
+        "router_ensemble": ["mamay4", "lapa", "aya"],
         "all": ["mamay4", "lapa", "aya"],
     }[args.mode]
     if not args.skip_health:
@@ -506,6 +551,21 @@ def main() -> None:
             "model": alias,
             "intent": d.intent,
             "reason": d.reason,
+            "backend_model": model,
+            "api_base": base,
+        }
+
+    def pick_best(item):
+        """Oracle: gold suite bucket → empirically best specialist on v4."""
+        bucket = str(item.get("bucket") or "chat")
+        alias = BEST_BY_BUCKET.get(bucket, "mamay4")
+        if alias not in BACKENDS:
+            raise SystemExit(f"BEST_BY_BUCKET alias unknown: {alias}")
+        base, model = BACKENDS[alias]
+        return alias, base, model, {
+            "model": alias,
+            "intent": bucket,
+            "reason": f"oracle best-by-bucket {bucket}→{alias}",
             "backend_model": model,
             "api_base": base,
         }
@@ -536,8 +596,10 @@ def main() -> None:
 
         return _pick
 
-    global SEED
+    global SEED, MAX_TOKENS
     base_seed = SEED
+    if args.max_tokens is not None:
+        MAX_TOKENS = int(args.max_tokens)
 
     for rep in range(1, max(1, args.repeats) + 1):
         if args.seed_jitter:
@@ -577,15 +639,26 @@ def main() -> None:
             run_system("mamay4", pick_fixed("mamay4"), items, bench_tag, **kw)
         if args.mode in ("all", "router_matrix"):
             sys_name = (
-                "router_matrix_fewshot"
+                "router_matrix_v2_fewshot"
                 if args.align_prompt == "fewshot"
                 else (
-                    "router_matrix_clarified"
+                    "router_matrix_v2_clarified"
                     if args.align_prompt == "clarified"
-                    else "router_matrix"
+                    else "router_matrix_v2"
                 )
             )
             run_system(sys_name, pick_matrix, items, bench_tag, **kw)
+        if args.mode == "router_best":
+            sys_name = (
+                "router_best_fewshot"
+                if args.align_prompt == "fewshot"
+                else (
+                    "router_best_clarified"
+                    if args.align_prompt == "clarified"
+                    else "router_best"
+                )
+            )
+            run_system(sys_name, pick_best, items, bench_tag, **kw)
         if args.mode == "router_small":
             run_system("router_small", pick_legacy_small, items, bench_tag, **kw)
         if args.mode in ("all", "mamay12"):
@@ -622,6 +695,20 @@ def main() -> None:
                 bench_tag,
                 cascade=True,
                 cascade_kind="micro",
+                **kw,
+            )
+        if args.mode == "router_ensemble":
+            ens_name = (
+                "router_ensemble_vote_fewshot"
+                if args.align_prompt == "fewshot"
+                else "router_ensemble_vote"
+            )
+            run_system(
+                ens_name,
+                pick_matrix,
+                items,
+                bench_tag,
+                ensemble=True,
                 **kw,
             )
 

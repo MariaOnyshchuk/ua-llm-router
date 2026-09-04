@@ -1,12 +1,12 @@
-"""Rules router — Mamay-4B + Lapa + Aya + Qwen-Coder-7B.
+"""Rules router — Mamay-4B + Lapa + Aya (+ Qwen-7B optional).
 
-Decision table:
-  code       → qwen7
+Decision table (week 7, v4-best specialists in the *rules*):
+  code       → mamay4   (was qwen7; v4 code 0.984 vs 0.969)
   translate  → aya
-  instruct   → mamay4   (strong format markers; before knowledge & code)
+  instruct   → mamay4
   knowledge  → lapa
-  alignment  → lapa     (pending social 1→2 ablation vs Mamay-4B / few-shot)
-  chat       → mamay4
+  alignment  → lapa
+  chat       → aya      (default; was mamay4; v4 chat 1.000 vs 0.984)
 
 Backends:
   mamay4 → :8003
@@ -88,7 +88,7 @@ _RULES: list[tuple[str, str, re.Pattern[str], str]] = [
         "instruct → Mamay-4B (strong format constraints before knowledge/code)",
     ),
     (
-        "qwen7",
+        "mamay4",
         "code",
         re.compile(
             r"("
@@ -101,7 +101,7 @@ _RULES: list[tuple[str, str, re.Pattern[str], str]] = [
             r")",
             re.I | re.U,
         ),
-        "code → Qwen-Coder-7B (larger specialist; bake-off pending)",
+        "code → Mamay-4B (v4 winner vs Qwen-Coder-7B)",
     ),
     (
         "lapa",
@@ -129,16 +129,92 @@ _RULES: list[tuple[str, str, re.Pattern[str], str]] = [
 # Multi-lineage pool: Mamay-4B/Lapa (Gemma-UA), Aya (Cohere), Qwen7 (Qwen).
 ROUTER_MODELS = frozenset({"mamay4", "lapa", "aya", "qwen7"})
 
+# Gold-bucket “best specialist” map from mixed_ua_v4 solos (week 6).
+# This is an oracle given suite labels — not the production rules router.
+# Alignment stays Lapa: Mamay-4B few-shot 0.781 was a 32-item slice, not full-suite.
+BEST_BY_BUCKET: dict[str, str] = {
+    "chat": "aya",  # 1.000 vs Mamay-4B 0.984
+    "instruct": "mamay4",  # tie 0.781 with Aya; keep UA IF specialist
+    "knowledge": "lapa",  # 0.750
+    "alignment": "lapa",  # 0.750 with few-shot; same as matrix
+    "code": "mamay4",  # 0.984 vs Qwen-7B 0.969 — Qwen drops out of this map
+    "translate": "aya",  # 0.821
+}
 
-def route_intent(text: str, default: str = "mamay4") -> RouteDecision:
-    if not text or not text.strip():
-        return RouteDecision(default, "default", "empty prompt")
 
-    for model, intent, pattern, reason in _RULES:
-        if pattern.search(text):
-            return RouteDecision(model, intent, reason)
+# Live / eval profiles. v2 is the product table baked into _RULES.
+# v1 remaps after the match: code → Qwen-7B, unmatched chat → Mamay-4B.
+ROUTER_PROFILES: dict[str, dict[str, object]] = {
+    "v1": {
+        "label": "Rules v1",
+        "remap": {"code": "qwen7"},
+        "default": "mamay4",
+        "blurb": "code → Qwen-7B · chat → Mamay-4B",
+    },
+    "v2": {
+        "label": "Rules v2",
+        "remap": {},
+        "default": "aya",
+        "blurb": "code → Mamay-4B · chat → Aya",
+    },
+}
 
-    return RouteDecision(default, "chat", "default UA chat → Mamay-4B")
+
+def route_intent(
+    text: str,
+    default: str | None = None,
+    *,
+    profile: str = "v2",
+    pool: frozenset[str] | set[str] | None = None,
+    intent_hint: str | None = None,
+) -> RouteDecision:
+    spec = ROUTER_PROFILES.get(profile) or ROUTER_PROFILES["v2"]
+    fallback = default if default is not None else str(spec["default"])
+    remap = spec["remap"] if isinstance(spec["remap"], dict) else {}
+
+    hinted = (intent_hint or "").strip().lower()
+    hinted_rule = next(
+        ((model, reason) for model, intent, _pattern, reason in _RULES if intent == hinted),
+        None,
+    )
+    if hinted == "chat":
+        decision = RouteDecision(fallback, "chat", f"planner intent hint → {fallback}")
+    elif hinted_rule is not None:
+        model, reason = hinted_rule
+        target = str(remap.get(hinted, model))
+        decision = RouteDecision(target, hinted, f"planner intent hint; {reason}")
+    elif not text or not text.strip():
+        decision = RouteDecision(fallback, "default", "empty prompt")
+    else:
+        decision = None
+        for model, intent, pattern, reason in _RULES:
+            if pattern.search(text):
+                target = str(remap.get(intent, model))
+                if target != model:
+                    reason = f"{intent} → {target} (profile {profile})"
+                decision = RouteDecision(target, intent, reason)
+                break
+        if decision is None:
+            chat_reason = (
+                "default UA chat → Mamay-4B"
+                if fallback == "mamay4"
+                else "default UA chat → Aya"
+            )
+            decision = RouteDecision(fallback, "chat", chat_reason)
+
+    if pool:
+        allowed = {m for m in pool if m in ROUTER_MODELS}
+        if allowed and decision.model not in allowed:
+            pick = next(
+                (m for m in ("aya", "mamay4", "lapa", "qwen7") if m in allowed),
+                decision.model,
+            )
+            decision = RouteDecision(
+                pick,
+                decision.intent,
+                f"{decision.reason}; {decision.model} not in pool → {pick}",
+            )
+    return decision
 
 
 def extract_user_text(messages: list[dict]) -> str:

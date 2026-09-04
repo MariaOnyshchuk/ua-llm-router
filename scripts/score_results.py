@@ -16,9 +16,39 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-
+ROOT = Path(__file__).resolve().parents[1]
 UA_RE = re.compile(r"[А-Яа-яЁёІіЇїЄєҐґ]")
 CODE_FENCE_RE = re.compile(r"```(?:python)?\s*([\s\S]*?)```", re.I)
+
+_HE_BY_ID: dict[str, dict[str, Any]] | None = None
+
+
+def humaneval_fields(row: dict[str, Any]) -> dict[str, Any]:
+    """Fill he_* from the suite if the result JSONL dropped them."""
+    if row.get("he_test") and row.get("he_entry_point"):
+        return row
+    global _HE_BY_ID
+    if _HE_BY_ID is None:
+        _HE_BY_ID = {}
+        for path in [
+            ROOT / "benchmarks/corpus/humaneval_code_en.jsonl",
+            ROOT / "benchmarks/mixed_ua_v5.jsonl",
+        ]:
+            if not path.exists():
+                continue
+            for line in path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                item = json.loads(line)
+                if item.get("he_test"):
+                    _HE_BY_ID[str(item.get("id"))] = item
+    extra = _HE_BY_ID.get(str(row.get("id") or ""), {})
+    merged = dict(row)
+    for k in ("he_prompt", "he_test", "he_entry_point"):
+        if extra.get(k) and not merged.get(k):
+            merged[k] = extra[k]
+    return merged
 
 
 def load_rows(paths: list[Path]) -> list[dict[str, Any]]:
@@ -312,7 +342,47 @@ CODE_TESTS = {
 }
 
 
-def score_code(content: str, item_id: str) -> dict[str, Any]:
+def score_humaneval(content: str, row: dict[str, Any]) -> dict[str, Any]:
+    """Run HumanEval check(candidate) with a short timeout."""
+    import concurrent.futures
+
+    row = humaneval_fields(row)
+    code = extract_code(content or "")
+    prompt = str(row.get("he_prompt") or "")
+    test = str(row.get("he_test") or "")
+    entry = str(row.get("he_entry_point") or "")
+    if not test or not entry:
+        return {"score": 0.0, "detail": "humaneval_missing_test"}
+
+    def _run() -> None:
+        ns: dict[str, Any] = {}
+        try:
+            exec(code, ns, ns)
+        except Exception:
+            ns = {}
+            exec(prompt + "\n" + code, ns, ns)
+        if entry not in ns:
+            exec(prompt + "\n" + code, ns, ns)
+        exec(test, ns, ns)
+        ns["check"](ns[entry])
+
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            fut = pool.submit(_run)
+            fut.result(timeout=8.0)
+        return {"score": 1.0, "detail": "humaneval_pass"}
+    except concurrent.futures.TimeoutError:
+        return {"score": 0.0, "detail": "humaneval_timeout"}
+    except Exception as e:
+        return {"score": 0.0, "detail": f"humaneval_fail:{type(e).__name__}"}
+
+
+def score_code(content: str, item_id: str, row: dict[str, Any] | None = None) -> dict[str, Any]:
+    if row and (
+        str(item_id).startswith("humaneval-")
+        or "score_mode=humaneval" in str(row.get("notes") or "")
+    ):
+        return score_humaneval(content, row)
     code = extract_code(content or "")
     tests = CODE_TESTS.get(item_id, [])
     if not tests:
@@ -364,7 +434,7 @@ def score_row(row: dict[str, Any]) -> dict[str, Any]:
     if bucket == "knowledge":
         return score_knowledge(content, reference)
     if bucket == "code":
-        return score_code(content, item_id)
+        return score_code(content, item_id, row)
     if bucket == "alignment":
         return score_alignment(content, reference)
     return {"score": 0.0, "detail": "unknown_bucket"}

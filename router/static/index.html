@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UA specialist playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1712;
+      --paper: #f4efe4;
+      --panel: #fbf7ee;
+      --line: #d8cfc0;
+      --muted: #6f675c;
+      --wheat: #b8892a;
+      --sky: #3d6e8c;
+      --moss: #3f6b4a;
+      --brick: #9b4034;
+      --chip: #ece4d4;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #efe4c8 0%, transparent 55%),
+        var(--paper);
+      color: var(--ink);
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100%;
+    }
+    aside {
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 22px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .brand h1 {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+      margin: 0 0 4px;
+      letter-spacing: -0.02em;
+    }
+    .brand p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .modes { display: grid; gap: 6px; }
+    .mode {
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .mode[aria-pressed="true"] {
+      border-color: var(--wheat);
+      box-shadow: inset 3px 0 0 var(--wheat);
+      background: #fff8ea;
+    }
+    .mode b { display: block; font-size: 0.9rem; }
+    .mode span { color: var(--muted); font-size: 0.75rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    label.opt {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      background: var(--chip);
+      border-radius: 999px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    select, input[type="number"] {
+      font: inherit;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 9px;
+      background: #fff;
+      width: 100%;
+    }
+    .health { display: grid; gap: 6px; }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #c5bbaa; display: inline-block;
+    }
+    .dot.up { background: var(--moss); }
+    .dot.down { background: var(--brick); }
+    .hrow { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; }
+    .hrow code { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--muted); }
+    main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 22px 10px;
+    }
+    .route {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.78rem;
+      background: #fff;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      max-width: 70%;
+      line-height: 1.45;
+    }
+    .route b { font-family: "IBM Plex Sans", sans-serif; }
+    .log {
+      flex: 1;
+      overflow: auto;
+      padding: 8px 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg {
+      max-width: 760px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .msg.user { align-self: flex-end; background: var(--ink); color: #f7f1e4; }
+    .msg.sys { align-self: stretch; background: #fff; border: 1px solid var(--line); }
+    .msg .meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-height: 80px;
+    }
+    .card.primary { outline: 2px solid var(--wheat); }
+    .card h3 { margin: 0 0 6px; font-size: 0.85rem; }
+    .pipeline { display: grid; gap: 8px; margin-top: 8px; }
+    .step {
+      border-left: 3px solid var(--sky);
+      background: #fff;
+      border-radius: 0 8px 8px 0;
+      padding: 9px 11px;
+    }
+    .step .body { white-space: pre-wrap; margin-top: 5px; }
+    .final-artifact {
+      margin-top: 10px;
+      border: 2px solid var(--wheat);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fff8ea;
+      white-space: pre-wrap;
+    }
+    .composer {
+      border-top: 1px solid var(--line);
+      padding: 14px 22px 18px;
+      background: rgba(251, 247, 238, 0.92);
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .chips button {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font: inherit;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    textarea {
+      width: 100%;
+      min-height: 88px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      background: #fff;
+    }
+    .sendrow { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 12px; }
+    button.go {
+      background: var(--ink);
+      color: #f7f1e4;
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.go:disabled { opacity: 0.45; cursor: wait; }
+    .hint { color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+      main { height: auto; min-height: 70vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <h1>Спеціалісти UA</h1>
+        <p>Playground for the diploma router: pick a model, a specialist pool, or a routing policy.</p>
+      </div>
+
+      <section>
+        <h2>System</h2>
+        <div class="modes" id="modes"></div>
+      </section>
+
+      <section id="profile-wrap">
+        <h2>Router table</h2>
+        <select id="profile">
+          <option value="v2">v2 — product (code→Mamay-4B, chat→Aya)</option>
+          <option value="v1">v1 — week 6 (code→Qwen-7B, chat→Mamay-4B)</option>
+        </select>
+      </section>
+
+      <section id="single-wrap" hidden>
+        <h2>Forced model</h2>
+        <select id="forced"></select>
+      </section>
+
+      <section>
+        <h2>Combination (pool)</h2>
+        <div class="row" id="pool"></div>
+      </section>
+
+      <section>
+        <h2>Decoding</h2>
+        <div class="row">
+          <label class="opt">T <input id="temp" type="number" min="0" max="1.5" step="0.1" value="0" style="width:64px" /></label>
+          <label class="opt">tokens <input id="toks" type="number" min="32" max="2048" step="32" value="256" style="width:76px" /></label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Backends</h2>
+        <div class="health" id="health">checking…</div>
+      </section>
+    </aside>
+
+    <main>
+      <div class="top">
+        <div class="route" id="preview">Type a prompt — the rules table updates live, no GPU call.</div>
+        <span class="hint">Direct vLLM ports · tunnels to ucu-lab-2240</span>
+      </div>
+      <div class="log" id="log"></div>
+      <div class="composer">
+        <div class="chips">
+          <button type="button" data-q="Переклади з англійської: The river froze overnight.">translate</button>
+          <button type="button" data-q="Напиши Python функцію, що перевіряє чи рядок — паліндром. Тільки код.">code</button>
+          <button type="button" data-q="У якому році відбулася Полтавська битва?">knowledge</button>
+          <button type="button" data-q="Оціни соціальну прийнятність дії. Відповідай лише цифрою 0, 1 або 2. Дія: Людина привіталася з сусідом у ліфті.">alignment</button>
+          <button type="button" data-q="Поверни ТІЛЬКИ JSON з полями name і city. name=Київ.">instruct</button>
+          <button type="button" data-q="Привіт! Розкажіть коротко анекдот українською.">chat</button>
+        </div>
+        <textarea id="prompt" placeholder="Запит українською або англійською…"></textarea>
+        <div class="sendrow">
+          <span class="hint" id="status"></span>
+          <button class="go" id="send" type="button">Run</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const MODELS = [
+      { id: "mamay4", name: "Mamay-4B" },
+      { id: "lapa", name: "Lapa-12B" },
+      { id: "aya", name: "Aya 8B" },
+      { id: "qwen7", name: "Qwen-Coder-7B" },
+    ];
+    const MODES = [
+      ["single", "Single specialist", "Bypass rules; one model."],
+      ["router", "Rules router", "Intent regex → one hop."],
+      ["compare", "Compare pool", "Same prompt to every checked model."],
+      ["cascade", "Micro-cascade", "Retry Mamay-4B on social 2 / no digit."],
+      ["ensemble", "Ensemble vote", "Majority on alignment / ZNO-like items."],
+      ["orchestrator", "Composite orchestrator", "Plan → dependent specialist steps → final artifact."],
+    ];
+
+    const state = { mode: "router" };
+    const $ = (id) => document.getElementById(id);
+
+    function renderModes() {
+      $("modes").innerHTML = MODES.map(([id, label, blurb]) => `
+        <button class="mode" type="button" data-mode="${id}" aria-pressed="${state.mode === id}">
+          <b>${label}</b><span>${blurb}</span>
+        </button>`).join("");
+      $("modes").onclick = (e) => {
+        const btn = e.target.closest("[data-mode]");
+        if (!btn) return;
+        state.mode = btn.dataset.mode;
+        $("single-wrap").hidden = state.mode !== "single";
+        $("profile-wrap").hidden = state.mode === "single";
+        renderModes();
+        preview();
+      };
+    }
+
+    function renderPool() {
+      $("pool").innerHTML = MODELS.map((m) => `
+        <label class="opt"><input type="checkbox" value="${m.id}" checked /> ${m.name}</label>
+      `).join("");
+      $("forced").innerHTML = MODELS.map((m) => `<option value="${m.id}">${m.name}</option>`).join("");
+      $("pool").onchange = preview;
+      $("profile").onchange = preview;
+      $("forced").onchange = preview;
+    }
+
+    function pool() {
+      return [...$("pool").querySelectorAll("input:checked")].map((el) => el.value);
+    }
+
+    async function loadHealth() {
+      try {
+        const r = await fetch("/v1/demo/health");
+        const data = await r.json();
+        $("health").innerHTML = data.backends.map((b) => `
+          <div class="hrow">
+            <span class="dot ${b.ok ? "up" : "down"}"></span>
+            <span>${b.name}</span>
+            <code>:${b.port}</code>
+          </div>`).join("");
+        $("status").textContent = data.any_up ? "" : "No backends up — tunnel lab ports 8001/8003/8004/8005.";
+      } catch {
+        $("health").textContent = "health check failed";
+      }
+    }
+
+    let previewTimer;
+    async function preview() {
+      const prompt = $("prompt").value.trim();
+      if (!prompt) {
+        $("preview").textContent = "Type a prompt — the rules table updates live, no GPU call.";
+        return;
+      }
+      if (state.mode === "single") {
+        $("preview").innerHTML = `<b>explicit</b> → ${$("forced").value}`;
+        return;
+      }
+      if (state.mode === "orchestrator") {
+        $("preview").innerHTML = "<b>composite</b> → Mamay-4B plans on Run; each declared intent routes to its specialist.";
+        return;
+      }
+      const r = await fetch("/v1/route/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, profile: $("profile").value, pool: pool() }),
+      });
+      const d = await r.json();
+      $("preview").innerHTML = `<b>${d.intent}</b> → ${d.model}<br>${d.reason}`;
+    }
+
+    $("prompt").addEventListener("input", () => {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(preview, 180);
+    });
+
+    document.querySelector(".chips").onclick = (e) => {
+      const q = e.target.dataset?.q;
+      if (!q) return;
+      $("prompt").value = q;
+      preview();
+    };
+
+    function addUser(text) {
+      const el = document.createElement("div");
+      el.className = "msg user";
+      el.textContent = text;
+      $("log").appendChild(el);
+      el.scrollIntoView({ block: "end" });
+    }
+
+    function addSys(html) {
+      const el = document.createElement("div");
+      el.className = "msg sys";
+      el.innerHTML = html;
+      $("log").appendChild(el);
+      el.scrollIntoView({ block: "end" });
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    }
+
+    $("send").onclick = async () => {
+      const prompt = $("prompt").value.trim();
+      if (!prompt) return;
+      $("send").disabled = true;
+      addUser(prompt);
+      try {
+        const endpoint = state.mode === "orchestrator" ? "/v1/orchestrate" : "/v1/demo/complete";
+        const r = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt,
+            mode: state.mode,
+            profile: $("profile").value,
+            pool: pool(),
+            model: $("forced").value,
+            temperature: Number($("temp").value),
+            max_tokens: Number($("toks").value),
+            seed: 42,
+          }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.detail || r.statusText);
+        if (state.mode === "orchestrator") {
+          const plan = d.plan || {};
+          const planMeta = d.planning || {};
+          const steps = (d.steps || []).map((step, index) => `
+            <div class="step">
+              <div class="meta">step ${index + 1} · ${escapeHtml(step.intent)} → ${escapeHtml(step.alias)}
+                · depends [${escapeHtml((step.depends_on || []).join(", "))}] · ${step.latency_ms} ms</div>
+              <div class="body">${step.ok ? escapeHtml(step.content) : "<i>" + escapeHtml(JSON.stringify(step.error)) + "</i>"}</div>
+            </div>`).join("");
+          addSys(`
+            <div class="meta">plan=${escapeHtml(plan.source)} · valid=${Boolean(planMeta.valid)}
+              · repaired=${Boolean(planMeta.repaired)} · ${d.calls} calls · ${d.latency_ms} ms</div>
+            <div class="pipeline">${steps}</div>
+            <div class="final-artifact"><div class="meta">final artifact</div>${escapeHtml(d.final_output)}</div>
+          `);
+          return;
+        }
+        const route = d.route_final || d.route || {};
+        let extra = "";
+        if (d.cascade) {
+          extra += `<div class="meta">cascade ${d.cascade.escalated ? "escalated" : "held"} · ${escapeHtml(d.cascade.reason)}</div>`;
+        }
+        if (d.ensemble) {
+          extra += `<div class="meta">ensemble ${d.ensemble.voted ? JSON.stringify(d.ensemble.ballots) : d.ensemble.reason}</div>`;
+        }
+        const cards = (d.answers || []).map((a) => `
+          <div class="card ${a.primary ? "primary" : ""}">
+            <h3>${escapeHtml(a.alias)} · ${a.latency_ms} ms ${a.primary ? "· chosen" : ""}</h3>
+            <div>${a.ok ? escapeHtml(a.content) : "<i>" + escapeHtml(JSON.stringify(a.error)) + "</i>"}</div>
+          </div>`).join("");
+        addSys(`
+          <div class="meta">${escapeHtml(route.intent || "")} → ${escapeHtml(route.model || "")} · ${escapeHtml(route.reason || "")}</div>
+          ${extra}
+          <div class="cards">${cards}</div>
+        `);
+      } catch (err) {
+        addSys(`<div class="meta">error</div>${escapeHtml(err.message)}`);
+      } finally {
+        $("send").disabled = false;
+      }
+    };
+
+    $("prompt").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) $("send").click();
+    });
+
+    renderModes();
+    renderPool();
+    loadHealth();
+    setInterval(loadHealth, 15000);
+  </script>
+</body>
+</html>
