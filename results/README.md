@@ -20,6 +20,7 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`week_7_v5/`](week_7_v5/) | 21 Aug | v4+32 HumanEval (224); rules v2 overall 0.796 (HE 19/32; chat hurt by max_tokens=512). |
 | [`week_7_ensemble/`](week_7_ensemble/) | 31 Aug | Majority vote on alignment+ZNO; overall **0.843** vs rules v2 0.848; 3 flips net −1. |
 | [`week_8_quant/`](week_8_quant/) | 31 Aug | Rules v2 on bitsandbytes 4-bit Mamay/Lapa/Aya: **0.830**, slower than bf16 0.848. |
+| [`week_10_composite/`](week_10_composite/) | 1 Sep | Authoritative composite 36×3 summary: oracle **0.882**, one-hop **0.812**, hybrid planner **0.768**. |
 | [`_empty_failed_stubs/`](_empty_failed_stubs/) | — | Zero-byte / aborted runs. Safe to ignore or delete. |
 
 ## Start here for claims
@@ -31,6 +32,8 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 5. **Alignment prompt/model ablation:** `week_5_alignment_bakeoff/scores_alignment_variants.json`
 6. **Narrative summary:** `docs/key_takeaways.md`
 6b. **Week-6 tables:** `docs/week_6_takeaways.md`
+6c. **Thesis conclusion:** `docs/conclusion.md`
+6d. **Composite router protocol/results:** `docs/week_10_composite.md`
 7. **Earlier v3 without Lapa/Qwen alone:** `week_3_v2_and_pinned_v3/scores_mean_sd_v3.json`
 
 ## Lab paths for raw v3 JSONL

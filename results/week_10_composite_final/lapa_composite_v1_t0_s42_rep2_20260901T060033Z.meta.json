@@ -1,0 +1,14 @@
+{
+  "system": "lapa",
+  "repeat": 2,
+  "n": 36,
+  "failures": 0,
+  "calls": 36,
+  "latency_ms_total": 180324.3,
+  "gpu_seconds_total": 180.3243,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  }
+}

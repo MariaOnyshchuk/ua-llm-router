@@ -1,0 +1,14 @@
+{
+  "system": "hybrid",
+  "repeat": 2,
+  "n": 36,
+  "failures": 0,
+  "calls": 127,
+  "latency_ms_total": 501989.7,
+  "gpu_seconds_total": 501.9897,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  }
+}

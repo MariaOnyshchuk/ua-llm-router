@@ -1,0 +1,14 @@
+{
+  "system": "mamay4",
+  "repeat": 1,
+  "n": 6,
+  "failures": 0,
+  "calls": 6,
+  "latency_ms_total": 9082.1,
+  "gpu_seconds_total": 9.0821,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 512
+  }
+}

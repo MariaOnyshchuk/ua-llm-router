@@ -1,0 +1,14 @@
+{
+  "system": "qwen7",
+  "repeat": 1,
+  "n": 36,
+  "failures": 0,
+  "calls": 36,
+  "latency_ms_total": 25725.7,
+  "gpu_seconds_total": 25.7257,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  }
+}

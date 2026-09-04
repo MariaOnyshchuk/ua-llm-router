@@ -1,0 +1,181 @@
+{
+    "id": "comp-tc-011",
+    "bucket": "composite",
+    "family": "translate_code",
+    "prompt": "Виконай складене завдання. Спочатку переклади й нормалізуй англомовну специфікацію українською, потім реалізуй Python-функцію `running_total`. Фінальна відповідь — лише блок ```python без пояснень.\n\nSpecification: Return cumulative sums of the input integers.",
+    "provenance": "handcrafted_from_humaneval_style",
+    "system": "hybrid",
+    "oracle_plan": {
+        "steps": [
+            {
+                "id": "translate",
+                "intent": "translate",
+                "depends_on": [],
+                "prompt": "Переклади українською цю специфікацію без додавання вимог:\nReturn cumulative sums of the input integers.",
+                "rubric": {
+                    "type": "contains_all",
+                    "values": [
+                        "накопич",
+                        "сум"
+                    ]
+                }
+            },
+            {
+                "id": "implement",
+                "intent": "code",
+                "depends_on": [
+                    "translate"
+                ],
+                "prompt": "Реалізуй Python-функцію `running_total` за специфікацією нижче. Поверни лише блок ```python.\n\n{{translate.content}}",
+                "rubric": {
+                    "type": "python_function",
+                    "entry_point": "running_total",
+                    "only_code": true,
+                    "cases": [
+                        {
+                            "args": [
+                                [
+                                    1,
+                                    2,
+                                    3
+                                ]
+                            ],
+                            "expected": [
+                                1,
+                                3,
+                                6
+                            ]
+                        },
+                        {
+                            "args": [
+                                [
+                                    -1,
+                                    1
+                                ]
+                            ],
+                            "expected": [
+                                -1,
+                                0
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "final_step_expected": "implement",
+    "plan": {
+        "source": "llm",
+        "steps": [
+            {
+                "id": "step1",
+                "intent": "translate",
+                "prompt": "Переклади й нормалізуй англомовну специфікацію українською: Return cumulative sums of the input integers.",
+                "depends_on": []
+            },
+            {
+                "id": "step2",
+                "intent": "code",
+                "prompt": "Реалізуй Python-функцію `running_total` згідно з українською специфікацією: Поверни суму всіх попередніх елементів у списку. {{step1.content}} Поверни лише блок ```python без пояснень.\n\nОБОВ'ЯЗКОВА ВИМОГА ДО ФІНАЛЬНОЇ ВІДПОВІДІ: Фінальна відповідь — лише блок ```python без пояснень.",
+                "depends_on": [
+                    "step1"
+                ]
+            }
+        ]
+    },
+    "plan_valid": true,
+    "plan_match": true,
+    "planning": {
+        "valid": true,
+        "repaired": false,
+        "attempts": [
+            {
+                "alias": "mamay4",
+                "ok": true,
+                "content": "```json\n{\n  \"steps\": [\n    {\n      \"id\": \"step1\",\n      \"intent\": \"translate\",\n      \"depends_on\": [],\n      \"prompt\": \"Переклади й нормалізуй англомовну специфікацію українською: Return cumulative sums of the input integers.\"\n    },\n    {\n      \"id\": \"step2\",\n      \"intent\": \"code\",\n      \"depends_on\": [\"step1\"],\n      \"prompt\": \"Реалізуй Python-функцію `running_total` згідно з українською специфікацією: Поверни суму всіх попередніх елементів у списку. {{step1.content}} Поверни лише блок ```python без пояснень.\"\n    }\n  ]\n}\n```",
+                "latency_ms": 7704.1,
+                "gpu_seconds": 7.7041,
+                "http_status": 200,
+                "error": null,
+                "hf": "INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0",
+                "usage": {
+                    "prompt_tokens": 553,
+                    "total_tokens": 727,
+                    "completion_tokens": 174,
+                    "prompt_tokens_details": null
+                }
+            }
+        ]
+    },
+    "steps": [
+        {
+            "alias": "aya",
+            "ok": true,
+            "content": "**Нормалізований переклад:**\n\n**Повернення кумулятивних сум вхідних цілих чисел.**\n\n**Пояснення:**\n\n- \"Return\" - означає \"повернути\" або \"задати як результат\".\n- \"Cumulative sums\" - кумулятивні суми, тобто сума всіх попередніх елементів послідовності.\n- \"Input integers\" - вхідні цілі числа.\n\nОтже, перекладена фраза точно передає сенс оригіналу, адаптуючи термінологію до української мови.",
+            "latency_ms": 2267.4,
+            "gpu_seconds": 2.2674,
+            "http_status": 200,
+            "error": null,
+            "hf": "CohereLabs/aya-expanse-8b",
+            "usage": {
+                "prompt_tokens": 29,
+                "total_tokens": 147,
+                "completion_tokens": 118,
+                "prompt_tokens_details": null
+            },
+            "id": "step1",
+            "intent": "translate",
+            "depends_on": [],
+            "prompt": "Переклади й нормалізуй англомовну специфікацію українською: Return cumulative sums of the input integers.",
+            "route": {
+                "model": "aya",
+                "detected_intent": "translate",
+                "declared_intent": "translate",
+                "reason": "planner intent hint; translate → Aya Expanse 8B (cross-lineage multilingual; bake-off pending)"
+            }
+        },
+        {
+            "alias": "mamay4",
+            "ok": true,
+            "content": "```python\ndef running_total(numbers):\n    total = 0\n    result = []\n    for num in numbers:\n        total += num\n        result.append(total)\n    return result\n```",
+            "latency_ms": 2166.2,
+            "gpu_seconds": 2.1662,
+            "http_status": 200,
+            "error": null,
+            "hf": "INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0",
+            "usage": {
+                "prompt_tokens": 222,
+                "total_tokens": 270,
+                "completion_tokens": 48,
+                "prompt_tokens_details": null
+            },
+            "id": "step2",
+            "intent": "code",
+            "depends_on": [
+                "step1"
+            ],
+            "prompt": "Реалізуй Python-функцію `running_total` згідно з українською специфікацією: Поверни суму всіх попередніх елементів у списку. **Нормалізований переклад:**\n\n**Повернення кумулятивних сум вхідних цілих чисел.**\n\n**Пояснення:**\n\n- \"Return\" - означає \"повернути\" або \"задати як результат\".\n- \"Cumulative sums\" - кумулятивні суми, тобто сума всіх попередніх елементів послідовності.\n- \"Input integers\" - вхідні цілі числа.\n\nОтже, перекладена фраза точно передає сенс оригіналу, адаптуючи термінологію до української мови. Поверни лише блок ```python без пояснень.\n\nОБОВ'ЯЗКОВА ВИМОГА ДО ФІНАЛЬНОЇ ВІДПОВІДІ: Фінальна відповідь — лише блок ```python без пояснень.",
+            "route": {
+                "model": "mamay4",
+                "detected_intent": "code",
+                "declared_intent": "code",
+                "reason": "planner intent hint; code → Mamay-4B (v4 winner vs Qwen-Coder-7B)"
+            }
+        }
+    ],
+    "direct": null,
+    "content": "```python\ndef running_total(numbers):\n    total = 0\n    result = []\n    for num in numbers:\n        total += num\n        result.append(total)\n    return result\n```",
+    "http_status": 200,
+    "complete": true,
+    "calls": 3,
+    "execution_calls": 2,
+    "planner_calls": 1,
+    "latency_ms": 12137.7,
+    "gpu_seconds": 12.1377,
+    "decoding": {
+        "temperature": 0.0,
+        "seed": 42,
+        "max_tokens": 256
+    },
+    "repeat": 1
+}

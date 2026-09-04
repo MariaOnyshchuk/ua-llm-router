@@ -1,0 +1,14 @@
+{
+  "system": "router_direct",
+  "repeat": 1,
+  "n": 6,
+  "failures": 0,
+  "calls": 6,
+  "latency_ms_total": 6150.4,
+  "gpu_seconds_total": 6.1504,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 512
+  }
+}

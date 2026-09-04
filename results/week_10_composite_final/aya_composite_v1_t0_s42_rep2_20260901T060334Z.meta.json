@@ -1,0 +1,14 @@
+{
+  "system": "aya",
+  "repeat": 2,
+  "n": 36,
+  "failures": 0,
+  "calls": 36,
+  "latency_ms_total": 50322.4,
+  "gpu_seconds_total": 50.3224,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  }
+}

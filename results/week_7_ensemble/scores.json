@@ -1,0 +1,58 @@
+{
+  "systems": {
+    "router_ensemble_vote_fewshot": {
+      "n": 192,
+      "overall_mean": 0.8428,
+      "overall_mean_macro": 0.8428,
+      "latency_avg_ms": 1843.4,
+      "latency_p50_ms": 1200.5,
+      "latency_p95_ms": 4934.9,
+      "gpu_seconds_total": 353.942,
+      "gpu_seconds_per_prompt": 1.8434,
+      "by_bucket": {
+        "alignment": {
+          "quality_mean": 0.7812,
+          "latency_avg_ms": 583.5,
+          "latency_p50_ms": 389.5,
+          "latency_p95_ms": 1695.7,
+          "n": 32
+        },
+        "chat": {
+          "quality_mean": 1.0,
+          "latency_avg_ms": 3301.8,
+          "latency_p50_ms": 3722.8,
+          "latency_p95_ms": 4934.5,
+          "n": 32
+        },
+        "code": {
+          "quality_mean": 0.9844,
+          "latency_avg_ms": 2641.3,
+          "latency_p50_ms": 2587.7,
+          "latency_p95_ms": 4921.7,
+          "n": 32
+        },
+        "instruct": {
+          "quality_mean": 0.7812,
+          "latency_avg_ms": 1409.4,
+          "latency_p50_ms": 720.4,
+          "latency_p95_ms": 3288.3,
+          "n": 32
+        },
+        "knowledge": {
+          "quality_mean": 0.6875,
+          "latency_avg_ms": 2599.9,
+          "latency_p50_ms": 1803.7,
+          "latency_p95_ms": 6103.7,
+          "n": 32
+        },
+        "translate": {
+          "quality_mean": 0.8224,
+          "latency_avg_ms": 524.9,
+          "latency_p50_ms": 519.7,
+          "latency_p95_ms": 806.3,
+          "n": 32
+        }
+      }
+    }
+  }
+}

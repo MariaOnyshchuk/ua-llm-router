@@ -1,0 +1,14 @@
+{
+  "system": "oracle",
+  "repeat": 2,
+  "n": 36,
+  "failures": 0,
+  "calls": 84,
+  "latency_ms_total": 123774.0,
+  "gpu_seconds_total": 123.774,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 256
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "file": "results/week_7_v5/router_matrix_v2_fewshot_mixed_ua_v5_t0_s42_rep1_20260821T073415Z.jsonl",
+    "n": 224,
+    "http_ok": 224,
+    "models": {
+      "aya": 63,
+      "lapa": 65,
+      "mamay4": 96
+    },
+    "intents": {
+      "chat": 31,
+      "knowledge": 33,
+      "translate": 32,
+      "instruct": 32,
+      "code": 64,
+      "alignment": 32
+    },
+    "prompt_variant": {
+      "fewshot": 224
+    },
+    "escalated": 0,
+    "escalate_rate": 0.0,
+    "escalate_ids": []
+  }
+]

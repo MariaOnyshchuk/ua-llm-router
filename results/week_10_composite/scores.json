@@ -1,0 +1,256 @@
+{
+  "systems": {
+    "aya": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.7546,
+      "final_score_sd": 0.016,
+      "final_success_rate": 0.5,
+      "stage_mean": 0.7546,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1517.2,
+      "latency_avg_ms": 1391.0,
+      "gpu_seconds_per_item": 1.391,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.7708,
+          "final_success_rate": 0.5,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.9583,
+          "final_success_rate": 0.9167,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.5347,
+          "final_success_rate": 0.0833,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    },
+    "hybrid": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.7685,
+      "final_score_sd": 0.0321,
+      "final_success_rate": 0.4352,
+      "stage_mean": 0.5316,
+      "all_stages_pass_rate": 0.0833,
+      "plan_valid_rate": 0.9907,
+      "plan_exact_match_rate": 0.8056,
+      "intent_f1": 0.9543,
+      "calls_per_item": 3.5,
+      "latency_p50_ms": 13533.1,
+      "latency_avg_ms": 13529.4,
+      "gpu_seconds_per_item": 13.5294,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.6944,
+          "final_success_rate": 0.1667,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.9306,
+          "final_success_rate": 0.8611,
+          "all_stages_pass_rate": 0.25
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.6806,
+          "final_success_rate": 0.2778,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    },
+    "lapa": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.7361,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.4167,
+      "stage_mean": 0.7361,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 2183.3,
+      "latency_avg_ms": 5032.2,
+      "gpu_seconds_per_item": 5.0322,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.8958,
+          "final_success_rate": 0.6667,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.4583,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.8542,
+          "final_success_rate": 0.5833,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    },
+    "mamay4": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.794,
+      "final_score_sd": 0.004,
+      "final_success_rate": 0.5926,
+      "stage_mean": 0.794,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1718.3,
+      "latency_avg_ms": 1652.2,
+      "gpu_seconds_per_item": 1.6522,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.9236,
+          "final_success_rate": 0.7778,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.4583,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    },
+    "oracle": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.8819,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.6667,
+      "stage_mean": 0.8526,
+      "all_stages_pass_rate": 0.4722,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 1.0,
+      "intent_f1": 1.0,
+      "calls_per_item": 2.333,
+      "latency_p50_ms": 3710.9,
+      "latency_avg_ms": 3440.1,
+      "gpu_seconds_per_item": 3.4401,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.9167,
+          "final_success_rate": 0.75,
+          "all_stages_pass_rate": 0.6667
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.9583,
+          "final_success_rate": 0.9167,
+          "all_stages_pass_rate": 0.4167
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.7708,
+          "final_success_rate": 0.3333,
+          "all_stages_pass_rate": 0.3333
+        }
+      }
+    },
+    "qwen7": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.7778,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.5278,
+      "stage_mean": 0.7778,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 665.9,
+      "latency_avg_ms": 700.4,
+      "gpu_seconds_per_item": 0.7004,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.7917,
+          "final_success_rate": 0.5833,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.9583,
+          "final_success_rate": 0.9167,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.5833,
+          "final_success_rate": 0.0833,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    },
+    "router_direct": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.8125,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.5833,
+      "stage_mean": 0.8125,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1725.2,
+      "latency_avg_ms": 1606.0,
+      "gpu_seconds_per_item": 1.606,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.9167,
+          "final_success_rate": 0.75,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.9583,
+          "final_success_rate": 0.9167,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.5625,
+          "final_success_rate": 0.0833,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    }
+  }
+}

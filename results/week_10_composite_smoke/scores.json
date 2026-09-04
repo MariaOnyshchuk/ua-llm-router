@@ -1,0 +1,100 @@
+{
+  "systems": {
+    "hybrid": {
+      "n": 6,
+      "repeats": 1,
+      "final_score_mean": 1.0,
+      "final_score_sd": 0.0,
+      "final_success_rate": 1.0,
+      "stage_mean": 0.875,
+      "all_stages_pass_rate": 0.6667,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 1.0,
+      "intent_f1": 1.0,
+      "calls_per_item": 3.0,
+      "latency_p50_ms": 26077.9,
+      "latency_avg_ms": 26103.8,
+      "gpu_seconds_per_item": 26.1038,
+      "by_family": {
+        "translate_code": {
+          "n": 6,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.6667
+        }
+      }
+    },
+    "mamay4": {
+      "n": 6,
+      "repeats": 1,
+      "final_score_mean": 1.0,
+      "final_score_sd": 0.0,
+      "final_success_rate": 1.0,
+      "stage_mean": 1.0,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": 0.0,
+      "plan_exact_match_rate": 0.0,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1526.5,
+      "latency_avg_ms": 1513.7,
+      "gpu_seconds_per_item": 1.5137,
+      "by_family": {
+        "translate_code": {
+          "n": 6,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    },
+    "oracle": {
+      "n": 6,
+      "repeats": 1,
+      "final_score_mean": 1.0,
+      "final_score_sd": 0.0,
+      "final_success_rate": 1.0,
+      "stage_mean": 0.875,
+      "all_stages_pass_rate": 0.5,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 1.0,
+      "intent_f1": 1.0,
+      "calls_per_item": 2.0,
+      "latency_p50_ms": 3975.6,
+      "latency_avg_ms": 3895.2,
+      "gpu_seconds_per_item": 3.8952,
+      "by_family": {
+        "translate_code": {
+          "n": 6,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.5
+        }
+      }
+    },
+    "router_direct": {
+      "n": 6,
+      "repeats": 1,
+      "final_score_mean": 1.0,
+      "final_score_sd": 0.0,
+      "final_success_rate": 1.0,
+      "stage_mean": 1.0,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": 0.0,
+      "plan_exact_match_rate": 0.0,
+      "intent_f1": null,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 866.3,
+      "latency_avg_ms": 1025.1,
+      "gpu_seconds_per_item": 1.0251,
+      "by_family": {
+        "translate_code": {
+          "n": 6,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    }
+  }
+}

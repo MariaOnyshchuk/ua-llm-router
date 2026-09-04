@@ -1,0 +1,26 @@
+[
+  {
+    "file": "results/week_7_router_best/router_best_fewshot_mixed_ua_v4_balanced_t0_s42_rep1_20260821T063527Z.jsonl",
+    "n": 192,
+    "http_ok": 192,
+    "models": {
+      "aya": 64,
+      "mamay4": 64,
+      "lapa": 64
+    },
+    "intents": {
+      "chat": 32,
+      "translate": 32,
+      "instruct": 32,
+      "knowledge": 32,
+      "code": 32,
+      "alignment": 32
+    },
+    "prompt_variant": {
+      "fewshot": 192
+    },
+    "escalated": 0,
+    "escalate_rate": 0.0,
+    "escalate_ids": []
+  }
+]
