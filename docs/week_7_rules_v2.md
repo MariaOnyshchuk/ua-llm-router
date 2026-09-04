@@ -6,6 +6,17 @@
 
 `router/intent_rules.py`: **code → Mamay-4B**, **default chat → Aya**. Qwen-7B unused. Few-shot alignment kept.
 
+| Intent | Rules v1 | Rules v2 | Gold-bucket oracle |
+|--------|----------|----------|--------------------|
+| code | Qwen-Coder-7B | **Mamay-4B** | **Mamay-4B** |
+| default chat | Mamay-4B | **Aya-8B** | **Aya-8B** |
+| translate | Aya-8B | Aya-8B | Aya-8B |
+| knowledge | Lapa-12B | Lapa-12B | Lapa-12B |
+| alignment | Lapa-12B | Lapa-12B | Lapa-12B |
+| instruct | Mamay-4B | Mamay-4B | Mamay-4B |
+
+v2 copies the oracle **map**. The oracle still reads gold `bucket`; v2 guesses intent with regex.
+
 Same suite as the oracle (`mixed_ua_v4` 192×3, T=0, max_tokens=256):
 
 | System | Overall | p50 | chat | code | GPUs |
@@ -42,11 +53,12 @@ Rules v2 on v5 (3×224, **max_tokens=512** for HumanEval):
 
 Traffic v5: mamay4 96 (64 code + 32 instruct) · lapa 65 · aya 63. All 32 HumanEval routed as **code**.
 
-## Next
+## Closed
 
-- S3 ensemble: **done** — [`docs/week_7_ensemble.md`](week_7_ensemble.md). 0.843 vs 0.848; skip.
-- Quantization (bitsandbytes 4-bit): **done** — [`docs/week_8_quant.md`](week_8_quant.md). 0.830 / slower; keep bf16.
-- Fair v5 number: rerun with 256 on chat/instruct and 512 only on `humaneval-*`, or clip chat for scoring.
-- Growing a *balanced* 48×6 still needs more **chat/instruct**, not more ZNO.
+- S3 ensemble: **done** — [`docs/week_7_ensemble.md`](week_7_ensemble.md). 0.843 vs 0.848; skip product.
+- Quantization (bitsandbytes 4-bit): **done** — [`docs/week_8_quant.md`](week_8_quant.md). 0.830 / slower; keep bf16. One-GPU packing **not** measured.
+- Social prompt 1b: **skipped** — few-shot already 0.750; leftover is 2→1, not 1→2. See [`docs/conclusion.md`](conclusion.md).
+
+Fair v5 number (256 on chat/instruct, 512 only on `humaneval-*`) and a larger balanced chat/instruct set remain optional, not product blockers.
 
 Artifacts: `results/week_7_rules_v2/`, `results/week_7_v5/`.

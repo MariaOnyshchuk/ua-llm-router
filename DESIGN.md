@@ -39,6 +39,25 @@ Client (OpenAI SDK)
 2. **Cascade (next)** — try small/cheap specialist; escalate on low confidence or failed checks (survey: cascading paradigm).
 3. **Learned router (stretch)** — classifier or preference model over the same aliases.
 
+## Composite orchestration (September extension)
+
+The original router classifies one request and performs one model call.
+`router/orchestrator.py` adds a bounded workflow layer for requests whose
+subtasks depend on one another:
+
+1. Mamay-4B emits a strict 2–4-step JSON plan.
+2. The validator rejects invalid intents, forward/cyclic dependencies, unknown
+   placeholders, and oversized plans; one repair is allowed.
+3. Each declared intent is mapped through the same rules-v2 specialist table.
+4. A step can consume `{{previous_step.content}}`; the final step emits the
+   user-facing artifact.
+5. Invalid plans fall back to the original single-hop router.
+
+The diagnostic oracle uses a stored benchmark workflow but the exact same
+executor and specialists. This isolates planning errors from execution errors.
+See `benchmarks/mixed_ua_composite_v1.jsonl` and
+`docs/week_10_composite.md`.
+
 Paper axes for Methods: **when** (pre-generation), **what** (task/domain signals), **how** (rules → later classifier).
 
 ## Evaluation ladder

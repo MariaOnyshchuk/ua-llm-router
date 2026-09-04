@@ -1,10 +1,18 @@
 # Key takeaways — Ukrainian LLM router (diploma)
 
-*Last updated: 2026-08-31*
+*Last updated: 2026-09-01. Weeks 7–10 pack (glossary, router diagrams, v4/v5/composite tables): [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md).*
 
 ## One-sentence claim
 
 A **rules-based multi-lineage router** (Mamay-4B + Lapa + Aya + Qwen-Coder-7B) on `mixed_ua_v4` scores **0.816** at baseline and **0.842** with social few-shot — beating Aya (0.785), Mamay-4B (0.762), and Lapa (0.732) on the **same 192×3 suite**, with ~2–4× lower p50 than those singles. The old alignment hole (**0.594**) is a **social-scale prompt bug** (1→2); few-shot recovers the bucket to **0.750**. A micro-cascade (social `2` → one Mamay-4B retry) adds **1.6%** extra calls and **no quality**.
+
+**Product stop:** rules v2 + few-shot = **0.848** (matches oracle). Extra hops and 4-bit do not beat it. Thesis write-up: [`docs/conclusion.md`](conclusion.md).
+
+**Composite extension:** on 36 dependent tasks ×3, the stored workflow oracle
+scores **0.882** vs one-hop rules **0.812**, proving a 0.070 composition
+opportunity. The prompted hybrid planner reaches only **0.768** at 3.5 calls /
+13.5 s p50. Correct workflows can help; general planning does not yet.
+Details: [`docs/week_10_composite.md`](week_10_composite.md).
 
 ---
 
@@ -172,7 +180,9 @@ Slice: 32 alignment items from `mixed_ua_v4` (10 ethics + 22 social). Variants r
 - On **all 32 alignment items**, bucket Δ is **not** significant: Lapa few-shot +0.156 CI [−0.094, +0.406]; Mamay few-shot +0.188 CI [0.000, +0.375].
 - Tradeoff: variants push toward predicting **1**, trading 1→2 for new **2→1** (and some 0→1). Lapa few-shot **fixes 11 / breaks 6**; clarified **fixes 8 / breaks 3** — both land at 0.75.
 
-**Implication:** swapping alignment Lapa ↔ Mamay-4B does **not** fix the hole (both collapse at baseline). Few-shot is now on the eval path (`--align-prompt fewshot`); the full-suite router lands at alignment **0.750** / overall **0.842**. Micro-cascade on leftover social `2`s did not move the bucket.
+**Implication:** swapping alignment Lapa ↔ Mamay-4B does **not** fix the hole (both collapse at baseline). Few-shot is now on the eval path (`--align-prompt fewshot`); rules v2 lands at alignment **0.750** / overall **0.848**. Micro-cascade on leftover social `2`s did not move the bucket.
+
+**1b — clearer 2-class contrast: skipped.** After few-shot the 1→2 collapse is gone (11/11). The leftover social errors are the opposite: **4× `2→1`** plus **2× `0→1`** (over-predicting the everyday class). Ethics is a separate 0.800 ceiling (prompt variants never rewrite those 10 items). A contrastive 1-vs-2 pair might win a point or two on the same 32, but the bucket McNemar is already non-significant, and full-suite rules v2 already **matches the oracle**. Not worth another GPU pass; product prompt stays few-shot.
 
 Artifacts: `scripts/score_alignment_variants.py`, `scripts/alignment_prompt_variants.py`, `results/week_5_alignment_bakeoff/scores_alignment_variants{,_flat,_detail}.*`. Older `scores_alignment_bakeoff.json` is baseline-only / superseded for variant claims.
 
@@ -206,12 +216,16 @@ See **§E**. Baseline Lapa (and Mamay-4B) map social “1 — очікувано
 | Priority | Idea | Verdict |
 |----------|------|---------|
 | 1 | Alignment ablation | **Done** — prompt fix, not route swap |
-| 1b | Better social prompt (keep 1-class few-shot, clearer 2-class contrast) | **Do next** (same 32 items) |
-| 2 | Wire improved alignment prompt into eval/router path; re-run router v4 (+ leakage fix) | **Done** — `--align-prompt fewshot` → 0.842 / alignment 0.750 |
+| 1b | Better social prompt (keep 1-class few-shot, clearer 2-class contrast) | **Skipped** — few-shot already 0.750 (11/11 on social-1); leftover is 2→1 overcorrection; overall already = oracle 0.848 |
+| 2 | Wire improved alignment prompt into eval/router path; re-run router v4 (+ leakage fix) | **Done** — `--align-prompt fewshot` → 0.842 / alignment 0.750; rules v2 **0.848** |
 | 3 | **Selective cascade** (social 2 → Mamay-4B retry, no Mamay-12) | **Done** — 1.56% escalate, Δquality ≈ 0 |
 | 4 | **Ensemble / multi-agent** on discrete labels | **Done** — 0.843 vs 0.848; 3 flips net −1; skip product |
 | 5 | **Quantize** Mamay-4B / Lapa / Aya (bitsandbytes 4-bit) | **Done** — 0.830 / slower; keep bf16 |
+| 5b | Pack specialists on **one GPU** | **Not measured** — nvidia-smi ~44 GB/card at `gpu_memory_util=0.90` (KV fills the card). Needs lower util or two vLLMs colocated |
 | — | Full Mamay-4B / Lapa solo on v4 192×3 | **Done** (`week_6_v4_solos`) |
+| **6** | **S2: Mamay-12B on v4** — does composition beat scaling? | **Next** — ~40 min; [`docs/week_9_baselines.md`](week_9_baselines.md) |
+| **7** | **S3: hosted frontier API on v4** — how far is the unavailable option? | **Next** — ~$1–4; `scripts/run_api_baseline.py` |
+| **8** | Composite benchmark + hybrid orchestrator | **Done** — oracle 0.882, one-hop 0.812, hybrid 0.768; use fixed workflows, not general planner |
 | — | Full ~14k corpus ×3 | Optional later; ~18 h router wall estimate |
 
 Cascade should be **narrow** (e.g. instruct format fail→retry), not generic weak confidence that previously made `router_cascade ≈ router_small` on v3.
@@ -236,6 +250,10 @@ Cascade should be **narrow** (e.g. instruct format fail→retry), not generic we
 | Alignment variants (scored) | `results/week_5_alignment_bakeoff/scores_alignment_variants.json` |
 | Alignment prompt helpers | `scripts/alignment_prompt_variants.py`, `scripts/score_alignment_variants.py` |
 | Router scores (baseline) | `results/week_5_router_v4/scores_mean_sd_router_v4.json` |
+| Weeks 7–10 (oracle / router / suites / metrics) | [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md) |
+| Problem statement / scope | [`docs/thesis_scope.md`](thesis_scope.md) |
+| Missing baselines plan | [`docs/week_9_baselines.md`](week_9_baselines.md) |
+| Thesis conclusion | [`docs/conclusion.md`](conclusion.md) |
 | Week-6 tables (solos / few-shot / cascade) | `docs/week_6_takeaways.md` |
 | Router few-shot / solos / cascade scores | `results/week_6_*` |
 | Routing / success / cost | `week_5_router_v4/routing_stats_rep1.json`, `week_6_router_fewshot/routing_stats_rep1.json` |

@@ -21,8 +21,22 @@ Drops: instruct **−0.062** (2/32), knowledge **−0.031** (1/32), translate **
 
 **nvidia-smi still ~44 GB/GPU.** With `gpu_memory_utilization=0.90` the allocator fills the card with KV cache. 4-bit weights do not show up as a smaller reservation. Fair weight-VRAM would need a lower util (or an isolated load); that was not this run.
 
+## One GPU / packing — not this experiment
+
+Quantization **yes**; colocating the pool on **one GPU** **no**.
+
+This run kept the same three-process layout as bf16 (one vLLM per specialist, one GPU each, util 0.90). That answers “does 4-bit bitsandbytes beat bf16 at matched serving settings?” (it does not). It does **not** answer “can Mamay-4B + Lapa + Aya share a 48 GB card?”
+
+A packing measurement would need at least one of:
+
+- lower `gpu_memory_utilization` (and/or `max-model-len`) so weight size is visible in nvidia-smi;
+- two vLLM processes on one GPU, or one process with multiple models;
+- a weight-only VRAM snapshot before KV reservation.
+
+None of those were run. Do not cite week 8 as a packing or “fits on one GPU” result.
+
 ## Verdict
 
-Keep the **bf16** rules v2 product. 4-bit bitsandbytes here is a **quality and speed regression** at matched serving settings. It is not the packing story (`gpu_memory_util≈0.9` hides weight size). AWQ/FP8 with fused kernels would be a different experiment.
+Keep the **bf16** rules v2 product. 4-bit bitsandbytes here is a **quality and speed regression** at matched serving settings. It is not the packing story (`gpu_memory_util≈0.9` hides weight size). AWQ/FP8 with fused kernels, or a real colocation run, would be a different experiment.
 
 Artifacts: `results/week_8_quant/`.
