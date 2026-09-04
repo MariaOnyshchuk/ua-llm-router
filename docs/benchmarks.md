@@ -77,3 +77,45 @@ python scripts/build_balanced_suite.py --per-bucket 32 --out benchmarks/mixed_ua
 - UA-Code-Bench: **imported** (32 easy) — not in scored v4 until judge
 - Hand-written chat/instruct/code expanded to fill **32/bucket**
 - **`mixed_ua_v4_balanced.jsonl`**: 192 = 32×6
+
+## Composite v1 (September phase)
+
+`benchmarks/mixed_ua_composite_v1.jsonl` tests **dependent skills inside one
+request**, rather than another mixture of single-skill rows:
+
+| Family | n | Stored workflow | Final deterministic check |
+|--------|--:|-----------------|---------------------------|
+| `translate_code` | 12 | translate → code | Python function cases |
+| `knowledge_explain` | 12 | knowledge → instruct | answer label, two-line format, required evidence |
+| `translate_knowledge_write` | 12 | translate → knowledge → instruct | exact JSON fields and keys |
+
+The top-level `prompt` is visible to every system. `oracle_plan.steps[]` contains
+the hidden workflow, prompt templates, dependencies, and rubrics. The hybrid
+planner sees only the top-level prompt.
+
+Build and validate:
+
+```bash
+python scripts/build_composite_benchmark.py
+python scripts/build_composite_benchmark.py --check
+```
+
+Run a six-item smoke and then the deterministic evaluation:
+
+```bash
+python scripts/run_composite_router.py \
+  --systems mamay4,lapa,aya,router_direct,oracle,hybrid \
+  --limit 6 --out-dir results/week_10_composite_smoke
+
+python scripts/run_composite_router.py \
+  --systems mamay4,lapa,aya,qwen7,router_direct,oracle,hybrid \
+  --repeats 3 --out-dir results/week_10_composite
+
+python scripts/score_composite_results.py \
+  results/week_10_composite/*.jsonl \
+  --out results/week_10_composite/scores.json
+```
+
+This suite is deliberately small and controlled. Its handcrafted prompts are
+inspired by HumanEval-, ZNO-, and FLORES-style tasks but must not be described
+as new samples from those public datasets.
