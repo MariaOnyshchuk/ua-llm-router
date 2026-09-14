@@ -1,0 +1,11 @@
+system_id,label,prompt,suite,n_items,n_repeats,status,cite_as_thesis,overall,overall_sd,p50_ms,chat,code,translate,instruct,knowledge,alignment,source
+mamay4,Mamay-4B solo,baseline,mixed_ua_v4_balanced,192,3,confirmed,yes,0.7617,0.0001,1124.7333,0.9844,0.9844,0.7578,0.7812,0.4688,0.5938,week_6_v4_solos
+lapa,Lapa-12B solo,baseline,mixed_ua_v4_balanced,192,3,confirmed,yes,0.7315,0.0,1680.7333,0.9844,0.9375,0.4361,0.6875,0.75,0.5938,week_6_v4_solos
+aya,Aya-8B solo,baseline,mixed_ua_v4_balanced,192,3,confirmed,yes,0.7852,0.0003,866.9,1.0,0.9531,0.8205,0.7812,0.5625,0.5938,week_5_router_v4 rescored
+router_v1_baseline,Rules v1 (code→Qwen),baseline,mixed_ua_v4_balanced,192,3,provisional,no,0.8163,0.0,425.0667,0.9844,0.9688,0.8195,0.7812,0.75,0.5938,week_5_router_v4 pre-leakage-fix
+router_v1_fewshot,Rules v1 + social few-shot,fewshot,mixed_ua_v4_balanced,192,3,confirmed,yes,0.8425,0.0003,441.2667,0.9844,0.9688,0.8205,0.7812,0.75,0.75,week_6_router_fewshot
+cascade_micro,Rules v1 few-shot + micro-cascade,fewshot,mixed_ua_v4_balanced,192,3,confirmed,yes,0.8423,0.0,441.1667,0.9844,0.9688,0.8195,0.7812,0.75,0.75,week_6_cascade_micro
+oracle_gold_bucket,Gold-bucket oracle + few-shot,fewshot,mixed_ua_v4_balanced,192,3,confirmed,yes,0.8477,0.0003,633.4667,1.0,0.9844,0.8205,0.7812,0.75,0.75,week_7_router_best
+router_v2_fewshot,Rules v2 + few-shot (product),fewshot,mixed_ua_v4_balanced,192,3,confirmed,yes,0.8475,0.0,633.1333,1.0,0.9844,0.8195,0.7812,0.75,0.75,week_7_rules_v2
+ensemble_vote,Ensemble vote (align+ZNO),fewshot,mixed_ua_v4_balanced,192,1,confirmed,yes,0.8428,,1200.5,1.0,0.9844,0.8224,0.7812,0.6875,0.7812,week_7_ensemble
+rules_v2_4bit,Rules v2 4-bit bnb,fewshot,mixed_ua_v4_balanced,192,1,confirmed,yes,0.8304,,1115.3,1.0,1.0,0.7947,0.7188,0.7188,0.75,week_8_quant

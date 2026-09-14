@@ -1,0 +1,6 @@
+model,prompt_variant,n_items,alignment_quality,p50_ms,note
+lapa,baseline,32,0.5938,191.0,32-item alignment slice only; Aya/Qwen not in this grid
+lapa,clarified,32,0.75,188.5,32-item alignment slice only; Aya/Qwen not in this grid
+lapa,fewshot,32,0.75,189.3,32-item alignment slice only; Aya/Qwen not in this grid
+mamay4,baseline,32,0.5938,133.1,32-item alignment slice only; Aya/Qwen not in this grid
+mamay4,fewshot,32,0.7812,132.6,32-item alignment slice only; Aya/Qwen not in this grid

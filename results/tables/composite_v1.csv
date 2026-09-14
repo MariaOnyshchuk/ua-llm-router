@@ -1,0 +1,8 @@
+system,planner_model,final_score_mean,final_success_rate,plan_exact_match_rate,calls_per_item,latency_p50_ms,knowledge_explain_final,translate_code_final,translate_knowledge_write_final
+aya,,0.7546,0.5,,1.0,1517.2,0.7708,0.9583,0.5347
+hybrid,mamay4,0.7685,0.4352,0.8056,3.5,13533.1,0.6944,0.9306,0.6806
+lapa,,0.7361,0.4167,,1.0,2183.3,0.8958,0.4583,0.8542
+mamay4,,0.794,0.5926,,1.0,1718.3,0.9236,1.0,0.4583
+oracle,,0.8819,0.6667,1.0,2.333,3710.9,0.9167,0.9583,0.7708
+qwen7,,0.7778,0.5278,,1.0,665.9,0.7917,0.9583,0.5833
+router_direct,,0.8125,0.5833,,1.0,1725.2,0.9167,0.9583,0.5625

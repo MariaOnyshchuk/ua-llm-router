@@ -23,6 +23,8 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`week_10_composite/`](week_10_composite/) | 1 Sep | Authoritative composite 36×3 summary: oracle **0.882**, one-hop **0.812**, hybrid planner **0.768**. |
 | [`_empty_failed_stubs/`](_empty_failed_stubs/) | — | Zero-byte / aborted runs. Safe to ignore or delete. |
 
+Wide CSVs (open in Excel): [`tables/v4_model_bucket_quality.csv`](tables/v4_model_bucket_quality.csv), [`tables/v4_alignment_prompt_grid.csv`](tables/v4_alignment_prompt_grid.csv), [`tables/composite_v1.csv`](tables/composite_v1.csv), [`tables/v3_specialist_bakeoff.csv`](tables/v3_specialist_bakeoff.csv). Screening means: [`tables/v6_screen_not_for_claims.csv`](tables/v6_screen_not_for_claims.csv) — do not cite. Frozen-v6 **preview** (screening scores on the 2414 curated ids, not the 3× bake-off): [`tables/v6_preview_from_screen.csv`](tables/v6_preview_from_screen.csv), [`tables/v6_preview_model_bucket.csv`](tables/v6_preview_model_bucket.csv), [`tables/v6_preview_items.csv`](tables/v6_preview_items.csv). Rebuild with `python scripts/export_results_tables.py`. Long-format ledger: [`progress_ledger.csv`](progress_ledger.csv).
+
 ## Start here for claims
 
 1. **Bucket winners / route advice (v3):** `week_4_specialist_bakeoff/specialist_matrix_bakeoff.json`
