@@ -7,6 +7,7 @@ balanced suites are built FROM these corpora.
 Usage:
   python scripts/extract_full_corpora.py
   python scripts/extract_full_corpora.py --only zno,flores,ualign,uacode
+  python scripts/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
 """
 
 from __future__ import annotations
@@ -20,6 +21,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.extract_ua_leaderboard import (  # noqa: E402
+    extract_arc_ukr,
+    extract_belebele_uk,
+    extract_ifeval_ukr,
+    extract_mmlu_ukr,
+    extract_wmt22,
+)
 from scripts.sample_zno import SUBJECT_FILES, format_prompt, is_eligible, iter_tasks  # noqa: E402
 
 
@@ -208,35 +216,60 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument(
         "--only",
-        default="zno,flores,ualign,uacode",
-        help="Comma list: zno,flores,ualign,uacode",
+        default="zno,flores,ualign,uacode,ifeval,belebele,mmlu,arc,wmt22",
+        help="Comma list: zno,flores,ualign,uacode,ifeval,belebele,mmlu,arc,wmt22",
     )
     p.add_argument("--out-dir", type=Path, default=ROOT / "benchmarks" / "corpus")
+    p.add_argument("--mmlu-cap", type=int, default=2000, help="Stratified cap for mmlu_ukr (0 = all)")
     args = p.parse_args()
     only = {x.strip() for x in args.only.split(",") if x.strip()}
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     report: dict = {}
-    if "zno" in only:
-        print("extracting ZNO…")
-        report["zno"] = extract_zno(args.out_dir)
-        print(report["zno"])
-    if "flores" in only:
-        print("extracting FLORES…")
-        report["flores"] = extract_flores(args.out_dir)
-        print(report["flores"])
-    if "ualign" in only:
-        print("extracting UAlign…")
-        report["ualign"] = extract_ualign(args.out_dir)
-        print(report["ualign"])
-    if "uacode" in only:
-        print("extracting UA-Code-Bench…")
-        report["uacode"] = extract_uacode(args.out_dir)
-        print(report["uacode"])
+    extractors = [
+        ("zno", "extracting ZNO…", lambda: extract_zno(args.out_dir)),
+        ("flores", "extracting FLORES…", lambda: extract_flores(args.out_dir)),
+        ("ualign", "extracting UAlign…", lambda: extract_ualign(args.out_dir)),
+        ("uacode", "extracting UA-Code-Bench…", lambda: extract_uacode(args.out_dir)),
+        ("ifeval", "extracting IFEval-UA…", lambda: extract_ifeval_ukr(args.out_dir)),
+        ("belebele", "extracting Belebele uk…", lambda: extract_belebele_uk(args.out_dir)),
+        ("mmlu", "extracting MMLU-UA (stratified)…", lambda: extract_mmlu_ukr(args.out_dir, cap=args.mmlu_cap)),
+        ("arc", "extracting ARC-Challenge-UA…", lambda: extract_arc_ukr(args.out_dir)),
+        ("wmt22", "extracting WMT-22 en↔uk…", lambda: extract_wmt22(args.out_dir)),
+    ]
+    for key, label, fn in extractors:
+        if key not in only:
+            continue
+        print(label)
+        try:
+            report[key] = fn()
+        except Exception as exc:
+            report[key] = {"n": 0, "error": f"{type(exc).__name__}: {exc}"}
+            print(f"  failed: {type(exc).__name__}: {exc}")
+        print(report[key])
 
     inv = args.out_dir / "INVENTORY.json"
-    inv.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"inventory": str(inv), **{k: (v.get("n") or v.get("n_total") or v.get("n_unique_problems")) for k, v in report.items()}}, indent=2))
+    previous: dict = {}
+    if inv.exists():
+        try:
+            previous = json.loads(inv.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            previous = {}
+    previous.update(report)
+    inv.write_text(json.dumps(previous, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "inventory": str(inv),
+                **{
+                    k: (v.get("n") or v.get("n_total") or v.get("n_unique_problems"))
+                    for k, v in report.items()
+                    if isinstance(v, dict)
+                },
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

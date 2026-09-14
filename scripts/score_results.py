@@ -17,10 +17,15 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from scripts.ifeval_check import score_ifeval  # noqa: E402
+from scripts.mcq_format import letter_from_answer  # noqa: E402
+
 UA_RE = re.compile(r"[А-Яа-яЁёІіЇїЄєҐґ]")
 CODE_FENCE_RE = re.compile(r"```(?:python)?\s*([\s\S]*?)```", re.I)
 
 _HE_BY_ID: dict[str, dict[str, Any]] | None = None
+_IFEVAL_BY_ID: dict[str, dict[str, Any]] | None = None
 
 
 def humaneval_fields(row: dict[str, Any]) -> dict[str, Any]:
@@ -48,6 +53,36 @@ def humaneval_fields(row: dict[str, Any]) -> dict[str, Any]:
     for k in ("he_prompt", "he_test", "he_entry_point"):
         if extra.get(k) and not merged.get(k):
             merged[k] = extra[k]
+    return merged
+
+
+def ifeval_fields(row: dict[str, Any]) -> dict[str, Any]:
+    if row.get("ifeval_instruction_id_list"):
+        return row
+    global _IFEVAL_BY_ID
+    if _IFEVAL_BY_ID is None:
+        _IFEVAL_BY_ID = {}
+        for path in [
+            ROOT / "benchmarks/corpus/ifeval_ukr_instruct.jsonl",
+            ROOT / "benchmarks/mixed_ua_v6_screen.jsonl",
+            ROOT / "benchmarks/mixed_ua_v6.jsonl",
+        ]:
+            if not path.exists():
+                continue
+            for line in path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                item = json.loads(line)
+                if item.get("ifeval_instruction_id_list"):
+                    _IFEVAL_BY_ID[str(item.get("id"))] = item
+    extra = _IFEVAL_BY_ID.get(str(row.get("id") or ""), {})
+    merged = dict(row)
+    for k in ("ifeval_instruction_id_list", "ifeval_kwargs", "prompt"):
+        if extra.get(k) is not None and not merged.get(k):
+            merged[k] = extra[k]
+    if extra.get("notes") and not merged.get("notes"):
+        merged["notes"] = extra["notes"]
     return merged
 
 
@@ -144,10 +179,29 @@ def score_translate(content: str, reference: str) -> dict[str, Any]:
     return {"score": s, "chrf": round(s, 4)}
 
 
-def score_instruct(content: str, reference: str, item_id: str, notes: str) -> dict[str, Any]:
+def score_instruct(
+    content: str,
+    reference: str,
+    item_id: str,
+    notes: str,
+    row: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     text = (content or "").strip()
     ref = (reference or "").strip()
     notes = notes or ""
+    merged = ifeval_fields(row or {"id": item_id, "notes": notes})
+    if (
+        str(item_id).startswith("ifeval")
+        or "score_mode=ifeval" in notes
+        or "source=ifeval" in notes
+        or merged.get("ifeval_instruction_id_list")
+    ):
+        return score_ifeval(
+            content,
+            merged.get("ifeval_instruction_id_list"),
+            merged.get("ifeval_kwargs"),
+            str(merged.get("prompt") or ""),
+        )
 
     if item_id == "if-001":
         obj = extract_json_obj(text)
@@ -286,22 +340,26 @@ def score_knowledge(content: str, reference: str) -> dict[str, Any]:
         hits = sum(1 for k in keys if k in text)
         return {"score": 1.0 if hits >= 2 else 0.5 if hits == 1 else 0.0, "detail": f"keywords={hits}"}
 
-    # ZNO-Eval MCQ: reference is a single letter А–Д (latin A–D accepted in output)
+    # MCQ: ZNO (А–Д) and Belebele/MMLU/ARC (A–E). Latin and Cyrillic accepted.
     latin_to_cyr = {"a": "а", "b": "б", "c": "в", "d": "г", "e": "д"}
-    ref_letter = latin_to_cyr.get(ref, ref)
-    if len(ref_letter) == 1 and ref_letter in "абвгд":
+    cyr_to_latin = {v: k for k, v in latin_to_cyr.items()}
+    raw_ref = (reference or "").strip()
+    if raw_ref.isdigit() or (len(raw_ref) == 1 and raw_ref.upper() in "ABCDEАБВГД"):
+        want = letter_from_answer(raw_ref, 5).lower()
         raw = (content or "").strip()
-        m = re.search(r"(?:відповідь|answer)\s*[:\-–]?\s*([А-ДA-Ea-eабвгд])\b", raw, re.I)
+        m = re.search(r"(?:відповідь|answer)\s*[:\-–]?\s*([A-Ea-eА-Дабвгд])\b", raw, re.I)
         if not m:
-            m = re.search(r"(?m)^\s*([А-ДA-Ea-eабвгд])\s*[).]?\s*$", raw)
+            m = re.search(r"(?m)^\s*([A-Ea-eА-Дабвгд])\s*[).]?\s*$", raw)
         if not m:
-            m = re.search(r"\b([А-ДA-Ea-eабвгд])\b", raw)
+            m = re.search(r"\b([A-Ea-eА-Дабвгд])\b", raw)
         got = ""
         if m:
-            ch = m.group(1)
-            got = latin_to_cyr.get(ch.lower(), ch.lower())
-        ok = got == ref_letter
-        return {"score": 1.0 if ok else 0.0, "detail": f"zno_letter got={got or '?'} ref={ref_letter}"}
+            ch = m.group(1).lower()
+            got = cyr_to_latin.get(ch, ch)
+            got = latin_to_cyr.get(got, got)
+            got = cyr_to_latin.get(got, got)
+        ok = got == want
+        return {"score": 1.0 if ok else 0.0, "detail": f"mcq_letter got={got or '?'} ref={want}"}
 
     return {"score": 1.0 if ref in text else 0.0, "detail": "contains_ref"}
 
@@ -430,7 +488,7 @@ def score_row(row: dict[str, Any]) -> dict[str, Any]:
     if bucket == "translate":
         return score_translate(content, reference)
     if bucket == "instruct":
-        return score_instruct(content, reference, item_id, notes)
+        return score_instruct(content, reference, item_id, notes, row)
     if bucket == "knowledge":
         return score_knowledge(content, reference)
     if bucket == "code":
