@@ -511,7 +511,7 @@ def v6_screen() -> None:
 
 
 def v6_solos_one_pass() -> None:
-    """Dedicated 1× frozen-v6 solos (Mamay-12B, Qwen-7B). Not 3-repeat mean±sd."""
+    """Dedicated 1× frozen-v6 solos. Not 3-repeat mean±sd."""
     path = ROOT / "results/v6_solos/scores.json"
     if not path.is_file():
         return
@@ -530,7 +530,7 @@ def v6_solos_one_pass() -> None:
             "overall_mean_macro": sys.get("overall_mean_macro"),
             "latency_p50_ms": sys.get("latency_p50_ms"),
             "latency_avg_ms": sys.get("latency_avg_ms"),
-            "note": "dedicated solo; mamay4/lapa/aya dedicated 1× not in this file",
+            "note": "dedicated solo on frozen mixed_ua_v6; 1 pass",
         }
         for b in BUCKETS:
             cell = (sys.get("by_bucket") or {}).get(b) or {}

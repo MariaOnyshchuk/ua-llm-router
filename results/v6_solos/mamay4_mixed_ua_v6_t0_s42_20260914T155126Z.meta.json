@@ -1,0 +1,68 @@
+{
+  "system": "mamay4",
+  "bench_tag": "mixed_ua_v6_t0_s42",
+  "n": 2414,
+  "wrote": "/home/onyshchuk/Diploma/results/v6_solos/mamay4_mixed_ua_v6_t0_s42_20260914T155126Z.jsonl",
+  "prompt_variant": "baseline",
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 1024
+  },
+  "cascade": {
+    "enabled": false,
+    "kind": null,
+    "buckets": [
+      "alignment",
+      "knowledge"
+    ],
+    "escalated": 0,
+    "escalate_rate": 0.0
+  },
+  "ensemble": {
+    "enabled": false,
+    "voters": [
+      "lapa",
+      "mamay4",
+      "aya"
+    ],
+    "voted": 0,
+    "vote_rate": 0.0,
+    "flipped": 0,
+    "flip_rate": 0.0
+  },
+  "resource_protocol": {
+    "note": "Prefer one model live at a time for fair weight-VRAM. With gpu_memory_utilization≈0.9, nvidia-smi shows KV-cache reservation, not bare weight footprint. gpu_seconds ≈ wall latency (1 GPU).",
+    "vram_sample_interval_s": 0.5
+  },
+  "vram_before": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44644.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 0.0
+    }
+  ],
+  "vram_after": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mb": 44650.0,
+      "memory_total_mb": 49140.0,
+      "utilization_gpu_pct": 24.0
+    }
+  ],
+  "vram": {
+    "n_samples": 13445,
+    "steady_total_vram_mb": 44650.0,
+    "peak_total_vram_mb": 44650.0,
+    "peak_single_gpu_mb": 44650.0,
+    "steady_total_vram_gb": 43.604,
+    "peak_total_vram_gb": 43.604,
+    "peak_single_gpu_gb": 43.604
+  },
+  "gpu_seconds_total": 7126.081,
+  "gpu_seconds_per_prompt": 2.952,
+  "latency_avg_ms": 2952.0
+}

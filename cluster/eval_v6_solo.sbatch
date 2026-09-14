@@ -13,12 +13,21 @@
 #
 #   sbatch --job-name=v6-mamay12 --export=ALL,ALIAS=mamay12 cluster/eval_v6_solo.sbatch
 #   sbatch --job-name=v6-qwen7  --export=ALL,ALIAS=qwen7  cluster/eval_v6_solo.sbatch
+#   sbatch --job-name=v6-mamay4 --export=ALL,ALIAS=mamay4 cluster/eval_v6_solo.sbatch
+#   sbatch --job-name=v6-lapa   --export=ALL,ALIAS=lapa   cluster/eval_v6_solo.sbatch
+#   sbatch --job-name=v6-aya    --export=ALL,ALIAS=aya    cluster/eval_v6_solo.sbatch
 
 set -euo pipefail
 
 ROOT="${HOME}/Diploma"
 # shellcheck disable=SC1091
 source "${ROOT}/.venv/bin/activate"
+# shellcheck disable=SC1091
+set -a
+[ -f "${ROOT}/.env" ] && . "${ROOT}/.env"
+set +a
+export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
+export HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
 mkdir -p "${ROOT}/logs" "${ROOT}/results/v6_solos"
 
 ALIAS="${ALIAS:-mamay12}"
@@ -26,6 +35,21 @@ GPU_MEMORY_UTILIZATION="${GPU_MEMORY_UTILIZATION:-0.90}"
 export VLLM_USE_FLASHINFER_SAMPLER=0
 
 case "${ALIAS}" in
+  mamay4)
+    MODEL="${MODEL:-INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0}"
+    PORT="${PORT:-8003}"
+    PHASE="v6_solo_mamay4"
+    ;;
+  lapa)
+    MODEL="${MODEL:-lapa-llm/lapa-v0.1.2-instruct}"
+    PORT="${PORT:-8001}"
+    PHASE="v6_solo_lapa"
+    ;;
+  aya)
+    MODEL="${MODEL:-CohereLabs/aya-expanse-8b}"
+    PORT="${PORT:-8005}"
+    PHASE="v6_solo_aya"
+    ;;
   mamay12)
     MODEL="${MODEL:-INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v2.0}"
     PORT="${PORT:-8002}"
@@ -37,7 +61,7 @@ case "${ALIAS}" in
     PHASE="v6_solo_qwen7"
     ;;
   *)
-    echo "unknown ALIAS=${ALIAS} (expected mamay12|qwen7)" >&2
+    echo "unknown ALIAS=${ALIAS} (expected mamay4|lapa|aya|mamay12|qwen7)" >&2
     exit 1
     ;;
 esac

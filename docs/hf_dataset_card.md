@@ -33,9 +33,10 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 | `week_*/*.meta.json` | Decoding (`T=0`, `seed=42`), model ids, GPU-seconds |
 | `week_*/routing_stats*.json` | Traffic mix for router runs |
 | `week_*/scores_detail.jsonl` | Item-level scores (ids + scores, no prompts) |
-| `v6_solos/scores.json` | Frozen `mixed_ua_v6` 1-pass solos (Mamay-12B, Qwen-7B) |
+| `v6_solos/scores.json` | Frozen `mixed_ua_v6` 1-pass dedicated solos (five models) |
+| `v6_solos/*.meta.json` | Decoding, GPU-seconds, model ids for those runs |
 | `tables/v6_solos_1pass.csv` | Same numbers as a wide CSV |
-| `tables/v6_preview_from_screen.csv` | Mamay-4B / Lapa / Aya on frozen v6 **ids** from the screening pass — not a dedicated solo |
+| `tables/v6_preview_from_screen.csv` | Screening-sliced preview — do not mix with `v6_solos` |
 
 **Headline pinned numbers (do not mix suites):**
 
@@ -43,7 +44,7 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 - Same router on bitsandbytes 4-bit (week 8): **0.830**
 - Composite 36×3 (week 10): oracle **0.882**, one-hop **0.812**, hybrid planner **0.768**
 - `mixed_ua_v5` (+HumanEval) **0.796** is a harder suite, not a regression vs 0.848
-- Frozen `mixed_ua_v6` (2414 items, 1 pass): Mamay-12B and Qwen-7B dedicated solos in `v6_solos/`. Mamay-4B / Lapa / Aya still screening-sliced until their dedicated 1× files exist. Do not cite the incomplete Mamay-12B screening JSONL.
+- Frozen `mixed_ua_v6` (2414 items, 1 pass, T=0, seed=42): dedicated solos in `v6_solos/` — Mamay-12B **0.695**, Lapa **0.669**, Aya **0.667**, Mamay-4B **0.665**, Qwen-7B **0.594**. Do not cite the incomplete Mamay-12B screening JSONL. Do not mix screening-sliced scores with this table.
 
 ## What is not included (on purpose)
 
