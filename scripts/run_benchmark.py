@@ -149,10 +149,20 @@ def main() -> None:
                 "bucket": item.get("bucket"),
                 "prompt": item.get("prompt"),
                 "reference": item.get("reference", ""),
+                "notes": item.get("notes", ""),
                 "system": args.system,
                 "model_requested": args.model,
                 **result,
             }
+            for key in (
+                "ifeval_instruction_id_list",
+                "ifeval_kwargs",
+                "he_prompt",
+                "he_test",
+                "he_entry_point",
+            ):
+                if item.get(key) is not None:
+                    row[key] = item[key]
             fout.write(json.dumps(row, ensure_ascii=False) + "\n")
             fout.flush()
             preview = (result.get("content") or "")[:80].replace("\n", " ")

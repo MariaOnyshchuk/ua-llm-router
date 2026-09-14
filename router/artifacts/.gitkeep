@@ -1,0 +1,2 @@
+# Trained sklearn pickles live here after `train_learned_router.py`.
+# Encoder weights are not stored; config.json names the HF model.

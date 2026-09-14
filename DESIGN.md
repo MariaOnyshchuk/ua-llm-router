@@ -37,7 +37,7 @@ Client (OpenAI SDK)
 
 1. **Rules-first (MVP)** — keyword / regex intent → one specialist. Deterministic, easy to ablate.
 2. **Cascade (next)** — try small/cheap specialist; escalate on low confidence or failed checks (survey: cascading paradigm).
-3. **Learned router (stretch)** — classifier or preference model over the same aliases.
+3. **Learned router** — profiles `knn` / `clf` in `router/intent_rules.py` (embedding kNN or logistic regression). Default API profile stays **v2**.
 
 ## Composite orchestration (September extension)
 

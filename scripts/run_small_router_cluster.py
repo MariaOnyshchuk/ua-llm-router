@@ -213,6 +213,7 @@ def run_system(
     dest.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out = dest / f"{name}_{bench_tag}_{stamp}.jsonl"
+    partial_out = out.with_suffix(out.suffix + ".partial")
 
     sampler = VramSampler(interval_s=vram_interval_s)
     sampler.start()
@@ -222,7 +223,7 @@ def run_system(
     ensemble_voted = 0
     ensemble_flipped = 0
 
-    with httpx.Client(timeout=180.0) as client, out.open("w", encoding="utf-8") as fout:
+    with httpx.Client(timeout=180.0) as client, partial_out.open("w", encoding="utf-8") as fout:
         for i, item in enumerate(items, 1):
             tagged = apply_alignment_variant(item, align_prompt)
             prompt = tagged["prompt"]
@@ -349,6 +350,8 @@ def run_system(
                 "he_prompt": tagged.get("he_prompt", ""),
                 "he_test": tagged.get("he_test", ""),
                 "he_entry_point": tagged.get("he_entry_point", ""),
+                "ifeval_instruction_id_list": tagged.get("ifeval_instruction_id_list"),
+                "ifeval_kwargs": tagged.get("ifeval_kwargs"),
                 "system": name,
                 "prompt_variant": align_prompt,
                 "model_requested": router_meta.get("model", alias),
@@ -373,8 +376,16 @@ def run_system(
                 f"[{i}/{len(items)}] {item['id']} → {row['model_requested']} "
                 f"{result['http_status']} {result['latency_ms']}ms{tag} | {preview}"
             )
+            if not result.get("ok"):
+                sampler.stop()
+                raise RuntimeError(
+                    f"eval backend failed at item {item['id']} via {alias}: "
+                    f"HTTP {result.get('http_status')} {result.get('error')}. "
+                    f"Partial output retained at {partial_out}"
+                )
 
     vram_stats = sampler.stop()
+    partial_out.replace(out)
     gpu_seconds_total = sum(latencies) / 1000.0
     meta = {
         "system": name,
@@ -446,6 +457,8 @@ def main() -> None:
         "router_cascade_micro",
         "router_best",  # gold-bucket → v4 specialist winners (oracle, not rules)
         "router_ensemble",  # rules v2 + majority vote on alignment + ZNO
+        "router_knn",
+        "router_clf",
     ]
     p.add_argument("mode_pos", nargs="?", default=None, choices=MODE_CHOICES)
     p.add_argument(
@@ -537,6 +550,8 @@ def main() -> None:
         "router_cascade_micro": ["mamay4", "lapa", "aya", "qwen7"],
         "router_best": ["mamay4", "lapa", "aya"],  # no qwen7: code→mamay4, chat→aya
         "router_ensemble": ["mamay4", "lapa", "aya"],
+        "router_knn": ["mamay4", "lapa", "aya"],
+        "router_clf": ["mamay4", "lapa", "aya"],
         "all": ["mamay4", "lapa", "aya"],
     }[args.mode]
     if not args.skip_health:
@@ -582,6 +597,24 @@ def main() -> None:
             "backend_model": model,
             "api_base": base,
         }
+
+    def pick_learned(profile: str):
+        def _pick(item):
+            d = route_intent(item["prompt"], profile=profile)
+            alias = d.model if d.model in ROUTER_MODELS else "mamay4"
+            if alias not in BACKENDS:
+                alias = "mamay4"
+            base, model = BACKENDS[alias]
+            return alias, base, model, {
+                "model": alias,
+                "intent": d.intent,
+                "reason": d.reason,
+                "backend_model": model,
+                "api_base": base,
+                "profile": profile,
+            }
+
+        return _pick
 
     def pick_fixed(alias: str):
         def _pick(item):
@@ -711,6 +744,10 @@ def main() -> None:
                 ensemble=True,
                 **kw,
             )
+        if args.mode == "router_knn":
+            run_system("router_knn", pick_learned("knn"), items, bench_tag, **kw)
+        if args.mode == "router_clf":
+            run_system("router_clf", pick_learned("clf"), items, bench_tag, **kw)
 
 
 if __name__ == "__main__":

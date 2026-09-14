@@ -1,0 +1,68 @@
+{
+  "n_labeled": 1823,
+  "n_holdout_ids": 2414,
+  "label_counts": {
+    "mamay4": 842,
+    "lapa": 579,
+    "aya": 402,
+    "qwen7": 0
+  },
+  "models": [
+    {
+      "kind": "knn",
+      "train_acc": 1.0,
+      "n_train": 1823,
+      "wrote": "/Users/monys/Documents/Diploma/router/artifacts/knn"
+    },
+    {
+      "kind": "clf",
+      "train_acc": 0.6199,
+      "n_train": 1823,
+      "wrote": "/Users/monys/Documents/Diploma/router/artifacts/clf"
+    }
+  ],
+  "leave_one_bucket_out": {
+    "alignment": {
+      "n_train": 1306,
+      "n_test": 517,
+      "knn": 0.2747,
+      "clf": 0.5551,
+      "rules_v2": 0.3385
+    },
+    "chat": {
+      "n_train": 1810,
+      "n_test": 13,
+      "knn": 0.5385,
+      "clf": 0.7692,
+      "rules_v2": 0.0
+    },
+    "code": {
+      "n_train": 1810,
+      "n_test": 13,
+      "knn": 0.2308,
+      "clf": 0.7692,
+      "rules_v2": 0.9231
+    },
+    "instruct": {
+      "n_train": 1577,
+      "n_test": 246,
+      "knn": 0.435,
+      "clf": 0.5041,
+      "rules_v2": 0.2398
+    },
+    "knowledge": {
+      "n_train": 1306,
+      "n_test": 517,
+      "knn": 0.3443,
+      "clf": 0.2708,
+      "rules_v2": 0.5861
+    },
+    "translate": {
+      "n_train": 1306,
+      "n_test": 517,
+      "knn": 0.3714,
+      "clf": 0.4507,
+      "rules_v2": 0.53
+    }
+  }
+}

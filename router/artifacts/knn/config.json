@@ -1,0 +1,13 @@
+{
+  "default": "aya",
+  "encoder": "e5",
+  "encoder_dim": 1024,
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "kind": "knn",
+  "n_train": 1823,
+  "labels": [
+    "aya",
+    "lapa",
+    "mamay4"
+  ]
+}

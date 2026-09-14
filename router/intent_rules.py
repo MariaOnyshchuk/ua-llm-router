@@ -157,6 +157,20 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "default": "aya",
         "blurb": "code → Mamay-4B · chat → Aya",
     },
+    "knn": {
+        "label": "Learned kNN",
+        "remap": {},
+        "default": "aya",
+        "blurb": "multilingual embedding kNN (Hybrid-LLM-style)",
+        "learned": "knn",
+    },
+    "clf": {
+        "label": "Learned classifier",
+        "remap": {},
+        "default": "aya",
+        "blurb": "multilingual embedding logistic regression",
+        "learned": "clf",
+    },
 }
 
 
@@ -171,8 +185,13 @@ def route_intent(
     spec = ROUTER_PROFILES.get(profile) or ROUTER_PROFILES["v2"]
     fallback = default if default is not None else str(spec["default"])
     remap = spec["remap"] if isinstance(spec["remap"], dict) else {}
-
     hinted = (intent_hint or "").strip().lower()
+    learned_kind = spec.get("learned") if isinstance(spec.get("learned"), str) else None
+    if learned_kind and not hinted:
+        from router.learned import route_learned
+
+        return route_learned(text, kind=learned_kind, default=fallback, pool=pool)
+
     hinted_rule = next(
         ((model, reason) for model, intent, _pattern, reason in _RULES if intent == hinted),
         None,
