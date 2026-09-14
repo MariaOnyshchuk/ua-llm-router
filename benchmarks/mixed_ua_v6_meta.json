@@ -1,0 +1,92 @@
+{
+  "suite": "benchmarks/mixed_ua_v6_screen.jsonl",
+  "scores": [
+    "results/v6_screen/scores_screen_detail.jsonl"
+  ],
+  "wrote": "benchmarks/mixed_ua_v6.jsonl",
+  "n": 2414,
+  "n_star": 683,
+  "p": 0.8,
+  "epsilon": 0.03,
+  "z": 1.96,
+  "formula": "N >= (z * sqrt(p*(1-p)) / epsilon)^2",
+  "drop_frac": 0.43,
+  "skipped_unscored": 0,
+  "systems": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "headline_buckets": [
+    "knowledge",
+    "translate",
+    "alignment",
+    "instruct"
+  ],
+  "appendix_buckets": [
+    "chat",
+    "code"
+  ],
+  "by_bucket": {
+    "knowledge": {
+      "pool_scored": 1200,
+      "dropped_low_var": 516,
+      "after_drop": 684,
+      "selected": 683,
+      "target_n": 683,
+      "n_star": 683,
+      "mean_var": 0.096667,
+      "role": "headline"
+    },
+    "translate": {
+      "pool_scored": 1200,
+      "dropped_low_var": 516,
+      "after_drop": 684,
+      "selected": 683,
+      "target_n": 683,
+      "n_star": 683,
+      "mean_var": 0.043021,
+      "role": "headline"
+    },
+    "alignment": {
+      "pool_scored": 1200,
+      "dropped_low_var": 516,
+      "after_drop": 684,
+      "selected": 683,
+      "target_n": 683,
+      "n_star": 683,
+      "mean_var": 0.059074,
+      "role": "headline"
+    },
+    "instruct": {
+      "pool_scored": 573,
+      "dropped_low_var": 246,
+      "after_drop": 327,
+      "selected": 327,
+      "target_n": 683,
+      "n_star": 683,
+      "mean_var": 0.061621,
+      "role": "headline"
+    },
+    "chat": {
+      "pool_scored": 32,
+      "dropped_low_var": 13,
+      "after_drop": 19,
+      "selected": 19,
+      "target_n": 19,
+      "n_star": 683,
+      "mean_var": 0.019097,
+      "role": "appendix"
+    },
+    "code": {
+      "pool_scored": 32,
+      "dropped_low_var": 13,
+      "after_drop": 19,
+      "selected": 19,
+      "target_n": 19,
+      "n_star": 683,
+      "mean_var": 0.022569,
+      "role": "appendix"
+    }
+  }
+}

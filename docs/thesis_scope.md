@@ -46,7 +46,7 @@ S2 and S3 are the two reference points that turn "router beats its own pool" (ne
 
 ## 5. Evaluation
 
-**Single-skill authoritative suite:** `benchmarks/mixed_ua_v4_balanced.jsonl` — 192 items, 32 each across chat / code / translate / instruct / knowledge / alignment. Decoding pinned at `T=0`, `seed=42`, `max_tokens=256`; 3 repeats for mean ± sd.
+**Single-skill next suite:** `benchmarks/mixed_ua_v6.jsonl` is frozen (2414 items; headline 683 knowledge / 683 translate / 683 alignment / 327 instruct; chat+code appendix). Methods: [`docs/mixed_ua_v6.md`](mixed_ua_v6.md). Published claims stay on `mixed_ua_v4_balanced.jsonl` (192×3) until the 3× v6 bake-off is scored — **do not quote screening means**. Decoding for v6: `T=0`, `seed=42`, `max_tokens=1024`.
 
 Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Code + HumanEval (code). Chat and instruct are hand-written — open UA data barely exists for them, and that is a stated limitation.
 
@@ -62,10 +62,12 @@ Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Co
 
 ## 7. Out of scope
 
-- Training or fine-tuning any model
-- A trained/neural router — the new planner is prompted Mamay-4B, not a learned routing model
+- Training or fine-tuning the **specialist** LLMs
 - Production SLA, autoscaling, uptime
 - Non-Ukrainian workloads
+- Mixing fairness-preference datasets (StereoSet-UK, BBQ-UK, …) into the UAlign quality mean
+
+Learned **routing** (embedding kNN / logistic regression profiles `knn` and `clf`) is in scope as a RouterBench-style comparison against Rules v2, Oracle, and BestSingle. The product default remains Rules v2 until that bake-off wins.
 
 ## 8. Composite-task phase
 

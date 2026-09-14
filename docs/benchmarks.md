@@ -31,7 +31,9 @@ benchmarks/
   mixed_ua_v1.jsonl          # v0 ∪ 24 sampled ZNO items
   mixed_ua_v2.jsonl          # v1 ∪ 48 FLORES ∪ 48 UAlign (160)
   mixed_ua_v3.jsonl          # v2 ∪ 22 hand-written code items (182; code=30) — unbalanced
-  mixed_ua_v4_balanced.jsonl # **32 per bucket × 6 = 192** (preferred next suite)
+  mixed_ua_v4_balanced.jsonl # **32 per bucket × 6 = 192** (historical claims)
+  mixed_ua_v6_screen.jsonl   # warehouse screening draw
+  mixed_ua_v6.jsonl          # IRT-curated eval (frozen; v4/v5 untouched)
   external_ua_v2.jsonl       # FLORES ∪ UAlign only (incremental run)
   samples/
     zno_knowledge_v1.jsonl
@@ -63,9 +65,10 @@ python scripts/build_balanced_suite.py --per-bucket 32 --out benchmarks/mixed_ua
 
 ## Scoring notes
 
-- **ZNO:** exact match on letter (А/Б/В/Г/Д) after normalizing answer prefix.
-- **FLORES:** chrF-like score against the official reference translation.
+- **ZNO / Belebele / MMLU-UA / ARC-UA:** letter match (A–E / А–Д).
+- **FLORES / WMT-22:** chrF-like score against the official reference translation.
 - **UAlign:** exact class accuracy (ETHICS: 0/1; Social Chemistry: 0/1/2).
+- **IFEval-UA:** fraction of instruction constraints satisfied (`scripts/ifeval_check.py`).
 - **UA-Code:** prefer Eolymp judge; local unit tests only for hand-written `code-*`.
 - Always report suite version explicitly (`v3` vs `v4_balanced`) so scores stay comparable.
 

@@ -34,5 +34,28 @@
       "4": 95,
       "5": 88
     }
+  },
+  "ifeval": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/ifeval_ukr_instruct.jsonl",
+    "n": 541
+  },
+  "belebele": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/belebele_uk_knowledge.jsonl",
+    "n": 900
+  },
+  "mmlu": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/mmlu_ukr_knowledge.jsonl",
+    "n": 2000,
+    "cap": 2000,
+    "source_n": 15858
+  },
+  "arc": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/arc_challenge_ukr_knowledge.jsonl",
+    "n": 2590
+  },
+  "wmt22": {
+    "wrote": "/Users/monys/Documents/Diploma/benchmarks/corpus/wmt22_translate.jsonl",
+    "n": 4000,
+    "pairs": 2000
   }
 }
