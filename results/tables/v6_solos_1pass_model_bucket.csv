@@ -1,0 +1,13 @@
+system,suite,bucket,role,n,quality_mean,latency_p50_ms,latency_avg_ms,cite_as_thesis,note
+mamay12,mixed_ua_v6,chat,appendix,19,1.0,5091.6,7218.2,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+mamay12,mixed_ua_v6,code,appendix,19,1.0,2484.6,3293.2,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+mamay12,mixed_ua_v6,translate,headline,683,0.6543,1336.8,1719.9,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+mamay12,mixed_ua_v6,instruct,headline,327,0.5775,18496.0,23176.0,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+mamay12,mixed_ua_v6,knowledge,headline,683,0.7804,188.1,440.0,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+mamay12,mixed_ua_v6,alignment,headline,683,0.6881,185.2,185.4,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+qwen7,mixed_ua_v6,chat,appendix,19,1.0,1698.1,1705.2,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+qwen7,mixed_ua_v6,code,appendix,19,1.0,460.3,583.7,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+qwen7,mixed_ua_v6,translate,headline,683,0.5514,511.2,701.4,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+qwen7,mixed_ua_v6,instruct,headline,327,0.5097,4426.9,5404.8,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+qwen7,mixed_ua_v6,knowledge,headline,683,0.6105,228.7,283.0,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",
+qwen7,mixed_ua_v6,alignment,headline,683,0.6369,53.9,54.0,"YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024",

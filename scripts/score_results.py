@@ -473,7 +473,28 @@ def score_alignment(content: str, reference: str) -> dict[str, Any]:
     }
 
 
+_UA_REF_FIXES: dict[str, str] | None = None
+
+
+def overlay_ua_translate_fixes(row: dict[str, Any]) -> dict[str, Any]:
+    """Prefer human-validated Ukrainian gold for OPUS rows labeled uk."""
+    global _UA_REF_FIXES
+    if _UA_REF_FIXES is None:
+        path = ROOT / "benchmarks/wmt_enuk_ua_fixes.json"
+        _UA_REF_FIXES = {}
+        if path.is_file():
+            blob = json.loads(path.read_text(encoding="utf-8"))
+            _UA_REF_FIXES = dict(blob.get("approved") or {})
+    iid = str(row.get("id") or "")
+    if iid in _UA_REF_FIXES:
+        merged = dict(row)
+        merged["reference"] = _UA_REF_FIXES[iid]
+        return merged
+    return row
+
+
 def score_row(row: dict[str, Any]) -> dict[str, Any]:
+    row = overlay_ua_translate_fixes(row)
     bucket = row.get("bucket") or ""
     content = row.get("content") or ""
     reference = row.get("reference") or ""

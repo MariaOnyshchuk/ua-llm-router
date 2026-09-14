@@ -510,6 +510,85 @@ def v6_screen() -> None:
     )
 
 
+def v6_solos_one_pass() -> None:
+    """Dedicated 1× frozen-v6 solos (Mamay-12B, Qwen-7B). Not 3-repeat mean±sd."""
+    path = ROOT / "results/v6_solos/scores.json"
+    if not path.is_file():
+        return
+    blob = load(path)
+    cite = "YES — frozen mixed_ua_v6, 1 pass, T=0, seed=42, max_tokens=1024"
+    rows = []
+    long = []
+    for name, sys in sorted(blob.get("systems", {}).items()):
+        row = {
+            "system": name,
+            "suite": "mixed_ua_v6",
+            "n": sys.get("n"),
+            "repeats": 1,
+            "cite_as_thesis": cite,
+            "overall_mean": sys.get("overall_mean"),
+            "overall_mean_macro": sys.get("overall_mean_macro"),
+            "latency_p50_ms": sys.get("latency_p50_ms"),
+            "latency_avg_ms": sys.get("latency_avg_ms"),
+            "note": "dedicated solo; mamay4/lapa/aya dedicated 1× not in this file",
+        }
+        for b in BUCKETS:
+            cell = (sys.get("by_bucket") or {}).get(b) or {}
+            row[b] = cell.get("quality_mean")
+            row[f"{b}_n"] = cell.get("n")
+            row[f"{b}_p50_ms"] = cell.get("latency_p50_ms")
+            long.append(
+                {
+                    "system": name,
+                    "suite": "mixed_ua_v6",
+                    "bucket": b,
+                    "role": "headline" if b in HEADLINE else "appendix",
+                    "n": cell.get("n"),
+                    "quality_mean": cell.get("quality_mean"),
+                    "latency_p50_ms": cell.get("latency_p50_ms"),
+                    "latency_avg_ms": cell.get("latency_avg_ms"),
+                    "cite_as_thesis": cite,
+                    "note": "",
+                }
+            )
+        rows.append(row)
+    write_csv(
+        OUT / "v6_solos_1pass.csv",
+        rows,
+        [
+            "system",
+            "suite",
+            "n",
+            "repeats",
+            "cite_as_thesis",
+            "overall_mean",
+            "overall_mean_macro",
+            "latency_p50_ms",
+            "latency_avg_ms",
+            *BUCKETS,
+            *[f"{b}_n" for b in BUCKETS],
+            *[f"{b}_p50_ms" for b in BUCKETS],
+            "note",
+        ],
+    )
+    write_csv(
+        OUT / "v6_solos_1pass_model_bucket.csv",
+        long,
+        [
+            "system",
+            "suite",
+            "bucket",
+            "role",
+            "n",
+            "quality_mean",
+            "latency_p50_ms",
+            "latency_avg_ms",
+            "cite_as_thesis",
+            "note",
+        ],
+    )
+
+
 def v3_bakeoff() -> None:
     blob = load(ROOT / "results/week_4_specialist_bakeoff/specialist_matrix_bakeoff.json")
     by = blob.get("quality_by_bucket") or {}
@@ -536,6 +615,7 @@ def main() -> None:
     alignment_prompts()
     composite()
     v6_screen()
+    v6_solos_one_pass()
     v3_bakeoff()
     print(f"wrote {OUT}")
     for p in sorted(OUT.glob("*.csv")):
