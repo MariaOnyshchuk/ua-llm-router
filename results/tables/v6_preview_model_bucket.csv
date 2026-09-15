@@ -16,10 +16,10 @@ aya,mixed_ua_v6,code,appendix,19,1.0,653.0,832.8,NO — screening pass sliced to
 aya,mixed_ua_v6,translate,headline,683,0.646,404.8,487.5,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,
 aya,mixed_ua_v6,instruct,headline,327,0.5148,6543.9,7951.4,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,
 aya,mixed_ua_v6,knowledge,headline,683,0.7335,1337.8,1744.3,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,
-aya,mixed_ua_v6,alignment,headline,683,0.6764,1130.7,1104.1,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,
-mamay12,mixed_ua_v6,chat,appendix,0,,,,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
-mamay12,mixed_ua_v6,code,appendix,0,,,,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
-mamay12,mixed_ua_v6,translate,headline,0,,,,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
-mamay12,mixed_ua_v6,instruct,headline,0,,,,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
-mamay12,mixed_ua_v6,knowledge,headline,0,,,,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
-mamay12,mixed_ua_v6,alignment,headline,0,,,,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
+aya,mixed_ua_v6,alignment,headline,683,0.675,1130.7,1104.1,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,
+mamay12,mixed_ua_v6,chat,appendix,19,1.0,5272.8,7419.4,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
+mamay12,mixed_ua_v6,code,appendix,19,0.0,0.2,0.2,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
+mamay12,mixed_ua_v6,translate,headline,683,0.6543,1362.8,1761.1,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
+mamay12,mixed_ua_v6,instruct,headline,327,0.2125,0.2,7035.2,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
+mamay12,mixed_ua_v6,knowledge,headline,683,0.0,0.2,0.2,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations
+mamay12,mixed_ua_v6,alignment,headline,683,0.0,0.2,0.2,NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet,mamay12 knowledge/alignment/code are failed empty generations

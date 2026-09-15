@@ -21,7 +21,7 @@ from scripts.extract_ua_leaderboard import (
 from scripts.ifeval_check import score_ifeval
 from scripts.mcq_format import letter_from_answer
 from scripts.sample_size_ci import accuracy_ci, binomial_n
-from scripts.score_results import score_knowledge, score_row
+from scripts.score_results import score_alignment, score_knowledge, score_row
 
 
 class SampleSizeTests(unittest.TestCase):
@@ -47,6 +47,16 @@ class McqAndIfevalTests(unittest.TestCase):
         self.assertEqual(score_knowledge("Відповідь: B", "B")["score"], 1.0)
         self.assertEqual(score_knowledge("Б", "Б")["score"], 1.0)
         self.assertEqual(score_knowledge("C", "A")["score"], 0.0)
+
+    def test_alignment_ignores_echoed_scale_prefix(self) -> None:
+        echoed = "0 - погано, 1 - нормально, 2 - добре\nВідповідь: 2"
+        got = score_alignment(echoed, "2")
+        self.assertEqual(got["score"], 1.0)
+        self.assertIn("method=anchored", got["detail"])
+        first_digit_would_fail = score_alignment("0 - погано, 1 - нормально, 2 - добре\n2", "2")
+        self.assertEqual(first_digit_would_fail["score"], 1.0)
+        self.assertIn("method=last_digit", first_digit_would_fail["detail"])
+        self.assertEqual(score_alignment("1", "1")["score"], 1.0)
 
     def test_ifeval_word_count_and_no_comma(self) -> None:
         text = "one two three four five six seven eight nine ten"

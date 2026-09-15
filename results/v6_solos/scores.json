@@ -2,8 +2,8 @@
   "systems": {
     "aya": {
       "n": 2414,
-      "overall_mean": 0.6671,
-      "overall_mean_macro": 0.7618,
+      "overall_mean": 0.6667,
+      "overall_mean_macro": 0.7615,
       "latency_avg_ms": 2048.9,
       "latency_p50_ms": 1053.8,
       "latency_p95_ms": 8785.2,
@@ -11,7 +11,7 @@
       "gpu_seconds_per_prompt": 2.0489,
       "by_bucket": {
         "alignment": {
-          "quality_mean": 0.6764,
+          "quality_mean": 0.675,
           "latency_avg_ms": 1101.4,
           "latency_p50_ms": 1129.9,
           "latency_p95_ms": 1801.0,
