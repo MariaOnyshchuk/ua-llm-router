@@ -28,8 +28,11 @@ def _result(alias: str, model: str, resp: httpx.Response, latency_ms: float) -> 
     except Exception:
         body = {"raw": resp.text}
     content = ""
+    finish_reason = None
     if resp.is_success:
-        content = ((body.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+        choice = (body.get("choices") or [{}])[0]
+        content = (choice.get("message") or {}).get("content") or ""
+        finish_reason = choice.get("finish_reason")
     return {
         "alias": alias,
         "ok": resp.is_success,
@@ -40,6 +43,7 @@ def _result(alias: str, model: str, resp: httpx.Response, latency_ms: float) -> 
         "error": None if resp.is_success else body,
         "hf": model,
         "usage": body.get("usage") if isinstance(body, dict) else None,
+        "finish_reason": finish_reason,
     }
 
 

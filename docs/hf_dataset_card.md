@@ -37,6 +37,8 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 | `v6_solos/*.meta.json` | Decoding, GPU-seconds, model ids for those runs |
 | `tables/v6_solos_1pass.csv` | Same numbers as a wide CSV |
 | `tables/v6_preview_from_screen.csv` | Screening-sliced preview — do not mix with `v6_solos` |
+| `tables/a2_planner_grid*.csv` | Planning-only prompt × model screen on composite v1 |
+| `tables/a2_agentcoma*.csv` | Planning-only AgentCoMa diagnostics (IDs and metrics; no prompts or generations) |
 
 **Headline pinned numbers (do not mix suites):**
 
@@ -45,11 +47,15 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 - Composite 36×3 (week 10): oracle **0.882**, one-hop **0.812**, hybrid planner **0.768**
 - `mixed_ua_v5` (+HumanEval) **0.796** is a harder suite, not a regression vs 0.848
 - Frozen `mixed_ua_v6` (2414 items, 1 pass, T=0, seed=42): dedicated solos in `v6_solos/` — Mamay-12B **0.695**, Lapa **0.669**, Aya **0.667**, Mamay-4B **0.665**, Qwen-7B **0.594**. Do not cite the incomplete Mamay-12B screening JSONL. Do not mix screening-sliced scores with this table.
+- A2 planner tables are diagnostics, not end-task quality results. The AgentCoMa
+  intent sequence is a project-defined diagnostic oracle, not benchmark gold.
 
 ## What is not included (on purpose)
 
 - Raw generation JSONL (`prompt` / `content`) — those rows reprint ZNO-Eval, FLORES-200, UAlign, and HumanEval text.
 - UA-Code-Bench / Eolymp problem statements (not redistributable).
+- AgentCoMa prompts or translated derivatives (the source dataset is gated and
+  does not publish a reusable dataset license).
 - Empty failed stubs and composite smoke folders.
 
 Prompts live in the original sources and in the GitHub repo’s `benchmarks/` samples. Cite those datasets if you rebuild the suites.

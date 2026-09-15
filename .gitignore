@@ -9,3 +9,15 @@ logs/
 .cursor/
 .DS_Store
 *.pid
+
+# Local publication staging and raw evaluation traces. Keep score summaries
+# and tables under results/ tracked; these paths contain prompts/generations.
+hf_eval/
+results/a2_agentcoma*/
+results/a2_planner_grid/
+results/v6_screen/*_mixed_ua_*.jsonl
+results/v6_solos/*_mixed_ua_*.jsonl
+
+# AgentCoMa is gated and does not publish a reusable dataset license.
+# Keep locally translated prompt files out of this repository.
+benchmarks/agentcoma_uk_50*.jsonl

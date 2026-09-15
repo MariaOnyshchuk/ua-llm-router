@@ -1,0 +1,51 @@
+id,family,raw_json_valid,strict_plan_valid,raw_n_steps,raw_intents,finish_reason,completion_tokens,validator_error
+eval_HW_add_1,house_working,True,False,4,knowledge>translate>knowledge>code,stop,369,step2: dependencies must refer to earlier steps
+eval_HW_sub_2,house_working,True,False,4,knowledge>translate>knowledge>knowledge,stop,343,step1: placeholders missing from depends_on: ['step1']
+eval_HW_mul_1,house_working,True,False,4,knowledge>knowledge>knowledge>chat,stop,329,step2: dependencies must refer to earlier steps
+eval_WS_sub_1,web_shopping,True,False,8,knowledge>translate>knowledge>knowledge>knowledge>knowledge>knowledge>code,stop,591,plan must contain 1-4 steps
+eval_WS_div_2,web_shopping,True,True,4,knowledge>translate>knowledge>code,stop,327,
+eval_WS_add_3,web_shopping,True,True,4,knowledge>translate>knowledge>code,stop,378,
+eval_SE_sub_1,science_experiments,True,False,4,knowledge>knowledge>knowledge>chat,stop,424,step2: dependencies must refer to earlier steps
+eval_SE_mul_2,science_experiments,True,False,6,knowledge>translate>knowledge>knowledge>code>alignment,stop,565,plan must contain 1-4 steps
+eval_SE_div_4,science_experiments,True,False,5,knowledge>translate>knowledge>code>alignment,stop,560,plan must contain 1-4 steps
+eval_SA_add_2,smart_assistant,True,False,4,knowledge>knowledge>knowledge>translate,stop,268,step2: dependencies must refer to earlier steps
+eval_SA_mul_4,smart_assistant,True,False,5,knowledge>translate>knowledge>code>alignment,stop,507,plan must contain 1-4 steps
+eval_SA_div_2,smart_assistant,True,False,8,knowledge>translate>translate>translate>instruct>instruct>code>alignment,stop,614,plan must contain 1-4 steps
+eval_TA_add_2,travel_agent,True,False,5,knowledge>knowledge>knowledge>code>alignment,stop,384,plan must contain 1-4 steps
+eval_TA_sub_2,travel_agent,True,True,4,knowledge>translate>knowledge>code,stop,286,
+eval_TA_div_3,travel_agent,True,False,6,knowledge>translate>knowledge>knowledge>instruct>chat,stop,383,plan must contain 1-4 steps
+eval_HW_add_2,house_working,True,False,6,knowledge>knowledge>knowledge>knowledge>knowledge>translate,stop,386,plan must contain 1-4 steps
+eval_HW_add_3,house_working,True,False,6,knowledge>knowledge>knowledge>knowledge>knowledge>translate,stop,381,plan must contain 1-4 steps
+eval_HW_sub_1,house_working,False,False,0,,length,1024,"Expecting ',' delimiter: line 86 column 6 (char 2839)"
+eval_HW_sub_3,house_working,True,False,5,knowledge>translate>knowledge>code>chat,stop,440,plan must contain 1-4 steps
+eval_HW_mul_3,house_working,True,False,4,knowledge>translate>knowledge>code,stop,275,step2: dependencies must refer to earlier steps
+eval_HW_div_1,house_working,True,False,6,knowledge>knowledge>knowledge>knowledge>knowledge>code,stop,402,plan must contain 1-4 steps
+eval_HW_div_2,house_working,True,False,6,knowledge>translate>knowledge>instruct>code>alignment,stop,486,plan must contain 1-4 steps
+eval_WS_add_1,web_shopping,True,False,4,knowledge>translate>knowledge>code,stop,309,step2: dependencies must refer to earlier steps
+eval_WS_add_2,web_shopping,True,False,6,knowledge>translate>knowledge>knowledge>knowledge>code,stop,542,plan must contain 1-4 steps
+eval_WS_sub_2,web_shopping,True,False,7,knowledge>translate>knowledge>knowledge>knowledge>translate>code,stop,545,plan must contain 1-4 steps
+eval_WS_sub_3,web_shopping,True,False,5,knowledge>translate>knowledge>code>alignment,stop,436,plan must contain 1-4 steps
+eval_WS_mul_1,web_shopping,True,False,4,knowledge>translate>code>alignment,stop,477,step2: dependencies must refer to earlier steps
+eval_WS_mul_2,web_shopping,True,True,4,knowledge>translate>knowledge>code,stop,334,
+eval_WS_div_1,web_shopping,True,False,4,knowledge>translate>knowledge>code,stop,277,step2: dependencies must refer to earlier steps
+eval_SE_add_1,science_experiments,True,False,4,knowledge>knowledge>knowledge>translate,stop,271,step2: dependencies must refer to earlier steps
+eval_SE_add_2,science_experiments,True,False,4,knowledge>translate>knowledge>code,stop,314,step2: dependencies must refer to earlier steps
+eval_SE_add_3,science_experiments,True,False,4,knowledge>knowledge>knowledge>translate,stop,276,step2: dependencies must refer to earlier steps
+eval_SE_sub_2,science_experiments,True,False,10,knowledge>knowledge>knowledge>knowledge>knowledge>knowledge>knowledge>knowledge>knowledge>code,stop,689,plan must contain 1-4 steps
+eval_SE_sub_3,science_experiments,True,False,4,knowledge>translate>knowledge>code,stop,379,step2: dependencies must refer to earlier steps
+eval_SE_mul_1,science_experiments,True,False,4,knowledge>knowledge>knowledge>knowledge,stop,367,step2: dependencies must refer to earlier steps
+eval_SE_div_1,science_experiments,True,False,4,knowledge>translate>knowledge>code,stop,333,step2: dependencies must refer to earlier steps
+eval_SA_add_1,smart_assistant,True,False,6,knowledge>knowledge>knowledge>knowledge>translate>instruct,stop,497,plan must contain 1-4 steps
+eval_SA_add_3,smart_assistant,True,False,4,knowledge>knowledge>knowledge>knowledge,stop,325,step2: dependencies must refer to earlier steps
+eval_SA_sub_1,smart_assistant,True,False,6,knowledge>translate>knowledge>code>alignment>chat,stop,546,plan must contain 1-4 steps
+eval_SA_sub_2,smart_assistant,True,False,4,knowledge>translate>knowledge>code,stop,334,step2: dependencies must refer to earlier steps
+eval_SA_mul_1,smart_assistant,True,False,4,knowledge>knowledge>translate>chat,stop,277,step2: dependencies must refer to earlier steps
+eval_SA_mul_2,smart_assistant,True,False,3,knowledge>translate>code,stop,280,step2: dependencies must refer to earlier steps
+eval_SA_div_1,smart_assistant,True,False,5,knowledge>knowledge>knowledge>code>alignment,stop,494,plan must contain 1-4 steps
+eval_TA_add_1,travel_agent,True,False,5,knowledge>knowledge>knowledge>translate>translate,stop,414,plan must contain 1-4 steps
+eval_TA_add_3,travel_agent,True,True,4,knowledge>translate>knowledge>code,stop,315,
+eval_TA_sub_1,travel_agent,True,False,10,knowledge>knowledge>translate>knowledge>alignment>translate>knowledge>knowledge>code>chat,stop,713,plan must contain 1-4 steps
+eval_TA_sub_3,travel_agent,True,False,8,knowledge>knowledge>knowledge>knowledge>knowledge>knowledge>knowledge>translate,stop,917,plan must contain 1-4 steps
+eval_TA_mul_1,travel_agent,True,False,7,knowledge>knowledge>knowledge>knowledge>knowledge>code>alignment,stop,467,plan must contain 1-4 steps
+eval_TA_mul_2,travel_agent,True,False,6,knowledge>knowledge>translate>knowledge>code>alignment,stop,430,plan must contain 1-4 steps
+eval_TA_div_1,travel_agent,True,False,6,knowledge>knowledge>knowledge>knowledge>knowledge>translate,stop,570,plan must contain 1-4 steps

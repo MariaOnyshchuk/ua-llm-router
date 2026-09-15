@@ -11,6 +11,20 @@ from router.orchestrator import Plan, PlanStep, validate_plan
 
 PLANNER_MODEL = "mamay4"
 
+SYSTEM_INSTRUCTION_V3_MINIMAL = """Ти плануєш виконання складеного запиту для українського асистента,
+розбиваючи його на 2-4 залежні кроки. Кожен крок має один з intent:
+translate, knowledge, instruct, code, alignment, chat — обери сам,
+який підходить найкраще для того, що конкретно потрібно зробити на цьому кроці.
+
+Поверни ЛИШЕ JSON у форматі:
+{"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."}, ...]}
+
+Залежність між кроками познач у prompt як {{step_id.content}}.
+Не вигадуй фактів, яких немає в запиті чи в результатах попередніх кроків.
+Фінальний крок має дослівно відтворити всі вимоги користувача щодо формату
+відповіді (наприклад: лише JSON, рівно два рядки, лише блок коду тощо).
+"""
+
 SYSTEM_INSTRUCTION = """Ти планувальник складених запитів для українського асистента.
 Розбий запит на 2-4 залежні кроки. Дозволені intent:
 translate, knowledge, instruct, code, alignment, chat.
@@ -105,10 +119,14 @@ async def generate_plan(
     caller,
     *,
     repair: bool = True,
+    instruction: str | None = None,
+    model: str | None = None,
 ) -> tuple[Plan, dict[str, Any]]:
-    planner_prompt = f"{SYSTEM_INSTRUCTION}\n\nЗАПИТ КОРИСТУВАЧА:\n{user_prompt}"
+    system = SYSTEM_INSTRUCTION if instruction is None else instruction
+    planner_model = PLANNER_MODEL if model is None else model
+    planner_prompt = f"{system}\n\nЗАПИТ КОРИСТУВАЧА:\n{user_prompt}"
     attempts: list[dict[str, Any]] = []
-    hop = await caller(PLANNER_MODEL, planner_prompt)
+    hop = await caller(planner_model, planner_prompt)
     attempts.append(hop)
 
     try:
@@ -121,11 +139,11 @@ async def generate_plan(
 
     if repair:
         repair_prompt = (
-            f"{SYSTEM_INSTRUCTION}\n\nПопередня відповідь невалідна: {first_error}\n"
+            f"{system}\n\nПопередня відповідь невалідна: {first_error}\n"
             "Виправ її. Поверни тільки валідний JSON.\n\n"
             f"ЗАПИТ:\n{user_prompt}\n\nПОПЕРЕДНЯ ВІДПОВІДЬ:\n{hop.get('content') or ''}"
         )
-        repaired = await caller(PLANNER_MODEL, repair_prompt)
+        repaired = await caller(planner_model, repair_prompt)
         attempts.append(repaired)
         try:
             plan = Plan.from_dict(

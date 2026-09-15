@@ -17,7 +17,8 @@ from router.orchestrator import (
     render_prompt,
     validate_plan,
 )
-from router.planner import enforce_final_constraint, generate_plan
+from router.planner import enforce_final_constraint, generate_plan, SYSTEM_INSTRUCTION_V3_MINIMAL
+from scripts.build_agentcoma_benchmark import wrap_row
 from scripts.build_composite_benchmark import build_items, validate_items
 from scripts.run_composite_router import balanced_limit
 from scripts.score_composite_results import parse_json_content, score_row, score_rubric
@@ -50,6 +51,22 @@ class BenchmarkTests(unittest.TestCase):
             "translate_code": 2,
             "translate_knowledge_write": 2,
         })
+
+    def test_agentcoma_wrapper_hides_gold_from_prompt(self) -> None:
+        wrapped = wrap_row(
+            {
+                "id": "eval_HW_add_1",
+                "category": "house_working",
+                "operation_type": "addition",
+                "question_composition_uk": "Скільки предметів підуть у шафу?",
+                "answer_composition": 5,
+            }
+        )
+        self.assertEqual(wrapped["oracle_plan"]["steps"][0]["intent"], "knowledge")
+        self.assertEqual(wrapped["oracle_plan"]["steps"][1]["intent"], "instruct")
+        self.assertEqual(wrapped["prompt"], "Скільки предметів підуть у шафу?")
+        self.assertNotIn("5", wrapped["prompt"])
+        self.assertNotIn("5", wrapped["oracle_plan"]["steps"][0]["prompt"])
 
 
 class PlanTests(unittest.TestCase):
@@ -118,6 +135,43 @@ class PlanTests(unittest.TestCase):
         self.assertFalse(meta["valid"])
         self.assertEqual(plan.source, "single_hop_fallback")
         self.assertEqual(plan.steps[0].prompt, "original")
+
+    def test_instruction_and_model_overrides_are_forwarded(self) -> None:
+        seen: list[tuple[str, str]] = []
+
+        async def caller(alias: str, prompt: str) -> dict:
+            seen.append((alias, prompt))
+            return {
+                "alias": alias,
+                "ok": True,
+                "content": json.dumps(
+                    {
+                        "steps": [
+                            {
+                                "id": "a",
+                                "intent": "knowledge",
+                                "depends_on": [],
+                                "prompt": "fact",
+                            }
+                        ]
+                    }
+                ),
+                "latency_ms": 1,
+                "gpu_seconds": 0.001,
+            }
+
+        plan, meta = asyncio.run(
+            generate_plan(
+                "question",
+                caller,
+                instruction=SYSTEM_INSTRUCTION_V3_MINIMAL,
+                model="mamay12",
+            )
+        )
+        self.assertTrue(meta["valid"])
+        self.assertEqual(plan.steps[0].intent, "knowledge")
+        self.assertEqual(seen[0][0], "mamay12")
+        self.assertTrue(seen[0][1].startswith(SYSTEM_INSTRUCTION_V3_MINIMAL))
 
     def test_final_constraint_is_enforced(self) -> None:
         plan = Plan(
