@@ -1,4 +1,4 @@
-"""Mamay-4B JSON planner for bounded composite workflows."""
+"""Mamay JSON planner for bounded composite workflows."""
 
 from __future__ import annotations
 
@@ -53,11 +53,9 @@ translate, knowledge, instruct, code, alignment, chat.
 - не додавай ключів поза steps/id/intent/depends_on/prompt.
 
 Приклади структури:
-1) Англійська специфікація → реалізація:
-translate → code.
-2) Тестове питання → відповідь із поясненням у двох рядках:
+1) Тестове питання → відповідь із поясненням у двох рядках:
 knowledge → instruct.
-3) Англійське джерело → витяг фактів → фінальний JSON:
+2) Англійське джерело → витяг фактів → фінальний JSON:
 translate → knowledge → instruct.
 """
 
