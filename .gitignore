@@ -17,6 +17,8 @@ results/a2_agentcoma*/
 results/a2_planner_grid/
 results/v6_screen/*_mixed_ua_*.jsonl
 results/v6_solos/*_mixed_ua_*.jsonl
+# Generation rows (prompt + model answer). Publish on Hugging Face, not git.
+results/week_9_baselines/*.jsonl
 
 # AgentCoMa is gated and does not publish a reusable dataset license.
 # Keep locally translated prompt files out of this repository.
