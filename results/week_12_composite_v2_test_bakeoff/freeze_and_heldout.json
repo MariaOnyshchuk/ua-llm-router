@@ -1,0 +1,64 @@
+{
+  "created_utc": "2026-09-28T14:29:48Z",
+  "suite": "mixed_ua_composite_v2",
+  "frozen_profile": "template",
+  "dev_ablation": {
+    "plan_exact_match_rate": 1.0,
+    "template_id_accuracy": 1.0,
+    "fallback_rate": 0.0,
+    "n": 60
+  },
+  "heldout_test_planning": {
+    "plan_exact_match_rate": 1.0,
+    "template_id_accuracy": 1.0,
+    "fallback_rate": 0.0,
+    "n": 60,
+    "by_family": {
+      "extract_classify_write": {
+        "exact": 1.0,
+        "n": 12
+      },
+      "knowledge_explain": {
+        "exact": 1.0,
+        "n": 12
+      },
+      "translate_code": {
+        "exact": 1.0,
+        "n": 12
+      },
+      "translate_knowledge_write": {
+        "exact": 1.0,
+        "n": 12
+      },
+      "translate_summarize_format": {
+        "exact": 1.0,
+        "n": 12
+      }
+    }
+  },
+  "execution_bakeoff": {
+    "status": "ready_on_cluster",
+    "sbatch": "cluster/eval_composite_v2_bakeoff.sbatch",
+    "systems": [
+      "router_direct",
+      "oracle",
+      "hybrid",
+      "template"
+    ],
+    "split": "test",
+    "repeats": 3,
+    "protocol": "T=0 seed=42 max_tokens=256",
+    "note": "Planning held-out is complete offline (template exact=1.0). Specialist execution quality on the same 60×3 test items requires the GPU sbatch; do not mix with v1 0.812/0.882 cells."
+  },
+  "decision": {
+    "frozen_profile": "template",
+    "open_test": false,
+    "distillation_warranted": false,
+    "distillation_reason": "Template already reaches perfect workflow match on the bounded v2 families. Distill only if freer natural-language prompts break the regex selector.",
+    "reasons": [
+      "template exact workflow match on v2/dev = 1.0",
+      "v1 hybrid v3 exact workflow match was 0.639 (different suite; planning headroom)",
+      "no live LLM planner scores; freeze template from offline ablation"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+cuda_visible=0
+utils lapa=0.42 aya=0.28 mamay4=0.18
+index, memory.used [MiB], memory.total [MiB]
+0, 45668 MiB, 49140 MiB
+pid, used_gpu_memory [MiB]
+3865155, 21392 MiB
+3865770, 14530 MiB
+3866138, 9726 MiB

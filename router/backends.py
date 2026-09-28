@@ -2,29 +2,38 @@
 
 from __future__ import annotations
 
+import os
+
+
+def _v1(port_env: str, default_port: int) -> str:
+    """Base URL. Override the port when two jobs share a host."""
+    port = os.environ.get(port_env, str(default_port))
+    return f"http://127.0.0.1:{port}/v1"
+
+
 BACKENDS: dict[str, tuple[str, str]] = {
     "mamay4": (
-        "http://127.0.0.1:8003/v1",
+        _v1("ROUTER_PORT_MAMAY4", 8003),
         "INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0",
     ),
     "qwen": (
-        "http://127.0.0.1:8004/v1",
+        _v1("ROUTER_PORT_QWEN", 8004),
         "Qwen/Qwen2.5-Coder-3B-Instruct",
     ),
     "qwen7": (
-        "http://127.0.0.1:8004/v1",
+        _v1("ROUTER_PORT_QWEN7", 8004),
         "Qwen/Qwen2.5-Coder-7B-Instruct",
     ),
     "mamay12": (
-        "http://127.0.0.1:8002/v1",
+        _v1("ROUTER_PORT_MAMAY12", 8002),
         "INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v2.0",
     ),
     "lapa": (
-        "http://127.0.0.1:8001/v1",
+        _v1("ROUTER_PORT_LAPA", 8001),
         "lapa-llm/lapa-v0.1.2-instruct",
     ),
     "aya": (
-        "http://127.0.0.1:8005/v1",
+        _v1("ROUTER_PORT_AYA", 8005),
         "CohereLabs/aya-expanse-8b",
     ),
 }

@@ -39,4 +39,19 @@ None of those were run. Do not cite week 8 as a packing or “fits on one GPU”
 
 Keep the **bf16** rules v2 product. 4-bit bitsandbytes here is a **quality and speed regression** at matched serving settings. It is not the packing story (`gpu_memory_util≈0.9` hides weight size). AWQ/FP8 with fused kernels, or a real colocation run, would be a different experiment.
 
-Artifacts: `results/week_8_quant/`.
+## Follow-up — one GPU, online FP8 (27 Sep 2026)
+
+Different experiment from the table above. Three vLLM processes on one RTX 6000 Ada, `--quantization fp8`, `--enforce-eager`, `max-model-len 4096`. `gpu_memory_utilization` is a fraction of the whole card: Lapa 0.42, Aya 0.28, Mamay-4B 0.18. After load, nvidia-smi showed **45 668 / 49 140 MiB**, split 21 392 + 14 530 + 9 726 MiB.
+
+Rules v2 + few-shot, `mixed_ua_v4`, T=0, seed=42, max_tokens=256, **3 repeats**. HTTP 192/192 on each. The three repeats agree:
+
+| System | Overall | p50 | chat | code | translate | instruct | knowledge | alignment |
+|--------|--------:|----:|-----:|-----:|----------:|---------:|----------:|----------:|
+| bf16 rules v2 (3×, three GPUs) | **0.848** | **633** | 1.000 | 0.984 | 0.820 | 0.781 | **0.750** | 0.750 |
+| **FP8, one GPU (3×)** | **0.842** | 723 | 1.000 | 0.984 | 0.816 | 0.781 | 0.688 | **0.781** |
+
+The 1× screen that gated the 3× was 0.842 / p50 725 ms, above the bitsandbytes bar of 0.830. Overall drop vs bf16 is 0.006. The bucket that moves is knowledge (0.750 → 0.688). p50 is slower (633 → 723 ms) and still far from the bitsandbytes 1115 ms. Resident GPUs go from 3 to 1. This does not replace the bf16 product number.
+
+Artifacts: `results/week_11_pack_fp8/`. Script: `cluster/eval_pack_fp8.sbatch`.
+
+Artifacts for the bitsandbytes run stay in `results/week_8_quant/`.

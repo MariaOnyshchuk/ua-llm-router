@@ -218,6 +218,44 @@ REGISTRY: tuple[Run, ...] = (
         detail="results/week_5_alignment_bakeoff/scores_alignment_variants_detail.jsonl",
         buckets=("alignment",),
     ),
+    Run(
+        run_group="week_9_baselines",
+        date="2026-09-26",
+        path="results/week_9_baselines/scores_mean_sd_s2.json",
+        suite="mixed_ua_v4_balanced",
+        n_repeats=3,
+        scorer_epoch=SCORER_POST,
+        status="confirmed",
+        notes=(
+            "S2 Mamay-12B alone, bf16, util 0.90, few-shot. HTTP 192/192 ×3. "
+            "Overall 0.874 vs rules v2 0.848; p50 1352 ms vs 633 ms."
+        ),
+        detail=(
+            "results/week_9_baselines/scored/"
+            "mamay12_mixed_ua_v4_balanced_t0_s42_rep1_20260926T205756Z"
+            ".scores_detail.jsonl"
+        ),
+    ),
+    Run(
+        run_group="week_11_pack_fp8",
+        date="2026-09-27",
+        path="results/week_11_pack_fp8/scores_mean_sd_pack.json",
+        suite="mixed_ua_v4_balanced",
+        n_repeats=3,
+        scorer_epoch=SCORER_POST,
+        status="confirmed",
+        notes=(
+            "Rules v2 + few-shot, online FP8, three vLLMs on one GPU "
+            "(utils 0.42/0.28/0.18, max-model-len 4096). HTTP 192/192 ×3. "
+            "Overall 0.842 / p50 723 ms vs bf16 0.848 / 633 ms. "
+            "Resident 45668/49140 MiB."
+        ),
+        detail=(
+            "results/week_11_pack_fp8/scored/"
+            "router_matrix_v2_fewshot_mixed_ua_v4_balanced_t0_s42_rep1_"
+            "20260927T111407Z.scores_detail.jsonl"
+        ),
+    ),
 )
 
 # Artifacts deliberately left out, recorded so the omission is auditable.

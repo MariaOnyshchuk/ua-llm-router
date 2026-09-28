@@ -12,15 +12,24 @@ from router.app import app
 from router.orchestrator import (
     Plan,
     PlanStep,
+    ensure_dependency_placeholders,
     execute_plan,
     plan_signature,
     render_prompt,
     validate_plan,
 )
 from router.planner import enforce_final_constraint, generate_plan, SYSTEM_INSTRUCTION_V3_MINIMAL
+from router.workflows import select_plan, select_template
 from scripts.build_agentcoma_benchmark import wrap_row
-from scripts.build_composite_benchmark import build_items, validate_items
-from scripts.run_composite_router import balanced_limit
+from scripts.build_composite_benchmark import (
+    FAMILIES_V2,
+    SPLIT_COUNTS_V2,
+    build_items,
+    build_items_v2,
+    validate_items,
+    validate_items_v2,
+)
+from scripts.run_composite_router import balanced_limit, filter_items
 from scripts.score_composite_results import parse_json_content, score_row, score_rubric
 
 
@@ -38,6 +47,17 @@ class BenchmarkTests(unittest.TestCase):
             },
         )
 
+    def test_v2_suite_shape_and_leakage(self) -> None:
+        items = build_items_v2()
+        validate_items_v2(items)
+        self.assertEqual(len(items), sum(SPLIT_COUNTS_V2.values()) * len(FAMILIES_V2))
+        self.assertEqual(Counter(i["split"] for i in items)["test"], SPLIT_COUNTS_V2["test"] * len(FAMILIES_V2))
+        keys = [i["source_key"] for i in items]
+        self.assertEqual(len(keys), len(set(keys)))
+        train_keys = {i["source_key"] for i in items if i["split"] == "train"}
+        test_keys = {i["source_key"] for i in items if i["split"] == "test"}
+        self.assertFalse(train_keys & test_keys)
+
     def test_forward_dependency_rejected(self) -> None:
         items = build_items()
         items[0]["oracle_plan"]["steps"][0]["depends_on"] = ["implement"]
@@ -51,6 +71,12 @@ class BenchmarkTests(unittest.TestCase):
             "translate_code": 2,
             "translate_knowledge_write": 2,
         })
+
+    def test_filter_items_split(self) -> None:
+        items = build_items_v2()
+        filtered = filter_items(items, family="", split="dev", limit=0)
+        self.assertEqual(len(filtered), SPLIT_COUNTS_V2["dev"] * len(FAMILIES_V2))
+        self.assertTrue(all(i["split"] == "dev" for i in filtered))
 
     def test_agentcoma_wrapper_hides_gold_from_prompt(self) -> None:
         wrapped = wrap_row(
@@ -67,6 +93,41 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(wrapped["prompt"], "Скільки предметів підуть у шафу?")
         self.assertNotIn("5", wrapped["prompt"])
         self.assertNotIn("5", wrapped["oracle_plan"]["steps"][0]["prompt"])
+        self.assertEqual(wrapped["split"], "dev")
+
+    def test_agentcoma_wrapper_carries_split_and_provenance(self) -> None:
+        wrapped = wrap_row(
+            {
+                "id": "test_TA_div_7",
+                "split": "test",
+                "category": "travel_agent",
+                "operation_type": "division",
+                "question_composition_uk": "Скільки коштуватиме відпустка для кожного?",
+                "answer_composition": 1050,
+            },
+            provenance="agentcoma_uk_200_claude_manual_v1v2",
+        )
+        self.assertEqual(wrapped["split"], "test")
+        self.assertEqual(wrapped["provenance"], "agentcoma_uk_200_claude_manual_v1v2")
+        self.assertNotIn("1050", wrapped["prompt"])
+        steps = wrapped["oracle_plan"]["steps"]
+        self.assertEqual(steps[0]["rubric"]["type"], "contains_any")
+        self.assertEqual(steps[1]["rubric"], {"type": "numeric", "value": 1050})
+
+    def test_numeric_rubric(self) -> None:
+        rubric = {"type": "numeric", "value": 19000}
+        self.assertEqual(score_rubric("Разом: 20 × 950 = 19 000 доларів.", rubric)[0], 1.0)
+        self.assertEqual(score_rubric("Відповідь: $19,000", rubric)[0], 1.0)
+        self.assertEqual(score_rubric("19000", rubric)[0], 1.0)
+        self.assertEqual(score_rubric("Це коштує 950 за особу, 20 осіб.", rubric)[0], 0.0)
+        self.assertEqual(score_rubric("немає числа", rubric)[0], 0.0)
+        decimal = {"type": "numeric", "value": 2.2}
+        self.assertEqual(score_rubric("0.4 + 1.8 = 2,2 см", decimal)[0], 1.0)
+        self.assertEqual(score_rubric("Відповідь: 2.2", decimal)[0], 1.0)
+        self.assertEqual(score_rubric("Відповідь: 2.2 см (0.4 + 1.8)", decimal)[0], 1.0)
+        self.assertEqual(score_rubric("Разом 22 мм", decimal)[0], 0.0)
+        self.assertEqual(score_rubric("ромашковий чай", {"type": "contains_any", "values": ["Ромашковий чай", "x"]})[0], 1.0)
+        self.assertEqual(score_rubric("чай мате", {"type": "contains_any", "values": ["ромашковий"]})[0], 0.0)
 
 
 class PlanTests(unittest.TestCase):
@@ -83,6 +144,66 @@ class PlanTests(unittest.TestCase):
     def test_substitution(self) -> None:
         step = PlanStep("write", "instruct", "Result: {{fact.content}}", ("fact",))
         self.assertEqual(render_prompt(step, {"fact": {"content": "42"}}), "Result: 42")
+
+    def test_missing_dependency_placeholder_is_spliced(self) -> None:
+        plan = Plan(
+            (
+                PlanStep("step1", "translate", "Переклади джерело"),
+                PlanStep(
+                    "step2",
+                    "knowledge",
+                    "Витягни три факти з перекладеного тексту",
+                    ("step1",),
+                ),
+            )
+        )
+        fixed = ensure_dependency_placeholders(plan)
+        self.assertEqual(plan.steps[1].prompt, "Витягни три факти з перекладеного тексту")
+        self.assertIn("{{step1.content}}", fixed.steps[1].prompt)
+        validate_plan(fixed)
+        rendered = render_prompt(
+            fixed.steps[1],
+            {"step1": {"content": "Дніпро, 2201, Київ"}},
+        )
+        self.assertIn("Дніпро, 2201, Київ", rendered)
+        self.assertIs(ensure_dependency_placeholders(fixed), fixed)
+
+    def test_generate_plan_splices_without_a_second_call(self) -> None:
+        calls = 0
+
+        async def caller(alias: str, prompt: str) -> dict:
+            nonlocal calls
+            calls += 1
+            return {
+                "alias": alias,
+                "ok": True,
+                "content": json.dumps(
+                    {
+                        "steps": [
+                            {
+                                "id": "step1",
+                                "intent": "translate",
+                                "depends_on": [],
+                                "prompt": "Переклади джерело",
+                            },
+                            {
+                                "id": "step2",
+                                "intent": "knowledge",
+                                "depends_on": ["step1"],
+                                "prompt": "Витягни три факти з перекладеного тексту",
+                            },
+                        ]
+                    }
+                ),
+                "latency_ms": 1,
+                "gpu_seconds": 0.001,
+            }
+
+        plan, meta = asyncio.run(generate_plan("question", caller))
+        self.assertEqual(calls, 1)
+        self.assertTrue(meta["valid"])
+        self.assertFalse(meta["repaired"])
+        self.assertIn("{{step1.content}}", plan.steps[1].prompt)
 
     def test_signature_ignores_generated_ids(self) -> None:
         left = Plan(
@@ -186,6 +307,41 @@ class PlanTests(unittest.TestCase):
             "Зроби два кроки. Фінальна відповідь — лише блок ```python без пояснень.\n\nSpec",
         )
         self.assertIn("лише блок ```python", guarded.steps[-1].prompt)
+
+    def test_template_profile_needs_no_caller(self) -> None:
+        calls = 0
+
+        async def caller(alias: str, prompt: str) -> dict:
+            nonlocal calls
+            calls += 1
+            return {"alias": alias, "ok": True, "content": "{}", "latency_ms": 1, "gpu_seconds": 0}
+
+        item = next(i for i in build_items_v2() if i["family"] == "knowledge_explain")
+        plan, meta = asyncio.run(generate_plan(item["prompt"], caller, profile="template"))
+        self.assertEqual(calls, 0)
+        self.assertEqual(meta["mode"], "template")
+        self.assertEqual(meta["template_id"], "knowledge_explain")
+        self.assertEqual(
+            plan_signature(plan),
+            plan_signature(Plan.from_dict(item["oracle_plan"], source="oracle")),
+        )
+
+    def test_template_selector_matches_all_v2_oracles(self) -> None:
+        for item in build_items_v2():
+            plan, meta = select_plan(item["prompt"])
+            self.assertFalse(meta["fallback"], item["id"])
+            self.assertEqual(meta["template_id"], item["template_id"], item["id"])
+            self.assertEqual(
+                plan_signature(plan),
+                plan_signature(Plan.from_dict(item["oracle_plan"], source="oracle")),
+                item["id"],
+            )
+            self.assertEqual(select_template(item["prompt"]).id, item["family"])
+
+    def test_template_fallback_on_unrelated_prompt(self) -> None:
+        plan, meta = select_plan("Привіт, як справи?")
+        self.assertTrue(meta["fallback"])
+        self.assertEqual(plan.source, "single_hop_fallback")
 
 
 class ScoringAndExecutionTests(unittest.TestCase):

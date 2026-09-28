@@ -1,6 +1,6 @@
 # Key takeaways — Ukrainian LLM router (diploma)
 
-*Last updated: 2026-09-01. Weeks 7–10 pack (glossary, router diagrams, v4/v5/composite tables): [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md).*
+*Last updated: 2026-09-28. Weeks 7–10 pack (glossary, router diagrams, v4/v5/composite tables): [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md). Composite v2: [`docs/week_12_composite_v2.md`](week_12_composite_v2.md).*
 
 ## One-sentence claim
 
@@ -11,8 +11,15 @@ A **rules-based multi-lineage router** (Mamay-4B + Lapa + Aya + Qwen-Coder-7B) o
 **Composite extension:** on 36 dependent tasks ×3, the stored workflow oracle
 scores **0.882** vs one-hop rules **0.812**, proving a 0.070 composition
 opportunity. The prompted hybrid planner reaches only **0.768** at 3.5 calls /
-13.5 s p50. Correct workflows can help; general planning does not yet.
+13.5 s p50 (Hybrid v3 later **0.8125**, exact workflow 0.639). Correct workflows
+can help; general planning does not yet.
 Details: [`docs/week_10_composite.md`](week_10_composite.md).
+
+**Composite v2 (week 12):** 200-item split suite (`train/dev/test`, five
+families). Constrained **template** selector reaches exact workflow match
+**1.000** on held-out test (60 items); freeze `template`, distillation not
+warranted on this surface. Live specialist bake-off pending GPU sbatch.
+Details: [`docs/week_12_composite_v2.md`](week_12_composite_v2.md).
 
 ---
 
@@ -221,11 +228,12 @@ See **§E**. Baseline Lapa (and Mamay-4B) map social “1 — очікувано
 | 3 | **Selective cascade** (social 2 → Mamay-4B retry, no Mamay-12) | **Done** — 1.56% escalate, Δquality ≈ 0 |
 | 4 | **Ensemble / multi-agent** on discrete labels | **Done** — 0.843 vs 0.848; 3 flips net −1; skip product |
 | 5 | **Quantize** Mamay-4B / Lapa / Aya (bitsandbytes 4-bit) | **Done** — 0.830 / slower; keep bf16 |
-| 5b | Pack specialists on **one GPU** | **Not measured** — nvidia-smi ~44 GB/card at `gpu_memory_util=0.90` (KV fills the card). Needs lower util or two vLLMs colocated |
+| 5b | Pack specialists on **one GPU** | **Done** — online FP8, utils 0.42/0.28/0.18, one card at 45 668 MiB. Rules v2 **0.842** / p50 723 ms vs bf16 0.848 / 633 ms. Knowledge 0.750 → 0.688. `results/week_11_pack_fp8/` |
 | — | Full Mamay-4B / Lapa solo on v4 192×3 | **Done** (`week_6_v4_solos`) |
-| **6** | **S2: Mamay-12B on v4** — does composition beat scaling? | **Next** — ~40 min; [`docs/week_9_baselines.md`](week_9_baselines.md) |
-| **7** | **S3: hosted frontier API on v4** — how far is the unavailable option? | **Next** — ~$1–4; `scripts/run_api_baseline.py` |
+| **6** | **S2: Mamay-12B on v4** — does composition beat scaling? | **Done** — **0.874** / p50 1352 ms vs router 0.848 / 633 ms. Headline quality goes to the 12B; the router stays faster and wins knowledge, code, translate. [`docs/week_9_baselines.md`](week_9_baselines.md) |
+| **7** | **S3: hosted frontier API on v4** — how far is the unavailable option? | **Not run** — spend not approved |
 | **8** | Composite benchmark + hybrid orchestrator | **Done** — oracle 0.882, one-hop 0.812, hybrid 0.768; use fixed workflows, not general planner |
+| **8b** | Composite v2 + constrained templates | **Planning done** — 200-item split suite; template exact=1.0 on test; distill **no**; live GPU bake-off ready (`eval_composite_v2_bakeoff.sbatch`) |
 | — | Full ~14k corpus ×3 | Optional later; ~18 h router wall estimate |
 
 Cascade should be **narrow** (e.g. instruct format fail→retry), not generic weak confidence that previously made `router_cascade ≈ router_small` on v3.
@@ -254,6 +262,7 @@ Cascade should be **narrow** (e.g. instruct format fail→retry), not generic we
 | Problem statement / scope | [`docs/thesis_scope.md`](thesis_scope.md) |
 | Missing baselines plan | [`docs/week_9_baselines.md`](week_9_baselines.md) |
 | Thesis conclusion | [`docs/conclusion.md`](conclusion.md) |
+| Composite v1 / v2 | [`docs/week_10_composite.md`](week_10_composite.md), [`docs/week_12_composite_v2.md`](week_12_composite_v2.md) |
 | Week-6 tables (solos / few-shot / cascade) | `docs/week_6_takeaways.md` |
 | Router few-shot / solos / cascade scores | `results/week_6_*` |
 | Routing / success / cost | `week_5_router_v4/routing_stats_rep1.json`, `week_6_router_fewshot/routing_stats_rep1.json` |

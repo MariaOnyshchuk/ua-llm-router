@@ -89,6 +89,21 @@ The first planner prompt scored 0.609 and exact-match 0.333. Definitions,
 three workflow examples, and a deterministic final-format guard improved it to
 0.768 / 0.806. No further tuning was done on the full test set.
 
+## Hybrid v3 — splice missing placeholders (27 Sep 2026)
+
+`ensure_dependency_placeholders` inserts `{{step.content}}` when a step lists a dependency the prompt never mentions. Same 36×3 suite, T=0, seed=42. HTTP executions completed on all 108 rows.
+
+| System | Final score | SD | Exact success | Calls | p50 | Exact workflow |
+|--------|------------:|---:|--------------:|------:|----:|---------------:|
+| Oracle workflow | **0.882** | 0.000 | **0.667** | 2.33 | 3711 ms | — |
+| Rules v2 direct | **0.812** | 0.000 | 0.583 | **1.00** | 1725 ms | — |
+| **Hybrid v3** | **0.8125** | 0.007 | 0.407 | 3.55 | 13 896 ms | 0.639 |
+| Hybrid v2 | 0.768 | 0.032 | 0.435 | 3.50 | 13 533 ms | 0.806 |
+
+v3 does not beat one-hop rules (0.8125 vs 0.812, inside the repeat sd). It does beat hybrid v2. The gain is the three-stage family (0.681 → 0.833). knowledge→explain stays weak (0.660, was 0.694). Valid plans are 1.000; exact workflow match fell to 0.639 and intent F1 to 0.872. The signature used for that match is intent plus dependencies, so the drop is a different set of plans, not the inserted placeholder text.
+
+Artifacts: `results/week_10_composite_hybrid_v3/`.
+
 ## Implementation
 
 - Benchmark builder: `scripts/build_composite_benchmark.py`
@@ -143,3 +158,9 @@ python scripts/score_composite_results.py \
 Do not call the three families “general complex reasoning.” They test bounded
 workflow composition under deterministic rubrics. Generalisation to arbitrary
 tasks remains future work.
+
+## Follow-on
+
+Composite **v2** (200 items, splits, constrained `template` planner) is documented
+in [`week_12_composite_v2.md`](week_12_composite_v2.md). Do not mix v1 and v2
+scores in one improvement cell.

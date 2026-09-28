@@ -68,6 +68,36 @@ def validate_plan(plan: Plan, *, max_steps: int = 4) -> None:
         seen.add(step.id)
 
 
+def ensure_dependency_placeholders(plan: Plan) -> Plan:
+    """Insert {{dep.content}} for every depends_on the prompt forgot to mention.
+
+    validate_plan only checks the other direction. A planner often emits
+    depends_on: ["step1"] and a prompt that never references step1, so
+    render_prompt passes the instruction through with no previous text.
+    """
+    steps: list[PlanStep] = []
+    changed = False
+    for step in plan.steps:
+        referenced = set(PLACEHOLDER_RE.findall(step.prompt))
+        missing = [dep for dep in step.depends_on if dep not in referenced]
+        if not missing:
+            steps.append(step)
+            continue
+        extra = "\n".join(f"{{{{{dep}.content}}}}" for dep in missing)
+        steps.append(
+            PlanStep(
+                id=step.id,
+                intent=step.intent,
+                prompt=step.prompt.rstrip() + "\n" + extra,
+                depends_on=step.depends_on,
+            )
+        )
+        changed = True
+    if not changed:
+        return plan
+    return Plan(steps=tuple(steps), source=plan.source)
+
+
 def render_prompt(step: PlanStep, results: dict[str, dict[str, Any]]) -> str:
     def replace(match: re.Match[str]) -> str:
         dep = match.group(1)
@@ -97,6 +127,7 @@ async def execute_plan(
     profile: str = "v2",
     pool: frozenset[str] | set[str] | None = None,
 ) -> dict[str, Any]:
+    plan = ensure_dependency_placeholders(plan)
     validate_plan(plan)
     results: dict[str, dict[str, Any]] = {}
     trace: list[dict[str, Any]] = []

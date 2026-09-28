@@ -8,7 +8,7 @@ A **rules-based multi-lineage router** over three open specialists — Mamay-4B 
 
 **rules v2 + few-shot = 0.848 overall, p50 633 ms.**
 
-That is better quality **and** lower median latency than any single specialist on the same items (Aya 0.785 / 867 ms, Mamay-4B 0.762 / 1125 ms, Lapa 0.732 / 1681 ms). Qwen-Coder-7B is not in the product table: on v4, Mamay-4B wins code (0.984 vs 0.969).
+That is better quality **and** lower median latency than any single specialist **in the pool** on the same items (Aya 0.785 / 867 ms, Mamay-4B 0.762 / 1125 ms, Lapa 0.732 / 1681 ms). It is not better quality than one larger open model: Mamay-12B alone scores **0.874** / p50 1352 ms. Qwen-Coder-7B is not in the product table: on v4, Mamay-4B wins code (0.984 vs 0.969).
 
 This is **routing across independently trained models**, not MoE inside one network. “Разом ≈ великий модель” means complementary coverage, not summed parameters.
 
@@ -33,14 +33,14 @@ A further “clearer 2-class contrast” pass on the same 32 items was **not run
 
 ## Resources (honest)
 
-The router improves **per-query latency and active GPU-seconds** (~1.5 GPU-s / prompt), not resident memory. An always-on three-model serve still occupies **three GPUs** of KV-reserved VRAM at `gpu_memory_utilization=0.90`. Week-8 4-bit did not change that picture and is **not** a packing result. Fitting the pool on one 48 GB card would need a separate run (lower util and/or colocated vLLMs).
+The router improves **per-query latency and active GPU-seconds** (~1.5 GPU-s / prompt), not resident memory of the bf16 product. An always-on three-model serve at `gpu_memory_utilization=0.90` still occupies **three GPUs**. Week-8 4-bit did not change that picture. A later FP8 colocation does: the same three specialists fit on one card (45 668 MiB) at **0.842** / p50 723 ms, with knowledge down from 0.750 to 0.688. Mamay-12B alone is one card at the 0.90 reservation and scores higher overall (**0.874**) at p50 1352 ms and ~2.5 GPU-s / prompt.
 
 ## Limitations
 
 - Authoritative claims use **192 items × 3 repeats** (`mixed_ua_v4`), not the ~14k corpus warehouse.
 - Chat and instruct at scale barely exist in open UA data; those buckets stay mostly hand-written.
 - `mixed_ua_v5` (+32 HumanEval) is a harder, **different** suite (code 0.789 mix; chat hurt by global max_tokens=512). Do not compare 0.796 to 0.848 as a router regression.
-- No ~70–120B monolingual UA reference was served; the ceiling here is the **oracle over the specialists we have**.
+- No ~70–120B monolingual UA reference was served. On this suite the open-model comparison above the pool is Mamay-12B at 0.874, not the pool oracle.
 
 ## Composite-task extension
 
@@ -57,6 +57,12 @@ there is measurable composition headroom. The hybrid planner reaches only
 better.” Correct fixed workflows help the three-stage source→JSON family, while
 unnecessary decomposition hurts tasks a single model already solves.
 
+A follow-on composite v2 suite (200 items, train/dev/test, five families) shows
+that a **constrained template selector** matches oracle workflows exactly on the
+held-out test split (exact match **1.000**). Distilling a planner is not
+justified on this bounded surface; the remaining open measurement is live
+specialist execution on that test split (lab sbatch), not further prompt tuning.
+
 ## One paragraph for the diploma
 
-На змішаному українському наборі `mixed_ua_v4` (192 запити) правила маршрутизації v2 з few-shot для соціальної шкали UAlign дають **0.848** якості при медіанній затримці 633 мс — стільки ж, скільки оракул «найкращий спеціаліст на кожен бакет», і більше, ніж будь-яка одна модель пулу. Додаткові стрибки (мікро-каскад, голосування ансамблю) і 4-bit bitsandbytes цю точку **не покращують**. Економія є в часі відповіді та GPU-секундах на запит, а не в тому, що три спеціалісти вміщаються на одну відеокарту: цього окремо не вимірювали.
+На змішаному українському наборі `mixed_ua_v4` (192 запити) правила маршрутизації v2 з few-shot для соціальної шкали UAlign дають **0.848** якості при медіанній затримці 633 мс — стільки ж, скільки оракул «найкращий спеціаліст на кожен бакет», і більше, ніж будь-яка одна модель пулу. Одна більша відкрита модель, Mamay-12B, на тому самому протоколі дає **0.874** при 1352 мс: композиція не обганяє масштабування за якістю, але лишається швидшою і кращою на knowledge, code і translate. Додаткові стрибки (мікро-каскад, голосування ансамблю) і 4-bit bitsandbytes точку 0.848 **не покращують**. Ті самі три спеціалісти в online FP8 вміщаються на одну карту (45 668 МіБ) з якістю **0.842** і p50 723 мс; просідання в knowledge (0.750 → 0.688).

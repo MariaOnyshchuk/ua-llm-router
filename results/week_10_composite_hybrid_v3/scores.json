@@ -1,0 +1,40 @@
+{
+  "systems": {
+    "hybrid": {
+      "n": 108,
+      "repeats": 3,
+      "final_score_mean": 0.8125,
+      "final_score_sd": 0.0069,
+      "final_success_rate": 0.4074,
+      "stage_mean": 0.5556,
+      "all_stages_pass_rate": 0.1574,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 0.6389,
+      "intent_f1": 0.8722,
+      "calls_per_item": 3.546,
+      "latency_p50_ms": 13895.6,
+      "latency_avg_ms": 13810.2,
+      "gpu_seconds_per_item": 13.8102,
+      "by_family": {
+        "knowledge_explain": {
+          "n": 36,
+          "final_score": 0.6597,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0
+        },
+        "translate_code": {
+          "n": 36,
+          "final_score": 0.9444,
+          "final_success_rate": 0.8889,
+          "all_stages_pass_rate": 0.4722
+        },
+        "translate_knowledge_write": {
+          "n": 36,
+          "final_score": 0.8333,
+          "final_success_rate": 0.3333,
+          "all_stages_pass_rate": 0.0
+        }
+      }
+    }
+  }
+}

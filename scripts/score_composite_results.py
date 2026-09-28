@@ -108,6 +108,55 @@ def normalise(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value)).strip().casefold()
 
 
+NUMBER_RE = re.compile(r"-?\d+(?:[ \u00a0]\d{3})+(?:[.,]\d+)?|-?\d+(?:[.,]\d+)?")
+ANSWER_MARK_RE = re.compile(r"(?:відповідь|answer|разом|загалом|=)\s*[:\-–—]?\s*", re.I)
+
+
+def parse_number(token: str) -> float | None:
+    """Parse ``19 000``, ``10,000``, ``3.50``, ``2,2`` -> float."""
+    raw = token.replace("\u00a0", " ").replace(" ", "")
+    if "," in raw and "." not in raw:
+        head, _, tail = raw.rpartition(",")
+        # "10,000" / "1,234,567" are thousands groups; "2,2" / "12,5" are decimals.
+        if len(tail) == 3 and re.fullmatch(r"-?\d{1,3}(?:,\d{3})*", head):
+            raw = raw.replace(",", "")
+        else:
+            raw = head.replace(",", "") + "." + tail
+    else:
+        raw = raw.replace(",", "")
+    try:
+        return float(raw)
+    except ValueError:
+        return None
+
+
+def extract_numbers(content: str) -> list[float]:
+    values = [parse_number(m.group(0)) for m in NUMBER_RE.finditer(content or "")]
+    return [v for v in values if v is not None]
+
+
+def score_numeric(content: str, rubric: dict[str, Any]) -> tuple[float, str]:
+    """Final-number match for AgentCoMa-style items.
+
+    The answer is the number after the last answer marker (``Відповідь:``,
+    ``=``, ...) when one exists, otherwise the last number in the text.
+    """
+    expected = float(rubric.get("value"))
+    tol = float(rubric.get("tolerance", 1e-6))
+    text = content or ""
+    marks = list(ANSWER_MARK_RE.finditer(text))
+    candidates: list[float] = []
+    if marks:
+        candidates = extract_numbers(text[marks[-1].end() :])
+    if not candidates:
+        candidates = extract_numbers(text)
+    if not candidates:
+        return 0.0, f"numeric got=? ref={expected:g}"
+    got = candidates[0] if marks and candidates else candidates[-1]
+    ok = math.isclose(got, expected, rel_tol=1e-9, abs_tol=tol)
+    return float(ok), f"numeric got={got:g} ref={expected:g}"
+
+
 def score_rubric(content: str, rubric: dict[str, Any]) -> tuple[float, str]:
     kind = rubric.get("type")
     if kind == "contains_all":
@@ -115,6 +164,13 @@ def score_rubric(content: str, rubric: dict[str, Any]) -> tuple[float, str]:
         text = normalise(content)
         hits = sum(value in text for value in values)
         return hits / max(1, len(values)), f"contains {hits}/{len(values)}"
+    if kind == "contains_any":
+        values = [normalise(x) for x in rubric.get("values") or []]
+        text = normalise(content)
+        hit = any(value in text for value in values)
+        return float(hit), f"contains_any {int(hit)}/1"
+    if kind == "numeric":
+        return score_numeric(content, rubric)
     if kind == "label":
         match = CYR_LABEL_RE.search(content or "")
         got = match.group(1).upper() if match else ""
@@ -157,9 +213,28 @@ def intent_f1(actual: list[str], expected: list[str]) -> float:
     return 2 * precision * recall / max(1e-12, precision + recall)
 
 
+def workflow_error(row: dict[str, Any], plan_match: bool, expected_n: int, actual_n: int) -> str | None:
+    """Classify planning error when the workflow is observable."""
+    if row.get("plan") is None:
+        return None
+    planning = row.get("planning") or {}
+    if planning.get("fallback"):
+        return "fallback"
+    if not row.get("plan_valid", True):
+        return "invalid_plan"
+    if plan_match:
+        return None
+    if actual_n > expected_n:
+        return "superfluous_steps"
+    if actual_n < expected_n:
+        return "missing_steps"
+    return "wrong_intents_or_deps"
+
+
 def score_row(row: dict[str, Any]) -> dict[str, Any]:
     oracle_steps = (row.get("oracle_plan") or {}).get("steps") or []
     trace = row.get("steps") or []
+    plan_steps = (row.get("plan") or {}).get("steps") or []
     stage_scores: list[dict[str, Any]] = []
     for index, expected in enumerate(oracle_steps):
         if index >= len(trace):
@@ -190,10 +265,17 @@ def score_row(row: dict[str, Any]) -> dict[str, Any]:
     all_stages = bool(trace) and len(trace) == len(oracle_steps) and all(x["score"] == 1.0 for x in stage_scores)
     expected_intents = [str(step["intent"]) for step in oracle_steps]
     actual_intents = [str(step.get("intent") or "") for step in trace]
+    plan_match = bool(row.get("plan_match"))
+    err = workflow_error(row, plan_match, len(oracle_steps), len(plan_steps))
     return {
         "system": row.get("system"),
         "id": row.get("id"),
         "family": row.get("family"),
+        "split": row.get("split"),
+        "selector_mode": row.get("selector_mode") or (row.get("planning") or {}).get("mode"),
+        "selected_template": row.get("selected_template")
+        or (row.get("planning") or {}).get("template_id"),
+        "planner_profile": row.get("planner_profile") or row.get("system"),
         "repeat": row.get("repeat", 1),
         "final_score": round(final_score, 4),
         "final_success": final_score == 1.0,
@@ -202,9 +284,13 @@ def score_row(row: dict[str, Any]) -> dict[str, Any]:
         "all_stages_pass": all_stages,
         "stage_scores": stage_scores,
         "plan_valid": row.get("plan_valid") if row.get("plan") else None,
-        "plan_match": bool(row.get("plan_match")),
+        "plan_match": plan_match,
+        "workflow_error": err,
+        "superfluous_steps": int(row.get("superfluous_steps") or max(0, len(plan_steps) - len(oracle_steps))),
+        "missing_steps": int(row.get("missing_steps") or max(0, len(oracle_steps) - len(plan_steps))),
         "intent_f1": round(intent_f1(actual_intents, expected_intents), 4) if trace else None,
         "complete": bool(row.get("complete")),
+        "http_ok": int(row.get("http_status") or 0) == 200 or bool(row.get("complete")),
         "calls": int(row.get("calls") or 0),
         "latency_ms": float(row.get("latency_ms") or 0),
         "gpu_seconds": float(row.get("gpu_seconds") or 0),
@@ -223,6 +309,31 @@ def sample_sd(values: list[float]) -> float:
     return math.sqrt(sum((x - avg) ** 2 for x in values) / (len(values) - 1))
 
 
+def _slice_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    plan_rows = [row for row in rows if row["plan_valid"] is not None]
+    intent_rows = [row for row in rows if row["intent_f1"] is not None]
+    errors = Counter(row["workflow_error"] for row in plan_rows if row.get("workflow_error"))
+    return {
+        "n": len(rows),
+        "final_score": round(mean([float(x["final_score"]) for x in rows]), 4),
+        "final_success_rate": round(mean([float(x["final_success"]) for x in rows]), 4),
+        "all_stages_pass_rate": round(mean([float(x["all_stages_pass"]) for x in rows]), 4),
+        "plan_exact_match_rate": (
+            round(mean([float(x["plan_match"]) for x in plan_rows]), 4) if plan_rows else None
+        ),
+        "intent_f1": (
+            round(mean([float(x["intent_f1"]) for x in intent_rows]), 4) if intent_rows else None
+        ),
+        "fallback_rate": (
+            round(mean([float(x["workflow_error"] == "fallback") for x in plan_rows]), 4)
+            if plan_rows
+            else None
+        ),
+        "workflow_errors": dict(errors),
+        "http_ok_rate": round(mean([float(x["http_ok"]) for x in rows]), 4),
+    }
+
+
 def summarize(scored: list[dict[str, Any]]) -> dict[str, Any]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in scored:
@@ -237,13 +348,14 @@ def summarize(scored: list[dict[str, Any]]) -> dict[str, Any]:
         intent_rows = [row for row in rows if row["intent_f1"] is not None]
         families: dict[str, Any] = {}
         for family in sorted({str(row["family"]) for row in rows}):
-            subset = [row for row in rows if row["family"] == family]
-            families[family] = {
-                "n": len(subset),
-                "final_score": round(mean([float(x["final_score"]) for x in subset]), 4),
-                "final_success_rate": round(mean([float(x["final_success"]) for x in subset]), 4),
-                "all_stages_pass_rate": round(mean([float(x["all_stages_pass"]) for x in subset]), 4),
-            }
+            families[family] = _slice_summary([row for row in rows if row["family"] == family])
+        splits: dict[str, Any] = {}
+        for split in sorted({str(row["split"]) for row in rows if row.get("split")}):
+            splits[split] = _slice_summary([row for row in rows if row.get("split") == split])
+        modes: dict[str, Any] = {}
+        for mode in sorted({str(row["selector_mode"]) for row in rows if row.get("selector_mode")}):
+            modes[mode] = _slice_summary([row for row in rows if row.get("selector_mode") == mode])
+        errors = Counter(row["workflow_error"] for row in plan_rows if row.get("workflow_error"))
         systems[system] = {
             "n": len(rows),
             "repeats": len(by_repeat),
@@ -267,11 +379,20 @@ def summarize(scored: list[dict[str, Any]]) -> dict[str, Any]:
                 if intent_rows
                 else None
             ),
+            "fallback_rate": (
+                round(mean([float(x["workflow_error"] == "fallback") for x in plan_rows]), 4)
+                if plan_rows
+                else None
+            ),
+            "workflow_errors": dict(errors),
+            "http_ok_rate": round(mean([float(x["http_ok"]) for x in rows]), 4),
             "calls_per_item": round(mean([float(x["calls"]) for x in rows]), 3),
             "latency_p50_ms": round(sorted(float(x["latency_ms"]) for x in rows)[len(rows) // 2], 1),
             "latency_avg_ms": round(mean([float(x["latency_ms"]) for x in rows]), 1),
             "gpu_seconds_per_item": round(mean([float(x["gpu_seconds"]) for x in rows]), 4),
             "by_family": families,
+            "by_split": splits,
+            "by_selector_mode": modes,
         }
     return {"systems": systems}
 

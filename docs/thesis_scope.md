@@ -36,11 +36,12 @@ Complementary specialists behind a deterministic router approximate a single str
 |----|--------|--------|
 | S0 | Each specialist alone (Mamay-4B, Lapa-12B, Aya-8B) | **Done** — `week_6_v4_solos`, `week_5_aya_qwen7` |
 | S1 | **Rules router v2 + few-shot** (the product) | **Done** — 0.848 / p50 633 ms |
-| S2 | One larger open model — Mamay-12B | **Missing on v4** (only v3: 0.793) |
+| S2 | One larger open model — Mamay-12B | **Done** — 0.874 / p50 1352 ms (`week_9_baselines`) |
 | S3 | Hosted frontier API | **Missing** — the sovereignty-constrained alternative |
 | S4 | Cascade / ensemble / 4-bit variants | **Done** — none beat S1 |
 | S5 | Oracle composite pipeline | **Done** — 0.882, diagnostic ceiling on composite v1 |
-| S6 | Hybrid planner + specialist executor | **Done** — 0.768; valid 0.991, exact workflow 0.806 |
+| S6 | Hybrid planner + specialist executor | **Done** — 0.768; valid 0.991, exact workflow 0.806 (v3: 0.8125 / exact 0.639) |
+| S6b | Constrained template workflows on composite v2 | **Planning done** — template exact=1.0 on held-out test; live execution pending GPU |
 
 S2 and S3 are the two reference points that turn "router beats its own pool" (near-tautological) into "composition is the right choice under these constraints."
 
@@ -50,15 +51,17 @@ S2 and S3 are the two reference points that turn "router beats its own pool" (ne
 
 Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Code + HumanEval (code). Chat and instruct are hand-written — open UA data barely exists for them, and that is a stated limitation.
 
-**Composite suite:** `benchmarks/mixed_ua_composite_v1.jsonl` — 36 deterministic items, 12 each for translate→code, knowledge→explain, and translate→knowledge→write. The stored workflow is hidden from the LLM planner. Final success uses executable tests, exact JSON/labels, and constrained evidence checks.
+**Composite suite (v1, historical):** `benchmarks/mixed_ua_composite_v1.jsonl` — 36 deterministic items, 12 each for translate→code, knowledge→explain, and translate→knowledge→write. The stored workflow is hidden from the LLM planner. Final success uses executable tests, exact JSON/labels, and constrained evidence checks.
+
+**Composite suite (v2):** `benchmarks/mixed_ua_composite_v2.jsonl` — 200 items, five families, explicit `train/dev/test` with disjoint source pools. Constrained template selection is the frozen planner (`template`); free-form hybrid remains a baseline. Do not mix v1 and v2 finals in one comparison cell.
 
 **Metrics:** quality per bucket/family, final task success, all-stages-pass, plan exact match, intent F1, invalid-plan rate, calls, latency mean / p50 / p95, GPU-seconds per prompt for self-hosted systems, USD per 1000 queries for the API baseline.
 
 ## 6. What we claim about resources — and what we do not
 
-**Claim:** the router lowers **per-query latency** (p50 633 ms vs 867–1681 ms for singles) and costs roughly **1.5 GPU-seconds per prompt**, with routing overhead itself immeasurable (−3.2 ms).
+**Claim:** the router lowers **per-query latency** (p50 633 ms vs 867–1681 ms for singles) and costs roughly **1.5 GPU-seconds per prompt**, with routing overhead itself immeasurable (−3.2 ms). One FP8 colocation of the same three specialists fits on **one** RTX 6000 Ada (45 668 / 49 140 MiB after load) and scores **0.842** / p50 723 ms. That is a packing result, not a replacement for the bf16 0.848 / 633 ms product number.
 
-**Do not claim:** lower resident VRAM. An always-on three-model deployment occupies three GPUs of KV-reserved memory at `gpu_memory_utilization=0.90`. Week-8 4-bit did not change this and is **not** a packing result. Colocating the pool on one card was never measured.
+**Do not claim** that the bf16 product uses less resident VRAM. At `gpu_memory_utilization=0.90` each specialist still reserves ~44 GB, and week-8 bitsandbytes did not change that. S2 (Mamay-12B alone) is one card at the same 0.90 reservation and scores **0.874** / p50 1352 ms against the router's 0.848 / 633 ms. A separate FP8 colocation (`results/week_11_pack_fp8/`) does put Mamay-4B + Lapa + Aya on one card: 45 668 MiB, rules v2 **0.842** / p50 723 ms, with the drop concentrated in knowledge (0.750 → 0.688).
 
 ## 7. Out of scope
 
@@ -83,7 +86,9 @@ This supports claims only over the three tested workflow families. It is not evi
 **Composite finding:** the oracle pipeline establishes a 0.070 quality
 opportunity over rules-v2 direct (0.882 vs 0.812), but the prompted planner
 scores 0.768 at 3.5 calls and 13.5 s p50. Therefore workflow composition is
-potentially useful, but general planning is not yet the product router.
+potentially useful, but general planning is not yet the product router. On
+composite v2, a constrained template selector recovers exact oracle workflows
+(1.000 on held-out test); distillation is not needed for these bounded families.
 
 ## 9. Compute note
 

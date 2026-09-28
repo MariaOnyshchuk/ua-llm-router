@@ -7,9 +7,19 @@ import re
 from typing import Any
 
 from router.intent_rules import route_intent
-from router.orchestrator import Plan, PlanStep, validate_plan
+from router.orchestrator import Plan, PlanStep, ensure_dependency_placeholders, validate_plan
+from router.workflows import select_plan as select_template_plan
 
 PLANNER_MODEL = "mamay4"
+
+# Named planner profiles used by run_composite_router / ablations.
+PLANNER_PROFILES = (
+    "hybrid",           # current free-form SYSTEM_INSTRUCTION (default)
+    "hybrid_minimal",   # SYSTEM_INSTRUCTION_V3_MINIMAL
+    "hybrid_fewshot",   # SYSTEM_INSTRUCTION_FEWSHOT
+    "template",         # constrained workflow selector (no LLM plan)
+    "hybrid_mamay12",   # free-form planner on Mamay-12B
+)
 
 SYSTEM_INSTRUCTION_V3_MINIMAL = """Ти плануєш виконання складеного запиту для українського асистента,
 розбиваючи його на 2-4 залежні кроки. Кожен крок має один з intent:
@@ -57,6 +67,48 @@ translate, knowledge, instruct, code, alignment, chat.
 knowledge → instruct.
 2) Англійське джерело → витяг фактів → фінальний JSON:
 translate → knowledge → instruct.
+"""
+
+SYSTEM_INSTRUCTION_FEWSHOT = """Ти планувальник складених запитів для українського асистента.
+Розбий запит на 2-4 залежні кроки. Дозволені intent:
+translate, knowledge, instruct, code, alignment, chat.
+
+Точні значення intent:
+- translate: ТІЛЬКИ переклад між мовами;
+- knowledge: відповідь на факт/тест або витяг/класифікація з наданого джерела;
+- instruct: пояснення, резюме чи переформатування у JSON/Markdown;
+- code: написання, виправлення або перевірка коду;
+- alignment: ТІЛЬКИ моральна/соціальна оцінка 0/1/2;
+- chat: звичайна розмова.
+Слово «літера» у тесті НЕ означає translate. JSON НЕ означає alignment.
+НЕ додавай зайвий крок translate, якщо весь запит уже українською.
+
+Поверни ЛИШЕ JSON:
+{"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."}, ...]}
+
+Правила:
+- кожен крок має одну чітку навичку;
+- залежність використовуй у prompt як {{step_id.content}};
+- фінальний крок повинен дослівно повторити всі вимоги користувача до формату;
+- не вигадуй факти; не додавай ключів поза steps/id/intent/depends_on/prompt.
+
+Few-shot (структура, не копіюй текст запиту):
+A) UA тест → два рядки Відповідь/Пояснення:
+{"steps":[
+ {"id":"answer","intent":"knowledge","depends_on":[],"prompt":"... питання + лише літера"},
+ {"id":"explain","intent":"instruct","depends_on":["answer"],
+  "prompt":"Рівно два рядки Відповідь/Пояснення. Попередня: {{answer.content}}"}]}
+B) EN spec → UA → Python:
+{"steps":[
+ {"id":"translate","intent":"translate","depends_on":[],"prompt":"Переклади специфікацію..."},
+ {"id":"implement","intent":"code","depends_on":["translate"],
+  "prompt":"Реалізуй функцію. Лише ```python. {{translate.content}}"}]}
+C) EN source → факти → JSON subject/number/place:
+translate → knowledge → instruct
+D) UA оголошення → extract → classify → JSON topic/urgency/subject/number:
+knowledge → knowledge → instruct (без translate)
+E) EN brief → translate → summarize → JSON topic/when/action:
+translate → instruct → instruct
 """
 
 
@@ -112,6 +164,27 @@ def enforce_final_constraint(plan: Plan, user_prompt: str) -> Plan:
     return Plan(steps=(*plan.steps[:-1], guarded), source=plan.source)
 
 
+def resolve_profile(profile: str) -> tuple[str, str | None]:
+    """Return (mode, planner_model_override). mode is template|llm."""
+    if profile == "template":
+        return "template", None
+    if profile == "hybrid_mamay12":
+        return "llm", "mamay12"
+    if profile in {"hybrid", "hybrid_minimal", "hybrid_fewshot"}:
+        return "llm", PLANNER_MODEL
+    raise ValueError(f"unknown planner profile: {profile}")
+
+
+def instruction_for_profile(profile: str) -> str:
+    if profile == "hybrid_minimal":
+        return SYSTEM_INSTRUCTION_V3_MINIMAL
+    if profile == "hybrid_fewshot":
+        return SYSTEM_INSTRUCTION_FEWSHOT
+    if profile in {"hybrid", "hybrid_mamay12"}:
+        return SYSTEM_INSTRUCTION
+    raise ValueError(f"profile {profile} has no LLM instruction")
+
+
 async def generate_plan(
     user_prompt: str,
     caller,
@@ -119,19 +192,41 @@ async def generate_plan(
     repair: bool = True,
     instruction: str | None = None,
     model: str | None = None,
+    profile: str | None = None,
 ) -> tuple[Plan, dict[str, Any]]:
+    if profile == "template":
+        plan, meta = select_template_plan(user_prompt)
+        return plan, meta
+
     system = SYSTEM_INSTRUCTION if instruction is None else instruction
+    if profile is not None and instruction is None:
+        system = instruction_for_profile(profile)
     planner_model = PLANNER_MODEL if model is None else model
+    if profile is not None and model is None:
+        _, planner_model = resolve_profile(profile)
+        planner_model = planner_model or PLANNER_MODEL
+
     planner_prompt = f"{system}\n\nЗАПИТ КОРИСТУВАЧА:\n{user_prompt}"
     attempts: list[dict[str, Any]] = []
     hop = await caller(planner_model, planner_prompt)
     attempts.append(hop)
 
+    def _meta(valid: bool, **extra: Any) -> dict[str, Any]:
+        return {
+            "mode": "llm",
+            "profile": profile or "hybrid",
+            "template_id": None,
+            "valid": valid,
+            "attempts": attempts,
+            **extra,
+        }
+
     try:
         plan = Plan.from_dict(extract_json_object(hop.get("content") or ""), source="llm")
         plan = enforce_final_constraint(plan, user_prompt)
+        plan = ensure_dependency_placeholders(plan)
         validate_plan(plan)
-        return plan, {"valid": True, "repaired": False, "attempts": attempts}
+        return plan, _meta(True, repaired=False, fallback=False)
     except (ValueError, json.JSONDecodeError) as exc:
         first_error = str(exc)
 
@@ -149,17 +244,18 @@ async def generate_plan(
                 source="llm_repaired",
             )
             plan = enforce_final_constraint(plan, user_prompt)
+            plan = ensure_dependency_placeholders(plan)
             validate_plan(plan)
-            return plan, {"valid": True, "repaired": True, "attempts": attempts}
+            return plan, _meta(True, repaired=True, fallback=False)
         except (ValueError, json.JSONDecodeError) as exc:
             last_error = str(exc)
     else:
         last_error = first_error
 
-    return fallback_plan(user_prompt), {
-        "valid": False,
-        "repaired": repair and len(attempts) == 2,
-        "error": last_error,
-        "attempts": attempts,
-        "fallback": True,
-    }
+    return fallback_plan(user_prompt), _meta(
+        False,
+        repaired=repair and len(attempts) == 2,
+        error=last_error,
+        fallback=True,
+        fallback_reason="llm_plan_invalid",
+    )

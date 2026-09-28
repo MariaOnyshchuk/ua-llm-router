@@ -34,6 +34,11 @@ benchmarks/
   mixed_ua_v4_balanced.jsonl # **32 per bucket × 6 = 192** (historical claims)
   mixed_ua_v6_screen.jsonl   # warehouse screening draw
   mixed_ua_v6.jsonl          # IRT-curated eval (frozen; v4/v5 untouched)
+  mixed_ua_composite_v1.jsonl  # 36 dependent workflows (historical)
+  mixed_ua_composite_v2.jsonl  # 200 items, 5 families, train/dev/test
+  agentcoma_uk_50*.jsonl       # AgentCoMa-UK 50 (source dev split) — local only, gitignored
+  agentcoma_uk_150_test_translated.jsonl  # +150 from source test split — local only
+  agentcoma_uk_200_merged.jsonl / agentcoma_uk_200_composite.jsonl  # 50 dev + 150 test — local only
   external_ua_v2.jsonl       # FLORES ∪ UAlign only (incremental run)
   samples/
     zno_knowledge_v1.jsonl
@@ -122,3 +127,52 @@ python scripts/score_composite_results.py \
 This suite is deliberately small and controlled. Its handcrafted prompts are
 inspired by HumanEval-, ZNO-, and FLORES-style tasks but must not be described
 as new samples from those public datasets.
+
+## AgentCoMa-UK 200 (compositional commonsense + arithmetic)
+
+`agentcoma_uk_200_merged.jsonl` is a Ukrainian translation of 200 items from
+[AgentCoMa](https://huggingface.co/datasets/LisaAlaz/AgentCoMa) (gated; no
+reusable dataset license, so **every `agentcoma_uk_*` file stays local and is
+gitignored**; publish only prompt-free metrics). Each item chains one
+commonsense step (which objects, places, or people qualify) with one arithmetic
+step over the numbers in the text.
+
+| Split | n | Source split | Translation | Ids |
+|-------|--:|--------------|-------------|-----|
+| `dev` | 50 | AgentCoMa dev | `claude_manual_v1` (earlier) | `eval_*` |
+| `test` | 150 | AgentCoMa test | `claude_manual_v2` (28 Sep) | `test_*` |
+
+Per category (`house_working`, `web_shopping`, `science_experiments`,
+`smart_assistant`, `travel_agent`): 40 items = 10 dev + 30 test; operations
+addition / subtraction / multiplication / division split 53 / 52 / 48 / 47
+overall (7–8 per category × operation among the test items). The 150 test items
+are the lowest-numbered ids per category × operation, so the selection is
+deterministic and disjoint from the existing 50. All rows have
+`needs_human_review: true`. Numbers, units, and currency symbols are kept
+exactly as in the source; brand names, Latin species names, and the source's
+own inconsistencies (e.g. `test_TA_add_3` quotes £ in one field and $ in
+another, `test_SE_mul_4` names Toulouse only in the math variant) are kept and
+noted in `cultural_notes`. Translation checks: every number in each English
+field appears in its Ukrainian counterpart, no extra keys, no duplicate ids.
+
+Build the planner-facing file (prompt = `question_composition_uk`, hidden
+`oracle_plan` = knowledge filter → instruct compute, `split` carried through).
+Rubrics: the filter step passes if it names any accepted `answers_commonsense_uk`
+string (`contains_any`); the final step passes if the number after the last
+answer marker (`Відповідь:`, `=`) — or the last number in the text — equals
+`answer_composition` (`numeric`, handles `19 000`, `19,000`, `2,2`):
+
+```bash
+python scripts/build_agentcoma_benchmark.py \
+  --src benchmarks/agentcoma_uk_200_merged.jsonl \
+  --out benchmarks/agentcoma_uk_200_composite.jsonl
+# lab, 3 GPUs (mamay4 / lapa / aya), pattern of eval_composite_v2_bakeoff:
+sbatch cluster/eval_agentcoma_200.sbatch            # SPLIT=dev (tuning)
+SPLIT=test sbatch cluster/eval_agentcoma_200.sbatch  # once, 3 repeats
+```
+
+Output files are tagged `*_composite_agentcoma200_*`; results go to
+`results/week_13_agentcoma_200_{dev,test}/`. No model has been run on the
+200-item file yet; the only AgentCoMa numbers on record are the planner-only
+Mamay-4B screens on the 50 dev items (`results/a2_agentcoma*/`, not end-task
+quality).

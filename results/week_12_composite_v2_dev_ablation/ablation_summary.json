@@ -1,0 +1,93 @@
+{
+  "created_utc": "2026-09-28T14:31:46Z",
+  "split": "dev",
+  "offline_template": {
+    "overall": {
+      "n": 60,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    },
+    "by_split": {
+      "dev": {
+        "n": 60,
+        "plan_exact_match_rate": 1.0,
+        "template_id_accuracy": 1.0,
+        "fallback_rate": 0.0,
+        "mean_superfluous_steps": 0.0,
+        "mean_missing_steps": 0.0,
+        "misses": []
+      }
+    },
+    "by_family": {
+      "extract_classify_write": {
+        "n": 12,
+        "plan_exact_match_rate": 1.0,
+        "template_id_accuracy": 1.0,
+        "fallback_rate": 0.0,
+        "mean_superfluous_steps": 0.0,
+        "mean_missing_steps": 0.0,
+        "misses": []
+      },
+      "knowledge_explain": {
+        "n": 12,
+        "plan_exact_match_rate": 1.0,
+        "template_id_accuracy": 1.0,
+        "fallback_rate": 0.0,
+        "mean_superfluous_steps": 0.0,
+        "mean_missing_steps": 0.0,
+        "misses": []
+      },
+      "translate_code": {
+        "n": 12,
+        "plan_exact_match_rate": 1.0,
+        "template_id_accuracy": 1.0,
+        "fallback_rate": 0.0,
+        "mean_superfluous_steps": 0.0,
+        "mean_missing_steps": 0.0,
+        "misses": []
+      },
+      "translate_knowledge_write": {
+        "n": 12,
+        "plan_exact_match_rate": 1.0,
+        "template_id_accuracy": 1.0,
+        "fallback_rate": 0.0,
+        "mean_superfluous_steps": 0.0,
+        "mean_missing_steps": 0.0,
+        "misses": []
+      },
+      "translate_summarize_format": {
+        "n": 12,
+        "plan_exact_match_rate": 1.0,
+        "template_id_accuracy": 1.0,
+        "fallback_rate": 0.0,
+        "mean_superfluous_steps": 0.0,
+        "mean_missing_steps": 0.0,
+        "misses": []
+      }
+    },
+    "error_counts": {}
+  },
+  "live": {},
+  "decision": {
+    "frozen_profile": "template",
+    "open_test": false,
+    "distillation_warranted": false,
+    "distillation_reason": "Template already reaches perfect workflow match on the bounded v2 families. Distill only if freer natural-language prompts break the regex selector.",
+    "reasons": [
+      "template exact workflow match on v2/dev = 1.0",
+      "v1 hybrid v3 exact workflow match was 0.639 (different suite; planning headroom)",
+      "no live LLM planner scores; freeze template from offline ablation"
+    ]
+  },
+  "historical_reference": {
+    "suite": "mixed_ua_composite_v1",
+    "hybrid_v3_plan_exact_match": 0.639,
+    "hybrid_v3_final": 0.8125,
+    "oracle_final": 0.882,
+    "rules_direct_final": 0.812
+  }
+}

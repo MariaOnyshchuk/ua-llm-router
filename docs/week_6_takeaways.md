@@ -158,7 +158,7 @@ Policy: first hop = matrix router; **social** items only; if answer is **`2`** o
 **Not allowed**
 
 - “Saves VRAM” — four hot models still reserve four GPUs.
-- “Beats Mamay-12B / GPT / any closed model” — not measured on v4.
+- “Beats Mamay-12B” — measured on v4 and false: Mamay-12B is 0.874 / p50 1352 ms, the router is 0.848 / 633 ms. GPT is still not measured.
 - “Works on 14k warehouse / production traffic” — not run.
 - “Cascade / ensemble is how we get the last points” — cascade measured, Δ = 0.
 - Treating 0.750 alignment as a solved 3-way scale — few-shot over-predicts **1**.

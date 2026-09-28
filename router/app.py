@@ -31,7 +31,7 @@ from router.ensemble import (
 )
 from router.intent_rules import ROUTER_PROFILES, extract_user_text, route_intent
 from router.orchestrator import Plan, execute_plan
-from router.planner import generate_plan
+from router.planner import PLANNER_PROFILES, generate_plan
 
 LITELLM_BASE = os.getenv("LITELLM_BASE", "http://localhost:4000").rstrip("/")
 LITELLM_KEY = os.getenv("LITELLM_MASTER_KEY", "sk-diploma-dev")
@@ -175,6 +175,12 @@ async def orchestrate_preview(body: dict[str, Any]) -> dict[str, Any]:
     temperature = float(body.get("temperature", 0.0))
     max_tokens = int(body.get("max_tokens") or 512)
     seed = int(body.get("seed", 42))
+    planner_profile = str(body.get("planner_profile") or "hybrid")
+    if planner_profile not in PLANNER_PROFILES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"planner_profile must be one of {sorted(PLANNER_PROFILES)}",
+        )
     async with httpx.AsyncClient(timeout=180.0) as client:
         async def caller(alias: str, step_prompt: str) -> dict[str, Any]:
             return await async_chat(
@@ -186,8 +192,8 @@ async def orchestrate_preview(body: dict[str, Any]) -> dict[str, Any]:
                 seed=seed,
             )
 
-        plan, planning = await generate_plan(prompt, caller)
-    return {"plan": plan.to_dict(), "planning": planning}
+        plan, planning = await generate_plan(prompt, caller, profile=planner_profile)
+    return {"plan": plan.to_dict(), "planning": planning, "planner_profile": planner_profile}
 
 
 @app.post("/v1/orchestrate")
@@ -202,6 +208,12 @@ async def orchestrate(body: dict[str, Any]) -> dict[str, Any]:
     max_tokens = int(body.get("max_tokens") or 512)
     seed = int(body.get("seed", 42))
     profile = str(body.get("profile") or "v2")
+    planner_profile = str(body.get("planner_profile") or "hybrid")
+    if planner_profile not in PLANNER_PROFILES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"planner_profile must be one of {sorted(PLANNER_PROFILES)}",
+        )
     pool = _pool_from_body(body) or frozenset(PLAYGROUND_MODELS)
 
     async with httpx.AsyncClient(timeout=180.0) as client:
@@ -224,7 +236,9 @@ async def orchestrate(body: dict[str, Any]) -> dict[str, Any]:
                 "attempts": [],
             }
         else:
-            plan, planning = await generate_plan(prompt, caller)
+            plan, planning = await generate_plan(
+                prompt, caller, profile=planner_profile
+            )
         execution = await execute_plan(
             plan,
             caller,

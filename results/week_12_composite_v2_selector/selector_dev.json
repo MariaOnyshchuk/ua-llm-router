@@ -1,0 +1,70 @@
+{
+  "overall": {
+    "n": 60,
+    "plan_exact_match_rate": 1.0,
+    "template_id_accuracy": 1.0,
+    "fallback_rate": 0.0,
+    "mean_superfluous_steps": 0.0,
+    "mean_missing_steps": 0.0,
+    "misses": []
+  },
+  "by_split": {
+    "dev": {
+      "n": 60,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    }
+  },
+  "by_family": {
+    "extract_classify_write": {
+      "n": 12,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    },
+    "knowledge_explain": {
+      "n": 12,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    },
+    "translate_code": {
+      "n": 12,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    },
+    "translate_knowledge_write": {
+      "n": 12,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    },
+    "translate_summarize_format": {
+      "n": 12,
+      "plan_exact_match_rate": 1.0,
+      "template_id_accuracy": 1.0,
+      "fallback_rate": 0.0,
+      "mean_superfluous_steps": 0.0,
+      "mean_missing_steps": 0.0,
+      "misses": []
+    }
+  },
+  "error_counts": {}
+}
