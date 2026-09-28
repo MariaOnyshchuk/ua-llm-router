@@ -1,0 +1,5 @@
+table,chat_model,code_model,translate_model,instruct_model,knowledge_model,alignment_model,chat,code,translate,instruct,knowledge,alignment,overall_estimate
+current rules v2 (solo-score estimate),aya,mamay4,aya,mamay4,lapa,lapa,1.0000,0.9844,0.8205,0.7812,0.7500,0.7500,0.8477
+"best per bucket: aya, lapa, mamay4 (no 12B)",aya,mamay4,aya,aya,lapa,lapa,1.0000,0.9844,0.8205,0.7812,0.7500,0.7500,0.8477
+"best per bucket: aya, lapa, mamay4, mamay12",aya,mamay4,aya,mamay12,lapa,mamay12,1.0000,0.9844,0.8205,0.9375,0.7500,0.8438,0.8894
+"best per bucket: aya, lapa, mamay12 (drop 4B)",aya,mamay12,aya,mamay12,lapa,mamay12,1.0000,0.9688,0.8205,0.9375,0.7500,0.8438,0.8868

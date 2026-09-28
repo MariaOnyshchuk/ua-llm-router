@@ -1,0 +1,8 @@
+system,overall_quality,p50_latency_ms,gpu_seconds_per_prompt,resident_gpus
+Mamay-4B solo,0.7617,1124.7,2.155,1
+Lapa-12B solo,0.7315,1680.7,4.628,1
+Aya-8B solo,0.7852,866.9,,1
+Router v1 + few-shot,0.8425,441.3,1.593,3
+Router v2 + few-shot,0.8475,633.1,,3
+Mamay-12B solo (S2),0.8738,1352.0,2.528,1
+"Router v2 FP8, 1 card",0.8417,722.8,1.723,1
