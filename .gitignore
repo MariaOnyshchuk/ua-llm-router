@@ -19,7 +19,13 @@ results/v6_screen/*_mixed_ua_*.jsonl
 results/v6_solos/*_mixed_ua_*.jsonl
 # Generation rows (prompt + model answer). Publish on Hugging Face, not git.
 results/week_9_baselines/*.jsonl
+results/week_11_pack_fp8/*.jsonl
+results/week_11_pack_fp8/smoke_*.json
+results/week_10_composite_hybrid_v3/*.jsonl
+results/week_10_composite_hybrid_v3/earlier_20260927T0933/
 
 # AgentCoMa is gated and does not publish a reusable dataset license.
 # Keep locally translated prompt files out of this repository.
 benchmarks/agentcoma_uk_50*.jsonl
+benchmarks/agentcoma_uk_150*.jsonl
+benchmarks/agentcoma_uk_200*.jsonl
