@@ -22,7 +22,7 @@ from router.intent_rules import route_intent  # noqa: E402
 from router.orchestrator import Plan, execute_plan, plan_signature  # noqa: E402
 from router.planner import PLANNER_PROFILES, generate_plan  # noqa: E402
 
-DIRECT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "mamay12")
+DIRECT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "mamay12", "mamay27")
 DEFAULT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "router_direct", "oracle", "hybrid")
 ORCHESTRATED = frozenset({"router_direct", "oracle", *PLANNER_PROFILES})
 

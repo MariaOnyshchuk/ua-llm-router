@@ -29,3 +29,15 @@ results/week_10_composite_hybrid_v3/earlier_20260927T0933/
 benchmarks/agentcoma_uk_50*.jsonl
 benchmarks/agentcoma_uk_150*.jsonl
 benchmarks/agentcoma_uk_200*.jsonl
+
+# Raw generation rows for the composite v2 bake-off and the solo/few-shot runs.
+# Score summaries and results/*/scored/ stay tracked.
+results/week_12_composite_v2_test_bakeoff/*.jsonl
+results/week_12_composite_v2_test_bakeoff/fixture/*.jsonl
+results/week_13_solo_v4/*/*.jsonl
+results/week_13_solo_v4/*/*.partial
+
+
+# AgentCoMa runs (Phase 1 baseline matrix): generation rows contain gated prompts.
+results/week_13_agentcoma_*/*.jsonl
+results/week_13_agentcoma_*/*.partial
