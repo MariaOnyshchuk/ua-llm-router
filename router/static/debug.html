@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Router debug</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --panel: #ffffff; --ink: #1c1c1a; --muted: #6b6b66; --line: #dcdcd6;
+    --accent: #1f5fbf; --good: #1a7f37; --bad: #b42318; --warn: #a15c00; --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #16171a; --panel: #1f2125; --ink: #e8e8e4; --muted: #9a9a94; --line: #34363c;
+            --accent: #6ea8ff; --good: #4cc26a; --bad: #ff7b72; --warn: #e3a94a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line);
+           background: var(--panel); flex-wrap: wrap; }
+  header h1 { font-size: 15px; margin: 0; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font: 12px var(--mono); padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+  .chip.up { color: var(--good); border-color: var(--good); }
+  .chip.down { color: var(--bad); border-color: var(--bad); }
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; padding: 16px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; padding: 16px; } }
+  aside, .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  aside { position: sticky; top: 8px; max-height: calc(100vh - 24px); overflow: auto; }
+  @media (max-width: 900px) { aside { position: static; max-height: 60vh; } }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 2px; }
+  select, input, textarea, button { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+           border-radius: 6px; padding: 6px 8px; }
+  select, input:not([type=checkbox]) { width: 100%; }
+  textarea { width: 100%; min-height: 130px; resize: vertical; font-family: inherit; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+  .row > div { flex: 1 1 110px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; background: var(--panel); }
+  .seg button[aria-pressed=true] { background: var(--accent); color: #fff; }
+  .list { margin-top: 8px; }
+  .list button { display: block; width: 100%; text-align: left; margin: 0 0 4px; padding: 6px 8px; }
+  .list button[aria-current=true] { border-color: var(--accent); }
+  .list small { display: block; color: var(--muted); }
+  .stack > * + * { margin-top: 12px; }
+  .lanes { display: grid; gap: 12px; }
+  .lanes.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1100px) { .lanes.two { grid-template-columns: 1fr; } }
+  .lane h3 { margin: 0 0 6px; font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 13px; }
+  .kv dt { color: var(--muted); } .kv dd { margin: 0; word-break: break-word; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.45 var(--mono); }
+  .out { padding: 8px; border: 1px solid var(--line); border-radius: 6px; min-height: 60px; background: var(--bg); }
+  .out.streaming::after { content: "▍"; color: var(--accent); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .badge { font: 12px var(--mono); padding: 1px 8px; border-radius: 4px; border: 1px solid var(--line); }
+  .badge.good { color: var(--good); border-color: var(--good); }
+  .badge.bad { color: var(--bad); border-color: var(--bad); }
+  .badge.warn { color: var(--warn); border-color: var(--warn); }
+  .muted { color: var(--muted); }
+  details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+  .rule { font: 12px var(--mono); display: flex; gap: 8px; } .rule .dot { width: 8px; }
+  .rule.hit { color: var(--ink); } .rule.miss { color: var(--muted); }
+  .rule.fired { font-weight: 600; color: var(--accent); }
+  .step { border: 1px solid var(--line); border-radius: 6px; padding: 8px; margin-top: 8px; }
+  .err { color: var(--bad); }
+  .gold { border-left: 3px solid var(--good); padding-left: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Router debug</h1>
+  <div class="chips" id="health"></div>
+  <span class="muted" id="hint">local only · runs are logged to logs/debug_sessions/</span>
+</header>
+
+<div class="layout">
+  <aside>
+    <h2>Benchmark browser</h2>
+    <label>Suite</label><select id="suite"></select>
+    <label>Bucket / family</label><select id="bucket"><option value="">all</option></select>
+    <label>Search</label><input id="q" placeholder="text or id">
+    <label>Only items a system got wrong (Phase 2 lists)</label>
+    <select id="detail"><option value="">off</option></select>
+    <select id="system" style="margin-top:4px" disabled><option value="">system</option></select>
+    <label>Score below</label><input id="maxscore" type="number" step="0.05" value="1">
+    <div class="muted" id="count" style="margin-top:8px"></div>
+    <div class="list" id="list"></div>
+    <div class="row"><button id="prev">‹</button><button id="next">›</button></div>
+  </aside>
+
+  <main class="stack">
+    <section class="card" id="itemcard" hidden></section>
+
+    <section class="card">
+      <h2>Prompt</h2>
+      <textarea id="prompt" placeholder="Напиши запит або вибери задачу зліва"></textarea>
+      <div class="row" style="margin-top:8px">
+        <div style="flex:0 0 auto"><label>Mode</label>
+          <div class="seg" id="mode">
+            <button data-m="router" aria-pressed="true">Router</button>
+            <button data-m="model" aria-pressed="false">Single model</button>
+            <button data-m="compare" aria-pressed="false">Compare</button>
+            <button data-m="composite" aria-pressed="false">Composite</button>
+          </div></div>
+        <div id="modelbox"><label id="modellabel">Model</label><select id="model"></select></div>
+        <div id="profilebox"><label>Router table</label><select id="profile"></select></div>
+        <div id="alignbox"><label>Alignment prompt</label>
+          <select id="align"><option value="baseline">baseline</option><option value="fewshot">fewshot</option></select></div>
+        <div id="plannerbox" hidden><label>Planner</label><select id="planner"></select>
+          <label style="display:flex;gap:6px;align-items:center;margin-top:6px"><input type="checkbox" id="oracle"> use oracle plan</label></div>
+      </div>
+      <div class="row">
+        <div><label>Temperature</label><input id="temp" type="number" step="0.1" value="0"></div>
+        <div><label>max_tokens</label><input id="maxtok" type="number" value="1024"></div>
+        <div><label>seed</label><input id="seed" type="number" value="42"></div>
+        <div style="flex:0 0 auto"><button class="primary" id="run">Run</button> <button id="stop" disabled>Stop</button></div>
+      </div>
+    </section>
+
+    <section id="lanes" class="lanes"></section>
+
+    <details class="card" id="logbox">
+      <summary>Session log (latest runs, from logs/debug_sessions/)</summary>
+      <div id="log"></div>
+    </details>
+  </main>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") el.className = v; else if (k.startsWith("on")) el[k] = v; else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  return el;
+}
+const state = { mode: "router", item: null, itemPrompt: "", offset: 0, suites: [], abort: null, health: {} };
+const LIMIT = 40;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error(path + " → " + r.status + " " + (await r.text()).slice(0, 200));
+  return r.json();
+}
+function fill(sel, values, keep) {
+  const cur = sel.value; sel.replaceChildren();
+  for (const v of values) sel.append(h("option", { value: v.value ?? v }, v.label ?? v));
+  if (keep && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
+}
+
+/* ---------- health + setup ---------- */
+async function loadHealth() {
+  const d = await api("/debug/api/health");
+  state.health = d.backends;
+  $("health").replaceChildren(...Object.entries(d.backends).map(([a, b]) =>
+    h("span", { class: "chip " + (b.up ? "up" : "down"), title: b.base }, a + (b.up ? " up" : " down"))));
+  fill($("model"), Object.keys(d.backends), true);
+  if (!$("model").value || $("model").value === "mamay4") $("model").value = "mamay12";
+  fill($("profile"), d.profiles, true); $("profile").value = "v2";
+  fill($("planner"), d.planners, true); $("planner").value = "hybrid";
+}
+
+/* ---------- benchmark browser ---------- */
+async function loadSuites() {
+  state.suites = await api("/debug/api/bench/suites");
+  fill($("suite"), state.suites.filter((s) => s.available).map((s) => ({ value: s.name, label: s.name + " — " + s.note })));
+  const files = await api("/debug/api/bench/detail_files");
+  state.files = Object.fromEntries(files.map((f) => [f.path, f.systems]));
+  fill($("detail"), [{ value: "", label: "off" }, ...files.map((f) => ({ value: f.path, label: f.path }))]);
+}
+async function loadList() {
+  const p = new URLSearchParams({ suite: $("suite").value, bucket: $("bucket").value, q: $("q").value,
+    limit: LIMIT, offset: state.offset, max_score: $("maxscore").value || 1 });
+  if ($("detail").value && $("system").value) { p.set("detail", $("detail").value); p.set("system", $("system").value); }
+  const d = await api("/debug/api/bench/items?" + p);
+  if ($("bucket").options.length <= 1) fill($("bucket"), [{ value: "", label: "all" }, ...d.buckets.filter(Boolean)], true);
+  $("count").textContent = d.total + " items";
+  $("list").replaceChildren(...d.items.map((it) => {
+    const b = h("button", { "aria-current": state.item && state.item.id === it.id },
+      it.id + "  ·  " + it.bucket + (it.score != null ? "  ·  score " + it.score : ""),
+      h("small", {}, it.snippet));
+    b.onclick = () => openItem(it.id);
+    return b;
+  }));
+}
+async function openItem(id) {
+  const it = await api("/debug/api/bench/item?" + new URLSearchParams({ suite: $("suite").value, id }));
+  state.item = { suite: $("suite").value, id, kind: it.kind, data: it };
+  $("prompt").value = state.itemPrompt = it.prompt;
+  setMode(it.kind === "composite" ? "composite" : (state.mode === "composite" ? "router" : state.mode));
+  renderItem(it); loadList();
+}
+function renderItem(it) {
+  const box = $("itemcard"); box.hidden = false;
+  const kids = [h("h2", {}, "Item " + it.id + " · " + (it.bucket || it.family))];
+  if (it.kind === "single") {
+    kids.push(h("dl", { class: "kv gold" }, h("dt", {}, "gold"), h("dd", {}, h("pre", {}, String(it.reference))),
+      it.notes ? h("dt", {}, "notes") : null, it.notes ? h("dd", {}, it.notes) : null));
+  } else {
+    kids.push(h("dl", { class: "kv gold" }, h("dt", {}, "gold final"), h("dd", {}, String(it.answer_composition)),
+      h("dt", {}, "oracle plan"), h("dd", {}, h("pre", {}, it.oracle_plan.steps.map((s) =>
+        s.id + " [" + s.intent + "]" + (s.depends_on.length ? " ← " + s.depends_on.join(",") : "") + "  gold: " + JSON.stringify(s.rubric)).join("\n")))));
+    if (it.steps_alone) {
+      const use = (t) => { $("prompt").value = t; state.item = null; setMode("router"); };
+      kids.push(h("div", { class: "row", style: "margin-top:8px" },
+        h("button", { onclick: () => use(it.steps_alone.commonsense) }, "Load commonsense step alone (gold: " + JSON.stringify(it.steps_alone.commonsense_gold) + ")"),
+        h("button", { onclick: () => use(it.steps_alone.math) }, "Load math step alone (gold: " + it.steps_alone.math_gold + ")")));
+    }
+  }
+  box.replaceChildren(...kids);
+}
+
+/* ---------- mode ---------- */
+function setMode(m) {
+  state.mode = m;
+  document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m));
+  $("modelbox").hidden = m === "router" || m === "composite";
+  $("modellabel").textContent = m === "compare" ? "Compare against (lane B)" : "Model";
+  $("profilebox").hidden = m === "model";
+  $("alignbox").hidden = m === "composite";
+  $("plannerbox").hidden = m !== "composite";
+  if (m === "composite" && $("maxtok").value === "1024") $("maxtok").value = 256;
+  if (m !== "composite" && $("maxtok").value === "256") $("maxtok").value = 1024;
+}
+
+/* ---------- lanes ---------- */
+function newLane(title) {
+  const lane = {
+    root: h("section", { class: "card lane" }), title,
+    head: h("h3", {}, title), route: h("div"), sent: h("div"), out: h("pre", { class: "out streaming" }),
+    score: h("div"), meta: h("div", { class: "muted" }), raw: h("details", {}, h("summary", {}, "Raw request / response")),
+    rawBody: h("pre"), text: "",
+  };
+  lane.raw.append(lane.rawBody);
+  lane.root.append(lane.head, lane.route, lane.sent, lane.out, lane.score, lane.meta, lane.raw);
+  return lane;
+}
+function showRoute(lane, ev) {
+  const t = ev.trace, dl = h("dl", { class: "kv" },
+    h("dt", {}, "intent"), h("dd", {}, t.intent), h("dt", {}, "model"), h("dd", {}, t.model + (ev.alias !== t.model ? " (→ " + ev.alias + ")" : "")),
+    h("dt", {}, "why"), h("dd", {}, t.reason));
+  lane.head.append(h("span", { class: "chip up" }, ev.alias));
+  const box = h("div", {}, h("h2", {}, "Routing"), dl);
+  if (t.rules && t.rules.length) {
+    const firstHit = t.rules.findIndex((r) => r.matched);
+    const rules = h("details", {}, h("summary", {}, "Rule table: " + t.rules.filter((r) => r.matched).length + " matched, first match wins"),
+      ...t.rules.map((r, i) => h("div", { class: "rule " + (r.matched ? "hit" : "miss") + (i === firstHit ? " fired" : "") },
+        h("span", { class: "dot" }, r.matched ? "●" : "○"), r.intent + " → " + r.model,
+        r.matched ? h("span", { class: "muted" }, "“" + r.match_text + "”") : null)));
+    box.append(rules);
+    if (t.learned) box.append(h("div", { class: "muted" }, "learned router profile: rule table not applicable"));
+  }
+  lane.route.replaceChildren(box);
+}
+function showPrompt(lane, ev) {
+  lane.sent.replaceChildren(h("details", {}, h("summary", {}, "Prompt sent" + (ev.changed ? " (differs from your text: alignment variant)" : "")), h("pre", {}, ev.text)));
+}
+function showScore(lane, sc) {
+  const s = sc.score;
+  const cls = s == null ? "warn" : s >= 1 ? "good" : s > 0 ? "warn" : "bad";
+  lane.score.replaceChildren(h("span", { class: "badge " + cls }, "score " + (s == null ? "—" : s)),
+    " ", h("span", { class: "muted" }, sc.detail || ""));
+}
+function handleLane(lane, ev) {
+  if (ev.type === "route") showRoute(lane, ev);
+  else if (ev.type === "prompt") showPrompt(lane, ev);
+  else if (ev.type === "request") lane.request = ev;
+  else if (ev.type === "delta") { lane.text += ev.text; lane.out.textContent = lane.text; }
+  else if (ev.type === "done") {
+    lane.out.classList.remove("streaming");
+    lane.meta.textContent = [ev.ttft_ms != null ? "first token " + ev.ttft_ms + " ms" : null, "total " + ev.latency_ms + " ms",
+      ev.usage ? ev.usage.completion_tokens + " completion / " + ev.usage.prompt_tokens + " prompt tokens" : null,
+      "finish: " + ev.finish_reason].filter(Boolean).join(" · ");
+    if (ev.finish_reason === "length") lane.meta.append(" ", h("span", { class: "badge warn" }, "cut off by max_tokens"));
+    lane.rawBody.textContent = JSON.stringify({ request: lane.request, response: { ...ev, content: undefined } }, null, 2);
+  } else if (ev.type === "score") showScore(lane, ev.score);
+  else if (ev.type === "error") { lane.out.classList.remove("streaming"); lane.out.append(h("div", { class: "err" }, ev.message)); }
+}
+
+/* ---------- composite ---------- */
+function renderComposite(root) {
+  const c = { root: h("section", { class: "card lane" }, h("h3", {}, "Composite run")), plan: h("div"), calls: h("div"), final: h("div"), n: 0 };
+  c.root.append(c.plan, c.calls, c.final); root.append(c.root); return c;
+}
+function handleComposite(c, ev) {
+  if (ev.type === "plan") {
+    c.plan.replaceChildren(h("h2", {}, "Plan (" + (ev.planning.mode || "planner") + ", valid: " + ev.planning.valid + ")"),
+      h("pre", {}, ev.plan.steps.map((s) => s.id + " [" + s.intent + "]" + (s.depends_on.length ? " ← " + s.depends_on.join(",") : "")).join("\n")));
+  } else if (ev.type === "call_start") {
+    c.n += 1; c.current = h("div", { class: "step" }, h("b", {}, "call " + c.n + " → " + ev.alias), h("span", { class: "muted" }, "  running…"));
+    c.calls.append(c.current);
+  } else if (ev.type === "call_done") {
+    c.current.replaceChildren(h("b", {}, "call " + c.n + " → " + ev.alias), h("span", { class: "muted" }, "  " + ev.latency_ms + " ms" + (ev.ok ? "" : " · FAILED")),
+      h("pre", {}, ev.content || ""));
+  } else if (ev.type === "final") {
+    const ex = ev.execution, sc = ev.score;
+    c.calls.replaceChildren();
+    const cards = ex.steps.map((s, i) => {
+      const st = sc && sc.stage_scores[i];
+      return h("div", { class: "step" },
+        h("b", {}, s.id + " · declared " + s.intent + " → detected " + s.route.detected_intent + " → " + s.route.model),
+        h("span", { class: "muted" }, "  " + s.latency_ms + " ms" + (s.depends_on.length ? " · after " + s.depends_on.join(",") : "")),
+        st ? h("span", { class: "badge " + (st.score >= 1 ? "good" : "bad"), style: "margin-left:8px" }, "stage " + st.score + " · " + st.detail) : null,
+        h("details", {}, h("summary", {}, "Prompt sent to " + s.route.model), h("pre", {}, s.prompt)),
+        h("pre", { class: "out" }, s.content || ""));
+    });
+    c.calls.append(...cards);
+    const kv = [h("dt", {}, "final output"), h("dd", {}, h("pre", {}, ex.final_output || "")),
+      h("dt", {}, "calls / latency"), h("dd", {}, ex.calls + " calls · " + ex.latency_ms + " ms")];
+    if (sc) kv.push(h("dt", {}, "final score"), h("dd", {}, h("span", { class: "badge " + (sc.final_score >= 1 ? "good" : "bad") }, sc.final_score + " · " + sc.final_detail)),
+      h("dt", {}, "plan match"), h("dd", {}, String(sc.plan_match) + (sc.workflow_error ? " · " + sc.workflow_error : "")),
+      h("dt", {}, "all stages pass"), h("dd", {}, String(sc.all_stages_pass)));
+    c.final.replaceChildren(h("h2", {}, "Result"), h("dl", { class: "kv" }, ...kv));
+  } else if (ev.type === "error") c.final.append(h("div", { class: "err" }, ev.message));
+}
+
+/* ---------- run ---------- */
+async function run() {
+  const prompt = $("prompt").value.trim(); if (!prompt) return;
+  const attached = state.item && prompt === state.itemPrompt;
+  const body = { prompt, mode: state.mode === "model" ? "model" : "router", model: $("model").value, model_b: $("model").value,
+    profile: $("profile").value, align_prompt: $("align").value, planner_profile: $("planner").value, use_oracle: $("oracle").checked,
+    temperature: parseFloat($("temp").value || 0), max_tokens: parseInt($("maxtok").value || 1024), seed: $("seed").value === "" ? null : parseInt($("seed").value) };
+  if (attached) { body.suite = state.item.suite; body.item_id = state.item.id; }
+  const lanes = $("lanes"); lanes.replaceChildren();
+  const path = { router: "chat", model: "chat", compare: "compare", composite: "composite" }[state.mode];
+  const byside = {};
+  if (state.mode === "compare") { lanes.className = "lanes two"; byside.a = newLane("A · Router"); byside.b = newLane("B · " + body.model_b); lanes.append(byside.a.root, byside.b.root); }
+  else if (state.mode === "composite") { lanes.className = "lanes"; byside.c = renderComposite(lanes); }
+  else { lanes.className = "lanes"; byside.a = newLane(state.mode === "router" ? "Router" : body.model); lanes.append(byside.a.root); }
+  if (!attached && state.item) lanes.prepend(h("div", { class: "muted" }, "Prompt was edited, so this run is not scored against the loaded item."));
+  state.abort = new AbortController(); $("run").disabled = true; $("stop").disabled = false;
+  try {
+    const resp = await fetch("/debug/api/" + path, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body), signal: state.abort.signal });
+    if (!resp.ok) throw new Error(resp.status + " " + (await resp.text()).slice(0, 300));
+    const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = "";
+    for (;;) {
+      const { value, done } = await reader.read(); if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i; while ((i = buf.indexOf("\n\n")) >= 0) {
+        const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
+        if (!chunk.startsWith("data:")) continue;
+        const ev = JSON.parse(chunk.slice(5));
+        if (state.mode === "composite") handleComposite(byside.c, ev); else handleLane(byside[ev.side || "a"], ev);
+      }
+    }
+  } catch (e) {
+    if (e.name !== "AbortError") lanes.append(h("div", { class: "err" }, String(e)));
+  } finally {
+    Object.values(byside).forEach((l) => l.out && l.out.classList.remove("streaming"));
+    $("run").disabled = false; $("stop").disabled = true; loadLog();
+  }
+}
+
+/* ---------- log ---------- */
+async function loadLog() {
+  const rows = await api("/debug/api/log?limit=15");
+  $("log").replaceChildren(...rows.map((r) => {
+    const lanes = Object.entries(r.lanes || {}).map(([s, l]) => s + ": " + ((l.route && l.route.trace && l.route.trace.model) || (l.done && l.done.alias) || "") +
+      (l.score ? " score " + (l.score.score && l.score.score.score) : "") + (l.error ? " ERROR" : "")).join(" | ");
+    return h("div", { class: "muted", style: "margin-top:6px" }, r.ts + " · " + r.kind + " · " + (r.item_id || "free text") + " · " + lanes);
+  }));
+}
+
+/* ---------- wiring ---------- */
+$("mode").onclick = (e) => e.target.dataset.m && setMode(e.target.dataset.m);
+$("run").onclick = run; $("stop").onclick = () => state.abort && state.abort.abort();
+$("prompt").addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") run(); });
+["suite", "bucket", "maxscore"].forEach((id) => $(id).onchange = () => { state.offset = 0; if (id === "suite") $("bucket").replaceChildren(h("option", { value: "" }, "all")); loadList(); });
+$("q").oninput = () => { state.offset = 0; clearTimeout(state.t); state.t = setTimeout(loadList, 250); };
+$("detail").onchange = () => { const s = state.files[$("detail").value] || []; fill($("system"), s); $("system").disabled = !s.length; state.offset = 0; loadList(); };
+$("system").onchange = () => { state.offset = 0; loadList(); };
+$("prev").onclick = () => { state.offset = Math.max(0, state.offset - LIMIT); loadList(); };
+$("next").onclick = () => { state.offset += LIMIT; loadList(); };
+
+(async () => {
+  setMode("router");
+  await loadHealth().catch((e) => $("hint").textContent = String(e));
+  await loadSuites().then(loadList).catch((e) => $("count").textContent = String(e));
+  loadLog();
+})();
+</script>
+</body>
+</html>
