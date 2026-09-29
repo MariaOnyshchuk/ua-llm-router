@@ -17,6 +17,8 @@ results/a2_agentcoma*/
 results/a2_planner_grid/
 results/v6_screen/*_mixed_ua_*.jsonl
 results/v6_solos/*_mixed_ua_*.jsonl
+results/v6_rules/*_mixed_ua_*.jsonl
+results/v6_rules/*.partial
 # Generation rows (prompt + model answer). Publish on Hugging Face, not git.
 results/week_9_baselines/*.jsonl
 results/week_11_pack_fp8/*.jsonl
