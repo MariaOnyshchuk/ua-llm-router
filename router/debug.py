@@ -355,7 +355,9 @@ async def health() -> dict[str, Any]:
         for alias, (base, model) in BACKENDS.items():
             try:
                 r = await client.get(f"{base}/models")
-                out[alias] = {"up": r.status_code == 200, "base": base, "model": model}
+                data = (r.json().get("data") or [{}]) if r.status_code == 200 else [{}]
+                out[alias] = {"up": r.status_code == 200, "base": base, "model": model,
+                              "mock": bool(data[0].get("mock"))}
             except Exception:  # noqa: BLE001
                 out[alias] = {"up": False, "base": base, "model": model}
     return {"backends": out, "profiles": sorted(ROUTER_PROFILES), "planners": sorted(PLANNER_PROFILES)}

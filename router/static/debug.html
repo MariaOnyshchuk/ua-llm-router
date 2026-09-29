@@ -74,6 +74,7 @@
 <header>
   <h1>Router debug</h1>
   <div class="chips" id="health"></div>
+  <span class="badge bad" id="mockwarn" hidden>MOCK BACKENDS: answers are fake, scores mean nothing</span>
   <span class="muted" id="hint">local only · runs are logged to logs/debug_sessions/</span>
 </header>
 
@@ -158,8 +159,9 @@ function fill(sel, values, keep) {
 async function loadHealth() {
   const d = await api("/debug/api/health");
   state.health = d.backends;
+  $("mockwarn").hidden = !Object.values(d.backends).some((b) => b.up && b.mock);
   $("health").replaceChildren(...Object.entries(d.backends).map(([a, b]) =>
-    h("span", { class: "chip " + (b.up ? "up" : "down"), title: b.base }, a + (b.up ? " up" : " down"))));
+    h("span", { class: "chip " + (b.up ? "up" : "down"), title: b.base }, a + (b.up ? (b.mock ? " MOCK" : " up") : " down"))));
   fill($("model"), Object.keys(d.backends), true);
   if (!$("model").value || $("model").value === "mamay4") $("model").value = "mamay12";
   fill($("profile"), d.profiles, true); $("profile").value = "v2";
@@ -371,6 +373,13 @@ async function loadLog() {
 
 /* ---------- wiring ---------- */
 $("mode").onclick = (e) => e.target.dataset.m && setMode(e.target.dataset.m);
+$("prompt").addEventListener("input", () => {
+  const box = $("itemcard"), detached = state.item && $("prompt").value !== state.itemPrompt;
+  box.style.opacity = detached ? 0.45 : 1;
+  const old = box.querySelector(".detached"); if (old) old.remove();
+  if (detached) box.prepend(h("div", { class: "badge warn detached", style: "margin-bottom:8px;display:inline-block" },
+    "prompt edited: this is no longer the item, gold and scoring do not apply"));
+});
 $("run").onclick = run; $("stop").onclick = () => state.abort && state.abort.abort();
 $("prompt").addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") run(); });
 ["suite", "bucket", "maxscore"].forEach((id) => $(id).onchange = () => { state.offset = 0; if (id === "suite") $("bucket").replaceChildren(h("option", { value: "" }, "all")); loadList(); });
