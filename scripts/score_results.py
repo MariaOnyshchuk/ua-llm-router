@@ -344,7 +344,12 @@ def score_knowledge(content: str, reference: str) -> dict[str, Any]:
     latin_to_cyr = {"a": "а", "b": "б", "c": "в", "d": "г", "e": "д"}
     cyr_to_latin = {v: k for k, v in latin_to_cyr.items()}
     raw_ref = (reference or "").strip()
-    if raw_ref.isdigit() or (len(raw_ref) == 1 and raw_ref.upper() in "ABCDEАБВГД"):
+    # A one-digit reference is an answer index (Belebele style). Longer digit strings
+    # such as 1991 or 24 are numeric facts and go to the contains-reference check below;
+    # treating them as MCQ indexes scored every model 0 on those items (fixed 29 Sep 2026).
+    if (len(raw_ref) == 1 and raw_ref.isdigit()) or (
+        len(raw_ref) == 1 and raw_ref.upper() in "ABCDEАБВГД"
+    ):
         want = letter_from_answer(raw_ref, 5).lower()
         raw = (content or "").strip()
         m = re.search(r"(?:відповідь|answer)\s*[:\-–]?\s*([A-Ea-eА-Дабвгд])\b", raw, re.I)
