@@ -292,8 +292,21 @@ function renderComposite(root) {
 }
 function handleComposite(c, ev) {
   if (ev.type === "plan") {
-    c.plan.replaceChildren(h("h2", {}, "Plan (" + (ev.planning.mode || "planner") + ", valid: " + ev.planning.valid + ")"),
-      h("pre", {}, ev.plan.steps.map((s) => s.id + " [" + s.intent + "]" + (s.depends_on.length ? " ← " + s.depends_on.join(",") : "")).join("\n")));
+    const pl = ev.planning || {}, attempts = pl.attempts || [];
+    c.calls.replaceChildren(); c.n = 0;   // planner calls are shown in the planning log below, not as step calls
+    const badge = pl.fallback ? h("span", { class: "badge bad" }, "FALLBACK plan: " + (pl.fallback_reason || "")) :
+      pl.repaired ? h("span", { class: "badge warn" }, "valid after repair") :
+      pl.valid ? h("span", { class: "badge good" }, "valid") : h("span", { class: "badge bad" }, "invalid");
+    const log = [h("h2", {}, "Planning"),
+      h("dl", { class: "kv" }, h("dt", {}, "planner"), h("dd", {}, (pl.mode || "planner") + (pl.profile ? " · " + pl.profile : "") + (pl.template_id ? " · template " + pl.template_id : "")),
+        h("dt", {}, "result"), h("dd", {}, badge, pl.error ? h("div", { class: "err" }, pl.error) : null),
+        h("dt", {}, "planner calls"), h("dd", {}, String(attempts.length)))];
+    attempts.forEach((a, i) => log.push(h("details", { open: "" },
+      h("summary", {}, "planner attempt " + (i + 1) + (i === 1 ? " (repair)" : "") + " → " + (a.alias || "?") + " · " + (a.latency_ms ?? "?") + " ms" + (a.ok === false ? " · FAILED" : "")),
+      h("pre", { class: "out" }, a.content || ""))));
+    log.push(h("h2", { style: "margin-top:12px" }, "Plan that will run"),
+      h("pre", {}, ev.plan.steps.map((st) => st.id + " [" + st.intent + "]" + (st.depends_on.length ? " ← " + st.depends_on.join(",") : "") + "\n    " + st.prompt.slice(0, 240).replace(/\n/g, " ")).join("\n")));
+    c.plan.replaceChildren(...log);
   } else if (ev.type === "call_start") {
     c.n += 1; c.current = h("div", { class: "step" }, h("b", {}, "call " + c.n + " → " + ev.alias), h("span", { class: "muted" }, "  running…"));
     c.calls.append(c.current);
