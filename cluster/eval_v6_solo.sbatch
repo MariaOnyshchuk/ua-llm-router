@@ -16,7 +16,7 @@
 #   sbatch --job-name=v6-mamay4 --export=ALL,ALIAS=mamay4 cluster/eval_v6_solo.sbatch
 #   sbatch --job-name=v6-lapa   --export=ALL,ALIAS=lapa   cluster/eval_v6_solo.sbatch
 #   sbatch --job-name=v6-aya    --export=ALL,ALIAS=aya    cluster/eval_v6_solo.sbatch
-#   sbatch --job-name=v6-mamay27 --export=ALL,ALIAS=mamay27,CUDA_VISIBLE_DEVICES=3 cluster/eval_v6_solo.sbatch   # FP8; pin a free card
+#   sbatch --job-name=v6-mamay27 --export=ALL,ALIAS=mamay27 cluster/eval_v6_solo.sbatch   # FP8
 
 set -euo pipefail
 
@@ -78,8 +78,9 @@ QUANT="${QUANT:-}"
 QUANT_ARGS=()
 [ -n "${QUANT}" ] && QUANT_ARGS=(--quantization "${QUANT}")
 
-# Slurm on this node does not isolate GPUs: a job without CUDA_VISIBLE_DEVICES lands on card 0.
-# Refuse to start on a card that is already in use (another job's model would corrupt both runs).
+# The node is shared with users outside our Slurm allocation, so an assigned card can already
+# hold memory (seen on 29 Sep 2026: card 0 had ~22 GB from another user). Refuse to start then;
+# do not override CUDA_VISIBLE_DEVICES by hand, the other cards belong to running jobs.
 GPU_FIRST="${CUDA_VISIBLE_DEVICES:-0}"; GPU_FIRST="${GPU_FIRST%,*}"
 GPU_USED_MB="$(nvidia-smi -i "${GPU_FIRST}" --query-gpu=memory.used --format=csv,noheader,nounits | tr -d ' ')"
 if [ "${GPU_USED_MB:-0}" -gt 2000 ]; then
