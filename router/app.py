@@ -23,6 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from router.backends import BACKENDS, MODEL_META, PLAYGROUND_MODELS
 from router.cascade import should_retry_mamay4_micro
 from router.client import async_chat
+from router.debug import router as debug_router
 from router.ensemble import (
     ENSEMBLE_VOTERS,
     extract_vote_label,
@@ -39,6 +40,7 @@ AUTO_MODELS = {"auto", "router", "ua-router"}
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 app = FastAPI(title="UA specialist intent router", version="0.2.0")
+app.include_router(debug_router)
 if STATIC_DIR.is_dir():
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
