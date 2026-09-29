@@ -57,6 +57,15 @@ for f in "${COMPOSITE}" "${MERGED}"; do
   [[ -f "${f}" ]] || { echo "[ac-solo] missing ${f}; scp it first" >&2; exit 1; }
 done
 
+# Slurm on this node does not isolate GPUs: a job without CUDA_VISIBLE_DEVICES lands on card 0.
+# Refuse to start on a card that is already in use (another job's model would corrupt both runs).
+GPU_FIRST="${CUDA_VISIBLE_DEVICES:-0}"; GPU_FIRST="${GPU_FIRST%,*}"
+GPU_USED_MB="$(nvidia-smi -i "${GPU_FIRST}" --query-gpu=memory.used --format=csv,noheader,nounits | tr -d ' ')"
+if [ "${GPU_USED_MB:-0}" -gt 2000 ]; then
+  echo "[ac-solo] GPU ${GPU_FIRST} already holds ${GPU_USED_MB} MiB; free it or submit with CUDA_VISIBLE_DEVICES=<free card>" >&2
+  nvidia-smi --query-gpu=index,memory.used,memory.total --format=csv >&2
+  exit 1
+fi
 echo "[ac-solo] host=$(hostname) alias=${ALIAS} split=${SPLIT} cuda_visible=${CUDA_VISIBLE_DEVICES:-unset}"
 nvidia-smi -L
 
