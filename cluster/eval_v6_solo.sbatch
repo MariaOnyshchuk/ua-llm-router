@@ -16,6 +16,7 @@
 #   sbatch --job-name=v6-mamay4 --export=ALL,ALIAS=mamay4 cluster/eval_v6_solo.sbatch
 #   sbatch --job-name=v6-lapa   --export=ALL,ALIAS=lapa   cluster/eval_v6_solo.sbatch
 #   sbatch --job-name=v6-aya    --export=ALL,ALIAS=aya    cluster/eval_v6_solo.sbatch
+#   sbatch --job-name=v6-mamay27 --export=ALL,ALIAS=mamay27,CUDA_VISIBLE_DEVICES=3 cluster/eval_v6_solo.sbatch   # FP8; pin a free card
 
 set -euo pipefail
 
@@ -55,17 +56,37 @@ case "${ALIAS}" in
     PORT="${PORT:-8002}"
     PHASE="v6_solo_mamay12"
     ;;
+  mamay27)
+    # bf16 needs about 54 GB and does not fit one 49 GB card; serve in FP8 and report it as such.
+    MODEL="${MODEL:-INSAIT-Institute/MamayLM-Gemma-3-27B-IT-v2.0}"
+    PORT="${PORT:-8002}"
+    PHASE="v6_solo_mamay27"
+    QUANT="${QUANT:-fp8}"
+    ;;
   qwen7)
     MODEL="${MODEL:-Qwen/Qwen2.5-Coder-7B-Instruct}"
     PORT="${PORT:-8004}"
     PHASE="v6_solo_qwen7"
     ;;
   *)
-    echo "unknown ALIAS=${ALIAS} (expected mamay4|lapa|aya|mamay12|qwen7)" >&2
+    echo "unknown ALIAS=${ALIAS} (expected mamay4|lapa|aya|mamay12|mamay27|qwen7)" >&2
     exit 1
     ;;
 esac
 
+QUANT="${QUANT:-}"
+QUANT_ARGS=()
+[ -n "${QUANT}" ] && QUANT_ARGS=(--quantization "${QUANT}")
+
+# Slurm on this node does not isolate GPUs: a job without CUDA_VISIBLE_DEVICES lands on card 0.
+# Refuse to start on a card that is already in use (another job's model would corrupt both runs).
+GPU_FIRST="${CUDA_VISIBLE_DEVICES:-0}"; GPU_FIRST="${GPU_FIRST%,*}"
+GPU_USED_MB="$(nvidia-smi -i "${GPU_FIRST}" --query-gpu=memory.used --format=csv,noheader,nounits | tr -d ' ')"
+if [ "${GPU_USED_MB:-0}" -gt 2000 ]; then
+  echo "[v6-solo] GPU ${GPU_FIRST} already holds ${GPU_USED_MB} MiB; free it or submit with CUDA_VISIBLE_DEVICES=<free card>" >&2
+  nvidia-smi --query-gpu=index,memory.used,memory.total --format=csv >&2
+  exit 1
+fi
 echo "[v6-solo] host=$(hostname) alias=${ALIAS} port=${PORT} cuda_visible=${CUDA_VISIBLE_DEVICES:-unset}"
 nvidia-smi -L
 
@@ -76,7 +97,8 @@ vllm serve "${MODEL}" \
   --max-model-len 8192 \
   --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION}" \
   --trust-remote-code \
-  --enforce-eager &
+  --enforce-eager \
+  "${QUANT_ARGS[@]}" &
 VLLM_PID=$!
 cleanup() { kill "${VLLM_PID}" 2>/dev/null || true; wait "${VLLM_PID}" 2>/dev/null || true; }
 trap cleanup EXIT
