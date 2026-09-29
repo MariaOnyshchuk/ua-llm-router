@@ -312,6 +312,7 @@ function handleComposite(c, ev) {
     c.calls.append(c.current);
   } else if (ev.type === "call_done") {
     c.current.replaceChildren(h("b", {}, "call " + c.n + " → " + ev.alias), h("span", { class: "muted" }, "  " + ev.latency_ms + " ms" + (ev.ok ? "" : " · FAILED")),
+      ev.finish_reason === "length" ? h("span", { class: "badge warn", style: "margin-left:8px" }, "CUT OFF by max_tokens") : null,
       h("pre", {}, ev.content || ""));
   } else if (ev.type === "final") {
     const ex = ev.execution, sc = ev.score;
@@ -322,6 +323,7 @@ function handleComposite(c, ev) {
         h("b", {}, s.id + " · declared " + s.intent + " → detected " + s.route.detected_intent + " → " + s.route.model),
         h("span", { class: "muted" }, "  " + s.latency_ms + " ms" + (s.depends_on.length ? " · after " + s.depends_on.join(",") : "")),
         st ? h("span", { class: "badge " + (st.score >= 1 ? "good" : "bad"), style: "margin-left:8px" }, "stage " + st.score + " · " + st.detail) : null,
+        s.finish_reason === "length" ? h("span", { class: "badge warn", style: "margin-left:8px" }, "CUT OFF by max_tokens (" + ((s.usage && s.usage.completion_tokens) || "?") + " tokens): the next step got truncated text") : null,
         h("details", {}, h("summary", {}, "Prompt sent to " + s.route.model), h("pre", {}, s.prompt)),
         h("pre", { class: "out" }, s.content || ""));
     });
