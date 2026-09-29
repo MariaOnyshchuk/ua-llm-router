@@ -28,6 +28,10 @@ BACKENDS: dict[str, tuple[str, str]] = {
         _v1("ROUTER_PORT_MAMAY12", 8002),
         "INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v2.0",
     ),
+    "mamay27": (
+        _v1("ROUTER_PORT_MAMAY27", 8002),
+        "INSAIT-Institute/MamayLM-Gemma-3-27B-IT-v2.0",
+    ),
     "lapa": (
         _v1("ROUTER_PORT_LAPA", 8001),
         "lapa-llm/lapa-v0.1.2-instruct",
