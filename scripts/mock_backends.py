@@ -43,7 +43,7 @@ def make_app(alias: str) -> FastAPI:
 
     @app.get("/v1/models")
     def models():
-        return {"data": [{"id": BACKENDS[alias][1]}]}
+        return {"data": [{"id": BACKENDS[alias][1], "mock": True}]}
 
     @app.post("/v1/chat/completions")
     async def chat(request: Request):
