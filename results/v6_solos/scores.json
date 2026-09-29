@@ -2,8 +2,8 @@
   "systems": {
     "aya": {
       "n": 2414,
-      "overall_mean": 0.6667,
-      "overall_mean_macro": 0.7615,
+      "overall_mean": 0.6676,
+      "overall_mean_macro": 0.762,
       "latency_avg_ms": 2048.9,
       "latency_p50_ms": 1053.8,
       "latency_p95_ms": 8785.2,
@@ -39,7 +39,7 @@
           "n": 327
         },
         "knowledge": {
-          "quality_mean": 0.7335,
+          "quality_mean": 0.7365,
           "latency_avg_ms": 1744.9,
           "latency_p50_ms": 1336.8,
           "latency_p95_ms": 4631.4,
@@ -56,8 +56,8 @@
     },
     "lapa": {
       "n": 2414,
-      "overall_mean": 0.6687,
-      "overall_mean_macro": 0.7627,
+      "overall_mean": 0.6696,
+      "overall_mean_macro": 0.7632,
       "latency_avg_ms": 3193.0,
       "latency_p50_ms": 504.0,
       "latency_p95_ms": 19810.6,
@@ -93,7 +93,7 @@
           "n": 327
         },
         "knowledge": {
-          "quality_mean": 0.7379,
+          "quality_mean": 0.7408,
           "latency_avg_ms": 1114.0,
           "latency_p50_ms": 440.8,
           "latency_p95_ms": 2153.3,
@@ -110,8 +110,8 @@
     },
     "mamay12": {
       "n": 2414,
-      "overall_mean": 0.6946,
-      "overall_mean_macro": 0.7834,
+      "overall_mean": 0.6954,
+      "overall_mean_macro": 0.7839,
       "latency_avg_ms": 3885.7,
       "latency_p50_ms": 492.1,
       "latency_p95_ms": 25154.9,
@@ -147,7 +147,7 @@
           "n": 327
         },
         "knowledge": {
-          "quality_mean": 0.7804,
+          "quality_mean": 0.7833,
           "latency_avg_ms": 440.0,
           "latency_p50_ms": 188.1,
           "latency_p95_ms": 969.3,
@@ -164,8 +164,8 @@
     },
     "mamay4": {
       "n": 2414,
-      "overall_mean": 0.6647,
-      "overall_mean_macro": 0.7612,
+      "overall_mean": 0.6656,
+      "overall_mean_macro": 0.7616,
       "latency_avg_ms": 2952.0,
       "latency_p50_ms": 539.2,
       "latency_p95_ms": 17936.1,
@@ -201,7 +201,7 @@
           "n": 327
         },
         "knowledge": {
-          "quality_mean": 0.7321,
+          "quality_mean": 0.735,
           "latency_avg_ms": 1241.9,
           "latency_p50_ms": 496.7,
           "latency_p95_ms": 5240.2,
@@ -218,8 +218,8 @@
     },
     "qwen7": {
       "n": 2414,
-      "overall_mean": 0.5937,
-      "overall_mean_macro": 0.7181,
+      "overall_mean": 0.5946,
+      "overall_mean_macro": 0.7186,
       "latency_avg_ms": 1044.0,
       "latency_p50_ms": 239.9,
       "latency_p95_ms": 6464.8,
@@ -255,7 +255,7 @@
           "n": 327
         },
         "knowledge": {
-          "quality_mean": 0.6105,
+          "quality_mean": 0.6135,
           "latency_avg_ms": 283.0,
           "latency_p50_ms": 228.7,
           "latency_p95_ms": 606.9,

@@ -2,8 +2,8 @@
   "systems": {
     "mamay12": {
       "n": 192,
-      "overall_mean": 0.873,
-      "overall_mean_macro": 0.873,
+      "overall_mean": 0.8835,
+      "overall_mean_macro": 0.8835,
       "latency_avg_ms": 2546.0,
       "latency_p50_ms": 1348.4,
       "latency_p95_ms": 11557.8,
@@ -39,7 +39,7 @@
           "n": 32
         },
         "knowledge": {
-          "quality_mean": 0.6875,
+          "quality_mean": 0.75,
           "latency_avg_ms": 1031.0,
           "latency_p50_ms": 554.7,
           "latency_p95_ms": 1608.0,
