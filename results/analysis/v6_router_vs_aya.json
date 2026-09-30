@@ -1,0 +1,94 @@
+{
+  "a": "router_matrix_v2_fewshot",
+  "b": "aya",
+  "rows": [
+    {
+      "scope": "knowledge",
+      "n": 683,
+      "a": 0.7408,
+      "b": 0.7365,
+      "diff": 0.0044,
+      "ci_low": -0.0015,
+      "ci_high": 0.0117,
+      "verdict": "not distinguishable",
+      "note": ""
+    },
+    {
+      "scope": "translate",
+      "n": 683,
+      "a": 0.6459,
+      "b": 0.6459,
+      "diff": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "verdict": "not distinguishable",
+      "note": ""
+    },
+    {
+      "scope": "alignment",
+      "n": 683,
+      "a": 0.6881,
+      "b": 0.675,
+      "diff": 0.0132,
+      "ci_low": -0.0381,
+      "ci_high": 0.0644,
+      "verdict": "not distinguishable",
+      "note": ""
+    },
+    {
+      "scope": "instruct",
+      "n": 327,
+      "a": 0.5219,
+      "b": 0.5148,
+      "diff": 0.0071,
+      "ci_low": 0.0,
+      "ci_high": 0.0143,
+      "verdict": "not distinguishable",
+      "note": ""
+    },
+    {
+      "scope": "chat",
+      "n": 19,
+      "a": 1.0,
+      "b": 1.0,
+      "diff": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "verdict": "not distinguishable",
+      "note": "appendix only"
+    },
+    {
+      "scope": "code",
+      "n": 19,
+      "a": 1.0,
+      "b": 1.0,
+      "diff": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "verdict": "not distinguishable",
+      "note": "appendix only"
+    },
+    {
+      "scope": "macro (4 claim buckets)",
+      "n": 2376,
+      "a": 0.6492,
+      "b": 0.643,
+      "diff": 0.0062,
+      "ci_low": -0.0065,
+      "ci_high": 0.0193,
+      "verdict": "not distinguishable",
+      "note": ""
+    },
+    {
+      "scope": "micro (claim items)",
+      "n": 2376,
+      "a": 0.6683,
+      "b": 0.6622,
+      "diff": 0.006,
+      "ci_low": -0.0084,
+      "ci_high": 0.0209,
+      "verdict": "not distinguishable",
+      "note": ""
+    }
+  ]
+}

@@ -256,6 +256,36 @@ REGISTRY: tuple[Run, ...] = (
             "20260927T111407Z.scores_detail.jsonl"
         ),
     ),
+    Run(
+        run_group="v6_solos",
+        date="2026-09-15",
+        path="results/v6_solos/scores.json",
+        suite="mixed_ua_v6",
+        n_repeats=1,
+        scorer_epoch=SCORER_POST,
+        status="confirmed",
+        notes=(
+            "Five solos on mixed_ua_v6, one pass, T=0, seed=42, max_tokens=1024, rescored 29 Sep "
+            "2026 with the fixed scorer. v6 was built by dropping low-variance items using the "
+            "Mamay-4B, Lapa and Aya screening runs, and its knowledge bucket is 99% multiple choice."
+        ),
+        detail="results/v6_solos/scores_detail.jsonl",
+    ),
+    Run(
+        run_group="v6_rules",
+        date="2026-09-29",
+        path="results/v6_rules/scores.json",
+        suite="mixed_ua_v6",
+        n_repeats=1,
+        scorer_epoch=SCORER_POST,
+        status="confirmed",
+        notes=(
+            "Rules v2 router with few-shot alignment on mixed_ua_v6, bf16, three specialists on three "
+            "GPUs, one pass, T=0, seed=42, max_tokens=1024. HTTP 2414/2414. Routing table frozen "
+            "before the run (code at commit f3bc8ff). Same v6 limits as v6_solos."
+        ),
+        detail="results/v6_rules/scores_detail.jsonl",
+    ),
 )
 
 # Artifacts deliberately left out, recorded so the omission is auditable.

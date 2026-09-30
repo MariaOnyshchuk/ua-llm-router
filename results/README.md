@@ -20,13 +20,15 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`week_7_v5/`](week_7_v5/) | 21 Aug | v4+32 HumanEval (224); rules v2 overall 0.796 (HE 19/32; chat hurt by max_tokens=512). |
 | [`week_7_ensemble/`](week_7_ensemble/) | 31 Aug | Majority vote on alignment+ZNO; overall **0.843** vs rules v2 0.848; 3 flips net −1. |
 | [`week_8_quant/`](week_8_quant/) | 31 Aug | Rules v2 on bitsandbytes 4-bit Mamay/Lapa/Aya: **0.830**, slower than bf16 0.848. |
-| [`week_9_baselines/`](week_9_baselines/) | 26 Sep | S2 Mamay-12B alone on v4, 192×3: **0.874** / p50 1352 ms vs rules v2 0.848 / 633 ms. |
+| [`week_9_baselines/`](week_9_baselines/) | 26 Sep | S2 Mamay-12B alone on v4, 192×3: **0.884** (rescored 29 Sep; 0.874 before) / p50 1352 ms vs rules v2 0.848 / 633 ms. |
 | [`week_10_composite_hybrid_v3/`](week_10_composite_hybrid_v3/) | 27 Sep | Hybrid with missing `{{step.content}}` spliced in, 36×3: **0.8125** vs one-hop 0.812 and hybrid v2 0.768. |
-| [`week_11_pack_fp8/`](week_11_pack_fp8/) | 27 Sep | Rules v2, three specialists, online FP8, one GPU: **0.842** / p50 723 ms; 45 668 MiB resident. |
+| [`week_11_pack_fp8/`](week_11_pack_fp8/) | 27 Sep | Rules v2, three specialists, online FP8, one GPU: **0.852** (rescored 29 Sep; 0.842 before) / p50 723 ms; 45 668 MiB resident. |
 | [`week_10_composite/`](week_10_composite/) | 1 Sep | Authoritative composite 36×3 summary: oracle **0.882**, one-hop **0.812**, hybrid planner **0.768**. |
 | [`week_12_composite_v2_selector/`](week_12_composite_v2_selector/) | 28 Sep | Offline constrained-template selector on composite v2 (200): exact workflow **1.000**. |
 | [`week_12_composite_v2_dev_ablation/`](week_12_composite_v2_dev_ablation/) | 28 Sep | Dev-only planner ablation; freeze **template**; distillation not warranted. |
 | [`week_12_composite_v2_test_bakeoff/`](week_12_composite_v2_test_bakeoff/) | 28 Sep | Held-out test planning **1.000**; fixture plumbing 60×3; live GPU bake-off via `cluster/eval_composite_v2_bakeoff.sbatch`. |
+| [`v6_solos/`](v6_solos/) | 15 Sep | Five solos on frozen mixed_ua_v6 (2414, 1 pass, max_tokens 1024), rescored 29 Sep: Mamay-12B **0.695**, Lapa 0.670, Aya 0.668, Mamay-4B 0.666, Qwen-7B 0.595 (overall micro, all buckets). |
+| [`v6_rules/`](v6_rules/) | 29 Sep | Rules v2 router on v6, bf16, 3 GPUs: overall **0.6735**, p50 347 ms, 1.91 GPU-s/prompt. On the four claim buckets it is below Mamay-12B (macro −0.027, interval [−0.042, −0.011]) and not distinguishable from Mamay-4B, Lapa or Aya alone. Comparisons: `scripts/analysis/v6_compare.py`. |
 | [`_empty_failed_stubs/`](_empty_failed_stubs/) | — | Zero-byte / aborted runs. Safe to ignore or delete. |
 
 Wide CSVs (open in Excel): [`tables/v4_model_bucket_quality.csv`](tables/v4_model_bucket_quality.csv), [`tables/v4_alignment_prompt_grid.csv`](tables/v4_alignment_prompt_grid.csv), [`tables/composite_v1.csv`](tables/composite_v1.csv), [`tables/v3_specialist_bakeoff.csv`](tables/v3_specialist_bakeoff.csv). Screening means: [`tables/v6_screen_not_for_claims.csv`](tables/v6_screen_not_for_claims.csv) — do not cite. Frozen-v6 **preview** (screening scores on the 2414 curated ids, not the 3× bake-off): [`tables/v6_preview_from_screen.csv`](tables/v6_preview_from_screen.csv), [`tables/v6_preview_model_bucket.csv`](tables/v6_preview_model_bucket.csv), [`tables/v6_preview_items.csv`](tables/v6_preview_items.csv). Rebuild with `python scripts/export_results_tables.py`. Long-format ledger: [`progress_ledger.csv`](progress_ledger.csv).

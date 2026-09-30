@@ -1,0 +1,76 @@
+{
+  "router": "router_matrix_v2_fewshot",
+  "solos": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "rows": [
+    {
+      "scope": "knowledge",
+      "n": 683,
+      "router": 0.7408,
+      "route_oracle": 0.7438,
+      "best_fixed_specialist": "lapa 0.7408",
+      "routing_accuracy": 0.9971,
+      "routed_to": "lapa:675, mamay4:5, aya:3",
+      "note": "",
+      "reference": 0.7833
+    },
+    {
+      "scope": "translate",
+      "n": 683,
+      "router": 0.6459,
+      "route_oracle": 0.6794,
+      "best_fixed_specialist": "lapa 0.6472",
+      "routing_accuracy": 0.4714,
+      "routed_to": "aya:683",
+      "note": "",
+      "reference": 0.6543
+    },
+    {
+      "scope": "alignment",
+      "n": 683,
+      "router": 0.6881,
+      "route_oracle": 0.6764,
+      "best_fixed_specialist": "mamay4 0.6764",
+      "routing_accuracy": 1.0,
+      "routed_to": "lapa:683",
+      "note": "",
+      "reference": 0.6881
+    },
+    {
+      "scope": "instruct",
+      "n": 327,
+      "router": 0.5219,
+      "route_oracle": 0.528,
+      "best_fixed_specialist": "mamay4 0.5240",
+      "routing_accuracy": 0.9817,
+      "routed_to": "aya:221, mamay4:93, lapa:13",
+      "note": "",
+      "reference": 0.5775
+    },
+    {
+      "scope": "chat",
+      "n": 19,
+      "router": 1.0,
+      "route_oracle": 1.0,
+      "best_fixed_specialist": "mamay4 1.0000",
+      "routing_accuracy": 1.0,
+      "routed_to": "aya:18, lapa:1",
+      "note": "appendix only",
+      "reference": 1.0
+    },
+    {
+      "scope": "code",
+      "n": 19,
+      "router": 1.0,
+      "route_oracle": 1.0,
+      "best_fixed_specialist": "mamay4 1.0000",
+      "routing_accuracy": 1.0,
+      "routed_to": "mamay4:19",
+      "note": "appendix only",
+      "reference": 1.0
+    }
+  ]
+}
