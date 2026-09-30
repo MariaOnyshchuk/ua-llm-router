@@ -5,8 +5,8 @@ Not a web scrape: official Hugging Face `openai/openai_humaneval` (MIT).
 UA-Code stays unscored (no Eolymp judge). These rows have unit tests.
 
 Usage:
-  python scripts/import_english_code.py
-  python scripts/import_english_code.py --append-to-v4 32 --out-suite benchmarks/mixed_ua_v5.jsonl
+  python scripts/benchmarks/import_english_code.py
+  python scripts/benchmarks/import_english_code.py --append-to-v4 32 --out-suite benchmarks/mixed_ua_v5.jsonl
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ import random
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 PROMPT_WRAP = (

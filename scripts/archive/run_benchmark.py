@@ -2,16 +2,16 @@
 """Run mixed_ua benchmark against router (auto) and/or explicit models.
 
 Examples:
-  PYTHONPATH=. python scripts/run_benchmark.py \\
+  PYTHONPATH=. python scripts/archive/run_benchmark.py \\
     --input benchmarks/mixed_ua_v0.jsonl \\
     --system router --base-url http://127.0.0.1:4010/v1 --model auto
 
-  PYTHONPATH=. python scripts/run_benchmark.py \\
+  PYTHONPATH=. python scripts/archive/run_benchmark.py \\
     --input benchmarks/mixed_ua_v0.jsonl \\
     --system lapa --base-url http://127.0.0.1:4010/v1 --model lapa
 
   # Big-model baseline (OpenAI-compatible API):
-  PYTHONPATH=. python scripts/run_benchmark.py \\
+  PYTHONPATH=. python scripts/archive/run_benchmark.py \\
     --input benchmarks/mixed_ua_v0.jsonl \\
     --system big \\
     --base-url https://api.openai.com/v1 \\

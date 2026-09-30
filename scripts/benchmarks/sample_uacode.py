@@ -15,7 +15,7 @@ remain the scored code bucket.
 
 Usage:
   export HF_TOKEN=hf_...
-  python scripts/sample_uacode.py --n 32 --bands 1,2 \\
+  python scripts/benchmarks/sample_uacode.py --n 32 --bands 1,2 \\
     --out benchmarks/samples/uacode_easy_v1.jsonl
 """
 

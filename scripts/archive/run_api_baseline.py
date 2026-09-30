@@ -9,7 +9,7 @@ Row shape matches scripts/run_small_router_cluster.py so score_results.py and
 aggregate_repeat_scores.py work unchanged.
 
   export OPENAI_API_KEY=sk-...
-  python scripts/run_api_baseline.py \
+  python scripts/archive/run_api_baseline.py \
     --system gpt --model gpt-4o-2024-11-20 \
     --align-prompt fewshot --repeats 3 \
     --out-dir results/week_9_baselines
@@ -31,7 +31,7 @@ from typing import Any
 
 import httpx
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from scripts.alignment_prompt_variants import apply_alignment_variant  # noqa: E402

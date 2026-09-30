@@ -9,7 +9,7 @@ Policy (default --per-bucket 32):
   alignment        — UAlign, balanced ethics/social if possible (cap)
 
 Usage:
-  python scripts/build_balanced_suite.py --per-bucket 32 \\
+  python scripts/benchmarks/build_balanced_suite.py --per-bucket 32 \\
     --out benchmarks/mixed_ua_v4_balanced.jsonl
 """
 
@@ -22,7 +22,7 @@ from collections import defaultdict
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 BUCKETS = ("chat", "translate", "instruct", "knowledge", "code", "alignment")
 
 

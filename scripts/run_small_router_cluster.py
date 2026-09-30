@@ -38,6 +38,7 @@ from router.ensemble import (  # noqa: E402
 )
 from router.intent_rules import BEST_BY_BUCKET, ROUTER_MODELS, route_intent  # noqa: E402
 from scripts.alignment_prompt_variants import apply_alignment_variant  # noqa: E402
+from scripts.bucket_prompt_variants import apply_bucket_fewshot, parse_buckets  # noqa: E402
 
 # Pinned decoding — do not change between systems without bumping run tags.
 TEMPERATURE = 0.0
@@ -207,8 +208,12 @@ def run_system(
     cascade_kind: str = "legacy",
     ensemble: bool = False,
     align_prompt: str = "baseline",
+    bucket_fewshot: frozenset[str] = frozenset(),
     out_dir: Path | None = None,
 ) -> Path:
+    if bucket_fewshot:
+        # keep runs with different prompts apart in file names and in the system column
+        name = f"{name}_bfs-{'-'.join(sorted(bucket_fewshot))}"
     dest = Path(out_dir) if out_dir else (ROOT / "results")
     dest.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -226,7 +231,8 @@ def run_system(
     with httpx.Client(timeout=180.0) as client, partial_out.open("w", encoding="utf-8") as fout:
         for i, item in enumerate(items, 1):
             tagged = apply_alignment_variant(item, align_prompt)
-            prompt = tagged["prompt"]
+            # routing sees the item without examples; only the text sent to the model changes
+            prompt = apply_bucket_fewshot(tagged, bucket_fewshot)["prompt"]
             alias, base, model, router_meta = pick_backend(tagged)
             result = chat(client, base, model, prompt)
             cascade_meta = None
@@ -354,6 +360,7 @@ def run_system(
                 "ifeval_kwargs": tagged.get("ifeval_kwargs"),
                 "system": name,
                 "prompt_variant": align_prompt,
+                "bucket_fewshot": sorted(bucket_fewshot),
                 "model_requested": router_meta.get("model", alias),
                 "router": router_meta,
                 "cascade": cascade_meta,
@@ -393,6 +400,7 @@ def run_system(
         "n": len(items),
         "wrote": str(out),
         "prompt_variant": align_prompt,
+        "bucket_fewshot": sorted(bucket_fewshot),
         "decoding": {
             "temperature": TEMPERATURE,
             "seed": SEED,
@@ -447,6 +455,7 @@ def main() -> None:
         "all",
         "mamay4",
         "mamay12",
+        "mamay27",
         "qwen",
         "qwen7",
         "lapa",
@@ -473,6 +482,12 @@ def main() -> None:
         default="baseline",
         choices=["baseline", "fewshot", "clarified"],
         help="Rewrite social alignment prompts before chat (eval-only).",
+    )
+    p.add_argument(
+        "--bucket-fewshot",
+        default="",
+        help="Comma list of buckets (chat,code,translate,instruct,knowledge) or 'all': "
+        "put two worked examples before the prompt. Alignment uses --align-prompt.",
     )
     p.add_argument(
         "--out-dir",
@@ -542,6 +557,7 @@ def main() -> None:
         "qwen": ["qwen"],
         "qwen7": ["qwen7"],
         "mamay12": ["mamay12"],
+        "mamay27": ["mamay27"],
         "lapa": ["lapa"],
         "aya": ["aya"],
         "router_matrix": ["mamay4", "lapa", "aya"],  # v2 rules: no qwen7
@@ -655,13 +671,14 @@ def main() -> None:
 
         print(
             f"bench={bench_path} n={len(items)} mode={args.mode} rep={rep}/{args.repeats} "
-            f"align={args.align_prompt} "
+            f"align={args.align_prompt} bucket_fewshot={args.bucket_fewshot or 'none'} "
             f"decoding={{temperature={TEMPERATURE}, seed={SEED}, max_tokens={MAX_TOKENS}}}"
         )
 
         kw: dict = {
             "vram_interval_s": args.vram_interval,
             "align_prompt": args.align_prompt,
+            "bucket_fewshot": parse_buckets(args.bucket_fewshot),
         }
         if args.out_dir:
             kw["out_dir"] = Path(args.out_dir)
@@ -696,6 +713,8 @@ def main() -> None:
             run_system("router_small", pick_legacy_small, items, bench_tag, **kw)
         if args.mode in ("all", "mamay12"):
             run_system("mamay12", pick_fixed("mamay12"), items, bench_tag, **kw)
+        if args.mode == "mamay27":
+            run_system("mamay27", pick_fixed("mamay27"), items, bench_tag, **kw)
         if args.mode == "qwen":
             run_system("qwen", pick_fixed("qwen"), items, bench_tag, **kw)
         if args.mode == "qwen7":

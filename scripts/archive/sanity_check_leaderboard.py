@@ -6,7 +6,7 @@ proxy set so you can catch broken scorers / broken decoding before trusting
 diploma tables.
 
 Usage (on lab, with mamay12 on :8002):
-  PYTHONPATH=. python scripts/sanity_check_leaderboard.py --backend mamay12
+  PYTHONPATH=. python scripts/archive/sanity_check_leaderboard.py --backend mamay12
 
 Expected ballpark (from lang-uk Ukrainian LLM leaderboard, 0-shot IT models):
   Mamay-12B-IT-v2 IFEval UA ≈ 61.92
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import httpx
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 BACKENDS = {
     "mamay12": (

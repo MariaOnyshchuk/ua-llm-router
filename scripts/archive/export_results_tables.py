@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Wide CSVs of scored runs for browsing (Excel / Numbers).
 
-  PYTHONPATH=. python scripts/export_results_tables.py
+  PYTHONPATH=. python scripts/archive/export_results_tables.py
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "results" / "tables"
 BUCKETS = ("chat", "code", "translate", "instruct", "knowledge", "alignment")
 HEADLINE = ("knowledge", "translate", "alignment", "instruct")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Summarize benchmark result JSONL files into a small comparison table.
 
-  python scripts/summarize_results.py results/*.jsonl
+  python scripts/archive/summarize_results.py results/*.jsonl
 """
 
 from __future__ import annotations

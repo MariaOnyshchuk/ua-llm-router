@@ -9,7 +9,7 @@ Inputs: one or more score JSON files from score_results.py
         OR scores_mean_sd_v3.json from aggregate_repeat_scores.py
 
 Example:
-  python scripts/build_specialist_matrix.py \\
+  python scripts/archive/build_specialist_matrix.py \\
     --scores results/scores_mean_sd_v3.json \\
     --default mamay4 \\
     --margin 0.02 \\

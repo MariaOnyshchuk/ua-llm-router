@@ -11,7 +11,7 @@ number cannot show: the social confusion matrix, and whether the ethics
 subset (which no variant rewrites) stayed fixed as a control.
 
 Example:
-  python scripts/score_alignment_variants.py
+  python scripts/archive/score_alignment_variants.py
 """
 
 from __future__ import annotations
