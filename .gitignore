@@ -43,3 +43,7 @@ results/week_13_solo_v4/*/*.partial
 # AgentCoMa runs (Phase 1 baseline matrix): generation rows contain gated prompts.
 results/week_13_agentcoma_*/*.jsonl
 results/week_13_agentcoma_*/*.partial
+
+# Raw generation rows (prompt + model answer) from early weeks were committed by mistake and are
+# untracked on 30 Sep 2026. Names end in a UTC timestamp; item-level *_detail / scores files do not.
+results/**/*_[0-9]*T[0-9]*Z.jsonl
