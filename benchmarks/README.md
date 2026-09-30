@@ -37,4 +37,3 @@ Historical 24–48 item draws + hand-written chat/instruct/code extras. Prefer `
 
 - **Full UA-Code-Bench problems:** `corpus/uacode_problems_full.jsonl` (468).
 - **Scored code in v4:** still hand-written `code-001`…`032` (exec tests). UA-Code needs Eolymp judge for real pass/fail.
-

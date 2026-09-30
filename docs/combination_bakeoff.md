@@ -53,13 +53,13 @@ python scripts/score_results.py results/<model>_mixed_ua_v3_*.jsonl \
   --out results/scores_<model>_v3.json
 
 # Matrix + suggested routes:
-python scripts/build_specialist_matrix.py \
+python scripts/archive/build_specialist_matrix.py \
   --scores results/scores_mean_sd_v3.json results/scores_qwen_v3.json results/scores_lapa_v3.json \
   --default mamay4 --margin 0.02 \
   --out results/specialist_matrix_v3.json
 
 # Efficiency (optional, needs *.meta.json):
-python scripts/build_efficiency_table.py \
+python scripts/archive/build_efficiency_table.py \
   --scores results/scores_....json \
   --meta-glob 'results/*_mixed_ua_v3_*.meta.json' \
   --out results/efficiency_table_v3.json

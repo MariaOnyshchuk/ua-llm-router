@@ -4,7 +4,7 @@
 **Compute:** UCU lab node `ucu-lab-2240`, 4× RTX 6000 Ada (49 140 MB each), vLLM under SLURM
 
 This is the speaking version of `docs/status_report_2026-07-27.md`. Every number below was
-re-derived from the raw run files by `scripts/verify_report_stats.py`, so it can be
+re-derived from the raw run files by `scripts/archive/verify_report_stats.py`, so it can be
 regenerated live if asked.
 
 ---
@@ -343,7 +343,7 @@ proper repeated runs.
 **Raw runs (2026-07-27):** eight `*_mixed_ua_v1_*.jsonl` and `*_external_ua_v2_*.jsonl`
 files in `results/`, each row carrying its own `vram_snapshot_mb`.
 
-**Reproduce every number in this brief:** `python3 scripts/verify_report_stats.py`.
+**Reproduce every number in this brief:** `python3 scripts/archive/verify_report_stats.py`.
 
 **Do not cite as results:** anything `results/*_20260725T*.jsonl`, plus
 `scores_s0_s1*.json`, `scores_dual.json`, `scores_with_latency.json`,

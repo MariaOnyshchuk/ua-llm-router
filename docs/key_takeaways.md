@@ -191,7 +191,7 @@ Slice: 32 alignment items from `mixed_ua_v4` (10 ethics + 22 social). Variants r
 
 **1b — clearer 2-class contrast: skipped.** After few-shot the 1→2 collapse is gone (11/11). The leftover social errors are the opposite: **4× `2→1`** plus **2× `0→1`** (over-predicting the everyday class). Ethics is a separate 0.800 ceiling (prompt variants never rewrite those 10 items). A contrastive 1-vs-2 pair might win a point or two on the same 32, but the bucket McNemar is already non-significant, and full-suite rules v2 already **matches the oracle**. Not worth another GPU pass; product prompt stays few-shot.
 
-Artifacts: `scripts/score_alignment_variants.py`, `scripts/alignment_prompt_variants.py`, `results/week_5_alignment_bakeoff/scores_alignment_variants{,_flat,_detail}.*`. Older `scores_alignment_bakeoff.json` is baseline-only / superseded for variant claims.
+Artifacts: `scripts/archive/score_alignment_variants.py`, `scripts/alignment_prompt_variants.py`, `results/week_5_alignment_bakeoff/scores_alignment_variants{,_flat,_detail}.*`. Older `scores_alignment_bakeoff.json` is baseline-only / superseded for variant claims.
 
 ---
 
@@ -208,7 +208,7 @@ Fix (`router/intent_rules.py`):
 - Strong instruct markers **before** knowledge/code (not bare `тільки`)
 - UA factoid openers for knowledge (`У якому`, `Яка/Яке…`, `Скільки`, `Хто автор`…)
 
-Check: `python scripts/check_router_leakage.py` → 11/11 hard cases OK. Soft leftover: `chat-017` → knowledge.
+Check: `python scripts/benchmarks/check_router_leakage.py` → 11/11 hard cases OK. Soft leftover: `chat-017` → knowledge.
 
 **Re-run** on full v4 with this fix: week-6 few-shot router (`results/week_6_router_fewshot/`). Traffic vs Aug 7: mamay4 64→63, lapa 63→65, qwen7 33→32 (aya 32). Knowledge/instruct/code scores unchanged vs baseline router — the +0.026 is from the alignment prompt, not leakage.
 
@@ -254,9 +254,9 @@ Cascade should be **narrow** (e.g. instruct format fail→retry), not generic we
 | What | Where |
 |------|--------|
 | Route rules | `router/intent_rules.py` |
-| Leakage check | `scripts/check_router_leakage.py` |
+| Leakage check | `scripts/benchmarks/check_router_leakage.py` |
 | Alignment variants (scored) | `results/week_5_alignment_bakeoff/scores_alignment_variants.json` |
-| Alignment prompt helpers | `scripts/alignment_prompt_variants.py`, `scripts/score_alignment_variants.py` |
+| Alignment prompt helpers | `scripts/alignment_prompt_variants.py`, `scripts/archive/score_alignment_variants.py` |
 | Router scores (baseline) | `results/week_5_router_v4/scores_mean_sd_router_v4.json` |
 | Weeks 7–10 (oracle / router / suites / metrics) | [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md) |
 | Problem statement / scope | [`docs/thesis_scope.md`](thesis_scope.md) |
