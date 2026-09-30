@@ -2,7 +2,7 @@
 """Build efficiency table from score JSON + optional *.meta.json VRAM stats.
 
 Example:
-  python scripts/build_efficiency_table.py \\
+  python scripts/archive/build_efficiency_table.py \\
     --scores results/scores_mixed_ua_v2.json \\
     --meta-glob 'results/*_mixed_ua_v1_*.meta.json' \\
     --out results/efficiency_table.json

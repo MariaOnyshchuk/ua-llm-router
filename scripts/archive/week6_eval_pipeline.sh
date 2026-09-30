@@ -1,9 +1,9 @@
 #!/bin/bash
 # Week 6 eval on ucu-lab-2240. Run after serving backends are healthy.
 # Usage (from ~/Diploma):
-#   bash scripts/week6_eval_pipeline.sh solos
-#   bash scripts/week6_eval_pipeline.sh router
-#   bash scripts/week6_eval_pipeline.sh cascade
+#   bash scripts/archive/week6_eval_pipeline.sh solos
+#   bash scripts/archive/week6_eval_pipeline.sh router
+#   bash scripts/archive/week6_eval_pipeline.sh cascade
 set -euo pipefail
 ROOT="${HOME}/Diploma"
 cd "$ROOT"
@@ -48,7 +48,7 @@ case "$PHASE" in
       --align-prompt fewshot --out-dir results/week_6_router_fewshot
     python scripts/score_repeat_dir.py results/week_6_router_fewshot \
       --out results/week_6_router_fewshot/scores_mean_sd_router_fewshot.json
-    python scripts/summarize_router_jsonl.py results/week_6_router_fewshot/*_rep1_*.jsonl \
+    python scripts/archive/summarize_router_jsonl.py results/week_6_router_fewshot/*_rep1_*.jsonl \
       --out results/week_6_router_fewshot/routing_stats_rep1.json
     ;;
   cascade)
@@ -60,9 +60,9 @@ case "$PHASE" in
       --align-prompt fewshot --out-dir results/week_6_cascade_micro
     python scripts/score_repeat_dir.py results/week_6_cascade_micro \
       --out results/week_6_cascade_micro/scores_mean_sd_cascade_micro.json
-    python scripts/summarize_router_jsonl.py results/week_6_cascade_micro/*_rep1_*.jsonl \
+    python scripts/archive/summarize_router_jsonl.py results/week_6_cascade_micro/*_rep1_*.jsonl \
       --out results/week_6_cascade_micro/escalate_stats_rep1.json
-    python scripts/summarize_router_jsonl.py results/week_6_cascade_micro/*_rep*.jsonl \
+    python scripts/archive/summarize_router_jsonl.py results/week_6_cascade_micro/*_rep*.jsonl \
       --out results/week_6_cascade_micro/escalate_stats_all_reps.json
     ;;
   *)

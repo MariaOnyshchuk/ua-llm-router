@@ -5,7 +5,7 @@ Runs only the alignment slice of mixed_ua_v4_balanced (≈32 items).
 Social items (0/1/2) get optional prompt variants; ethics left as-is.
 
 Example (on lab, with :8001 and :8003 up):
-  python scripts/run_alignment_ablation.py \\
+  python scripts/archive/run_alignment_ablation.py \\
     --bench benchmarks/mixed_ua_v4_balanced.jsonl \\
     --systems lapa:baseline,lapa:fewshot,mamay4:baseline,mamay4:fewshot \\
     --out-dir results/week_5_alignment_ablation
@@ -22,7 +22,7 @@ from pathlib import Path
 
 import httpx
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from scripts.alignment_prompt_variants import apply_alignment_variant  # noqa: E402

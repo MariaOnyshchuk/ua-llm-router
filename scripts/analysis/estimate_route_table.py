@@ -7,7 +7,7 @@ bucket scores. Picking the best model per bucket on the same suite is
 optimistic (selection on the test data): confirm any winner on a different
 suite (v5/v6) or on a held-out half before quoting it.
 
-Usage: python scripts/estimate_route_table.py
+Usage: python scripts/analysis/estimate_route_table.py
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import csv
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 BUCKETS = ["chat", "code", "translate", "instruct", "knowledge", "alignment"]
 
 

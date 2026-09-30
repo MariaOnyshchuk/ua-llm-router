@@ -7,7 +7,7 @@ drawn only where the ledger carries a bootstrap CI; ``sd_across_repeats`` is
 never used as an error bar since pinned decoding makes it ~0.
 
 Example:
-  .venv/bin/python scripts/plot_progress.py
+  .venv/bin/python scripts/archive/plot_progress.py
 """
 
 from __future__ import annotations

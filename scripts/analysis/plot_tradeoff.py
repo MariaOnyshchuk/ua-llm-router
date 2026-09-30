@@ -6,7 +6,7 @@ Quality and p50 latency come from results/tables/v4_model_bucket_quality.csv
 per prompt come from the runs' *.meta.json where they exist; systems without a
 meta file are omitted from the second panel, not estimated.
 
-Usage: python scripts/plot_tradeoff.py
+Usage: python scripts/analysis/plot_tradeoff.py
 Outputs: results/figures/tradeoff_v4.png, results/analysis/tradeoff_points.csv
 """
 
@@ -23,7 +23,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 # system_id in the CSV -> (label, resident GPUs at gpu_memory_utilization=0.90, meta glob)
 CSV_SYSTEMS = {

@@ -7,6 +7,7 @@
 #   bash scripts/week_v6_eval_pipeline.sh v6_solo_lapa
 #   bash scripts/week_v6_eval_pipeline.sh v6_solo_aya
 #   bash scripts/week_v6_eval_pipeline.sh v6_solo_mamay12  # S2 generalist
+#   bash scripts/week_v6_eval_pipeline.sh v6_solo_mamay27  # 27B, FP8 (see eval_v6_solo.sbatch)
 #   bash scripts/week_v6_eval_pipeline.sh v6_solo_qwen7    # Qwen as full generalist
 #   bash scripts/week_v6_eval_pipeline.sh v6_rules
 #   bash scripts/week_v6_eval_pipeline.sh v6_learned
@@ -79,6 +80,11 @@ case "$PHASE" in
     python scripts/run_small_router_cluster.py --mode mamay12 --bench "$V6" --repeats 1 \
       --max-tokens "$MAX_TOKENS" --out-dir results/v6_solos
     ;;
+  v6_solo_mamay27)
+    wait_health mamay27 8002
+    python scripts/run_small_router_cluster.py --mode mamay27 --bench "$V6" --repeats 1 \
+      --max-tokens "$MAX_TOKENS" --out-dir results/v6_solos
+    ;;
   v6_solo_qwen7)
     wait_health qwen7 8004
     python scripts/run_small_router_cluster.py --mode qwen7 --bench "$V6" --repeats 1 \
@@ -121,7 +127,7 @@ case "$PHASE" in
       --out results/v6_eval/router_comparison.json
     ;;
   *)
-    echo "usage: $0 {screen|v6_solos|v6_solo_mamay4|v6_solo_lapa|v6_solo_aya|v6_solo_mamay12|v6_solo_qwen7|v6_rules|v6_learned}" >&2
+    echo "usage: $0 {screen|v6_solos|v6_solo_mamay4|v6_solo_lapa|v6_solo_aya|v6_solo_mamay12|v6_solo_mamay27|v6_solo_qwen7|v6_rules|v6_learned}" >&2
     exit 1
     ;;
 esac

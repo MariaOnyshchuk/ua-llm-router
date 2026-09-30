@@ -7,8 +7,8 @@ so every bucket keeps its 32 items). Reports the mean difference A - B with a
 95% percentile CI and the bootstrap share of resamples where A <= B.
 
 Usage:
-  python scripts/bootstrap_compare.py            # default comparisons
-  python scripts/bootstrap_compare.py --n-boot 20000 --seed 42
+  python scripts/analysis/bootstrap_compare.py            # default comparisons
+  python scripts/analysis/bootstrap_compare.py --n-boot 20000 --seed 42
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 R = "results"
 
 # label -> glob(s) of per-item scored files.
@@ -33,6 +33,12 @@ SYSTEMS = {
     ],
     "router rules v1, pre-fix (1 rep)": [f"{R}/week_5_router_v4/scored/*scores_detail.jsonl"],
     "router ensemble vote (1 rep)": [f"{R}/week_7_ensemble/scores_detail.jsonl"],
+    # Present after re-scoring the raw rows on the cluster (see docs/week_12_composite_v2.md
+    # notes or the command list in the chat): score_repeat_dir.py creates these scored/ folders.
+    "router rules v2 + few-shot, bf16 (3 reps)": [f"{R}/week_7_rules_v2/scored/*scores_detail.jsonl"],
+    "mamay4 solo (3 reps)": [f"{R}/week_6_v4_solos/scored/mamay4_*scores_detail.jsonl"],
+    "lapa solo (3 reps)": [f"{R}/week_6_v4_solos/scored/lapa_*scores_detail.jsonl"],
+    "aya solo (3 reps)": [f"{R}/*/scored/aya_*scores_detail.jsonl"],
 }
 
 # (A, B) pairs; difference is A - B.
@@ -41,6 +47,11 @@ PAIRS = [
     ("router ensemble vote (1 rep)", "mamay12 (S2, 3 reps)"),
     ("router rules v1, pre-fix (1 rep)", "mamay12 (S2, 3 reps)"),
     ("router ensemble vote (1 rep)", "router rules v2 + few-shot, FP8 one card (3 reps)"),
+    ("router rules v2 + few-shot, bf16 (3 reps)", "mamay12 (S2, 3 reps)"),
+    ("router rules v2 + few-shot, bf16 (3 reps)", "router rules v2 + few-shot, FP8 one card (3 reps)"),
+    ("router rules v2 + few-shot, bf16 (3 reps)", "mamay4 solo (3 reps)"),
+    ("router rules v2 + few-shot, bf16 (3 reps)", "lapa solo (3 reps)"),
+    ("router rules v2 + few-shot, bf16 (3 reps)", "aya solo (3 reps)"),
 ]
 
 
@@ -113,9 +124,16 @@ def main() -> None:
     ap.add_argument("--out-dir", type=Path, default=ROOT / "results" / "analysis")
     args = ap.parse_args()
 
-    data = {name: load_items(pats) for name, pats in SYSTEMS.items()}
+    data = {}
+    for name, pats in SYSTEMS.items():
+        try:
+            data[name] = load_items(pats)
+        except FileNotFoundError:
+            print(f"skipped (no per-item scores yet): {name}")
     out_rows = []
     for a, b in PAIRS:
+        if a not in data or b not in data:
+            continue
         out_rows += summarize(a, b, data[a], data[b], args.n_boot, args.seed)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
