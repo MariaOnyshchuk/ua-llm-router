@@ -46,6 +46,7 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 
 **Headline pinned numbers (do not mix suites):**
 
+- **Scorer note (29 Sep 2026):** from 4 Sep to 29 Sep `score_results.py` scored numeric-fact knowledge references (know-002 = 1991, know-004 = 24) as multiple-choice indexes, so every model got 0 on those two items (-0.0104 overall). Runs scored in that window (Mamay-12B S2 0.874, FP8 pack 0.842, and any rescoring done then) are understated until they are rescored with the fixed scorer. The 0.848 router and week 6 solo numbers were scored before the bug. Do not compare across the two scorers.
 - Rules v2 + few-shot on `mixed_ua_v4` (192×3): **0.848**
 - Mamay-12B alone on `mixed_ua_v4` (192×3, S2 baseline): **0.874**, p50 1352 ms, about 2.5 GPU-seconds per prompt. The router: 0.848, p50 633 ms, about 1.5 GPU-seconds per prompt, three resident GPUs. The 12B model is the better single-number quality result; the router is faster and cheaper per prompt.
 - Same router with the three specialists in online FP8 on **one** GPU (week 11): **0.842**, p50 723 ms, 45 668 MiB resident. Knowledge drops from 0.750 to 0.688.

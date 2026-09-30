@@ -50,19 +50,19 @@ Any of the three is publishable. Only *not running it* is a problem.
 
 ## S3 — hosted frontier API on v4
 
-`scripts/run_api_baseline.py` writes the same row shape as the cluster runner, so `score_results.py` and `aggregate_repeat_scores.py` work unchanged. Requests are sequential so p50 stays comparable.
+`scripts/archive/run_api_baseline.py` writes the same row shape as the cluster runner, so `score_results.py` and `aggregate_repeat_scores.py` work unchanged. Requests are sequential so p50 stays comparable.
 
 ```bash
 export OPENAI_API_KEY=sk-...
 
 # smoke first — 6 items, cents
-python scripts/run_api_baseline.py \
+python scripts/archive/run_api_baseline.py \
   --system gpt --model gpt-4o-2024-11-20 \
   --bucket alignment --limit 6 \
   --out-dir results/week_9_baselines
 
 # full run
-python scripts/run_api_baseline.py \
+python scripts/archive/run_api_baseline.py \
   --system gpt --model gpt-4o-2024-11-20 \
   --align-prompt fewshot --repeats 3 \
   --price-in 2.5 --price-out 10 \

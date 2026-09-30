@@ -269,7 +269,7 @@ Everything above compares the router to models **inside its pool**. A reviewer c
 | Slot | System                                                        | Question                                                         | Status                                                      |
 | ---- | ------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------- |
 | S2   | Mamay-12B on v4, 1 GPU, same util 0.90                        | Does composition beat **scaling** one open model?                | **No on overall:** 0.874 / p50 1352 ms vs router 0.848 / 633 ms. Router still wins knowledge, code, translate. |
-| S3   | Hosted frontier API (e.g. gpt-4o), sequential, USD/1k queries | How far from the option a **data-residency** constraint forbids? | `scripts/run_api_baseline.py` ready; **not run**            |
+| S3   | Hosted frontier API (e.g. gpt-4o), sequential, USD/1k queries | How far from the option a **data-residency** constraint forbids? | `scripts/archive/run_api_baseline.py` ready; **not run**            |
 
 
 S2 landed above the router. The three pre-registered readings were:

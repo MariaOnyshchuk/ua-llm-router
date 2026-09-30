@@ -42,10 +42,10 @@ The router exposes routing metadata both in the response body and as `x-router-m
 | `scripts/run_small_router_cluster.py` | Cluster-side runner for S0/S1/S2 plus a standalone Qwen system; records latency, tokens, routing metadata, and an `nvidia-smi` VRAM snapshot per run |
 | `scripts/score_results.py` | Bucket-specific scoring: chrF-like for translation, executed unit tests for code, format checks for instruction following, ZNO letter matching, UAlign label matching |
 | `scripts/sample_zno.py`, `sample_flores.py`, `sample_ualign.py`, `sample_uacode.py` | Reproducible sampling from public datasets |
-| `scripts/merge_benchmarks.py` | Builds the v1 and v2 suites from v0 plus samples |
-| `scripts/analyze_routing.py` | Intent accuracy and backend-oracle accuracy against gold bucket labels |
-| `scripts/summarize_results.py` | Raw latency and routing summary from JSONL |
-| `scripts/verify_report_stats.py` | Recomputes every headline number in this report from the raw runs (bootstrap CIs, paired differences, routing distribution, nondeterminism, overhead, per-dataset accuracy, tokens, run health) |
+| `scripts/benchmarks/merge_benchmarks.py` | Builds the v1 and v2 suites from v0 plus samples |
+| `scripts/archive/analyze_routing.py` | Intent accuracy and backend-oracle accuracy against gold bucket labels |
+| `scripts/archive/summarize_results.py` | Raw latency and routing summary from JSONL |
+| `scripts/archive/verify_report_stats.py` | Recomputes every headline number in this report from the raw runs (bootstrap CIs, paired differences, routing distribution, nondeterminism, overhead, per-dataset accuracy, tokens, run health) |
 
 Decoding is fixed across all systems: `max_tokens=256`, `temperature=0.2`, 180 s timeout.
 

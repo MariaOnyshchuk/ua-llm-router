@@ -56,16 +56,16 @@ benchmarks/
 python scripts/sample_zno.py --zno-dir /path/to/ZNO --n 24 --out benchmarks/samples/zno_knowledge_v1.jsonl
 
 # UA-Code-Bench (HF; bands 1–2) — inventory only until Eolymp judge
-python scripts/sample_uacode.py --n 32 --bands 1,2 --out benchmarks/samples/uacode_easy_v1.jsonl
+python scripts/benchmarks/sample_uacode.py --n 32 --bands 1,2 --out benchmarks/samples/uacode_easy_v1.jsonl
 
 # FLORES-200 (24 pairs × 2 directions)
-python scripts/sample_flores.py --n-per-direction 24
+python scripts/benchmarks/sample_flores.py --n-per-direction 24
 
 # UAlign (24 items from each config)
-python scripts/sample_ualign.py --n-per-config 24
+python scripts/benchmarks/sample_ualign.py --n-per-config 24
 
 # Balanced suite (32/bucket)
-python scripts/build_balanced_suite.py --per-bucket 32 --out benchmarks/mixed_ua_v4_balanced.jsonl
+python scripts/benchmarks/build_balanced_suite.py --per-bucket 32 --out benchmarks/mixed_ua_v4_balanced.jsonl
 ```
 
 ## Scoring notes

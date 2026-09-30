@@ -28,7 +28,7 @@ file automatically. Keep it short; put long explanations in `docs/`.
 
 ## Evaluation protocol
 
-- **Authoritative single-skill suite:** `benchmarks/mixed_ua_v4_balanced.jsonl`
+- **Development suite (not for claims):** `benchmarks/mixed_ua_v4_balanced.jsonl`
   (192 = 32×6), `T=0`, `seed=42`, `max_tokens=256`, `--align-prompt fewshot`,
   **3 repeats**. Every number quoted next to the router's 0.848 must use this.
 - `mixed_ua_v6` uses `max_tokens=1024` and different items. Never place v3, v4,
@@ -41,6 +41,32 @@ file automatically. Keep it short; put long explanations in `docs/`.
   queries and "data leaves perimeter = yes". Keep `--concurrency 1`.
 - Historical artifacts listed as "do not cite" in
   `docs/status_report_2026-07-27.md` stay uncited.
+
+## Evidence rules (added 29 Sep 2026)
+
+One item on v4 moves the overall score by 0.0052 and a bucket by 0.031. The 95%
+interval for a router-vs-model difference on v4 is about ±0.04, so most v4
+differences are noise. The rules below follow from that.
+
+- **Claims come from `benchmarks/mixed_ua_v6.jsonl`** (2414 items: knowledge 683,
+  translate 683, alignment 683, instruct 327; chat and code have 19 each and are
+  appendix only). v4 is for development and diagnostics.
+- **Every claimed difference carries a paired bootstrap 95% interval**
+  (`python scripts/analysis/bootstrap_compare.py`). If the interval contains 0,
+  write "not distinguishable", not "better" or "worse".
+- **Freeze before you test.** Routing table, prompts and few-shot examples are
+  chosen on v4 (or a dev half) and recorded with the git commit hash before the
+  first v6 run. No tuning on v6. Any later change starts a new, labelled run.
+- **One pass on v6 is enough** (n is large; T=0, seed=42, max_tokens=1024). Do not
+  compare v6 numbers with v4 numbers.
+- **Item-level scores are kept for every cited run** (`scored/*scores_detail.jsonl`),
+  otherwise no interval can be computed.
+- **After any change to `score_results.py`, rescore every run that is cited** and
+  rebuild the ledger. On 29 Sep 2026 a bug from 4 Sep (numeric answers such as 1991
+  read as multiple-choice indexes) had understated every model by 0.0104 on v4.
+- **Say what v6 is:** it was built by dropping low-variance items using the
+  Mamay-4B, Lapa and Aya screening runs, and its knowledge bucket is 99% multiple
+  choice. State both limits next to any v6 headline.
 
 ## Scoring and bookkeeping
 
