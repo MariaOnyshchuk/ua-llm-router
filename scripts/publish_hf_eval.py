@@ -28,11 +28,24 @@ SKIP_DIRS = {
 
 SKIP_NAMES = {".json", ".gitkeep"}
 
+# Made inside the 4-29 Sep 2026 scorer-bug window and not rescored yet (generations are on the lab).
+# Drop this list once week 6 and week 7 are rescored and the bootstrap is rebuilt.
+STALE_PARTS = {"week_6_v4_solos/scored", "week_7_rules_v2/scored"}
+STALE_NAMES = {
+    "scores_mean_sd_v4_solos_rescore.json",
+    "scores_mean_sd_rules_v2_rescore.json",
+    "bootstrap_comparisons.json",
+    "bootstrap_comparisons.csv",
+}
+
 
 def should_copy(path: Path) -> bool:
     if path.name in SKIP_NAMES or path.name.startswith("."):
         return False
     if any(p in SKIP_DIRS for p in path.parts):
+        return False
+    rel = path.relative_to(RESULTS).as_posix() if path.is_relative_to(RESULTS) else path.as_posix()
+    if path.name in STALE_NAMES or any(rel.startswith(part + "/") for part in STALE_PARTS):
         return False
     if path.suffix == ".json":
         return True
