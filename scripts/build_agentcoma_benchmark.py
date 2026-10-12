@@ -29,14 +29,21 @@ KNOWN_SOURCES: dict[str, tuple[int, str]] = {
     "agentcoma_uk_200_merged.jsonl": (200, "agentcoma_uk_200_claude_manual_v1v2"),
 }
 
-ORACLE_FILTER = (
-    "Визнач, які об'єкти, факти чи категорії з запиту потрібні для відповіді. "
-    "Не виконуй арифметику. Коротко перелічи лише релевантне."
+# Until 12 Oct 2026 the filter prompt did not contain the task and the compute
+# prompt asked for "only the number, no explanation": the filter model answered
+# about an invented problem on every item. Oracle numbers from before that date
+# are invalid. The filter step is now AgentCoMa's own commonsense sub-question
+# (``question_commonsense_uk``), which is the gold decomposition of the task.
+ORACLE_FILTER = "{{commonsense}}\n\nВідповідай коротко, без обчислень."
+ORACLE_FILTER_FALLBACK = (
+    "Запит:\n{{user}}\n\n"
+    "Визнач, які об'єкти, факти чи категорії з запиту потрібні для відповіді, "
+    "і для кожного коротко поясни чому. Не виконуй арифметику."
 )
 ORACLE_COMPUTE = (
     "За запитом користувача та попереднім кроком обчисли числову відповідь.\n"
     "Запит:\n{{user}}\n\nФільтр:\n{{filter.content}}\n\n"
-    "Поверни лише число, без пояснень."
+    "Коротко покажи обчислення. В останньому рядку напиши: Відповідь: <число>"
 )
 
 
@@ -44,6 +51,11 @@ def wrap_row(
     row: dict[str, Any], provenance: str = "agentcoma_uk_50_claude_manual_v1"
 ) -> dict[str, Any]:
     prompt = str(row["question_composition_uk"]).strip()
+    commonsense = str(row.get("question_commonsense_uk") or "").strip()
+    if commonsense:
+        filter_prompt = ORACLE_FILTER.replace("{{commonsense}}", commonsense)
+    else:
+        filter_prompt = ORACLE_FILTER_FALLBACK.replace("{{user}}", prompt)
     compute = ORACLE_COMPUTE.replace("{{user}}", prompt)
     # Rubrics let score_composite_results.py grade these rows: the filter step
     # must name at least one accepted commonsense answer; the final step must
@@ -70,7 +82,7 @@ def wrap_row(
                     "id": "filter",
                     "intent": "knowledge",
                     "depends_on": [],
-                    "prompt": ORACLE_FILTER,
+                    "prompt": filter_prompt,
                     "rubric": filter_rubric,
                 },
                 {

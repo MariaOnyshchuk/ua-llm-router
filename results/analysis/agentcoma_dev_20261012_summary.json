@@ -1,0 +1,243 @@
+{
+ "systems": {
+  "hybrid": {
+   "n": 48,
+   "acc": 0.0625,
+   "lo": 0.0,
+   "hi": 0.14583333333333334
+  },
+  "oracle": {
+   "n": 50,
+   "acc": 0.04,
+   "lo": 0.0,
+   "hi": 0.1
+  },
+  "router_direct": {
+   "n": 50,
+   "acc": 0.16,
+   "lo": 0.06,
+   "hi": 0.26
+  },
+  "hybrid_gated": {
+   "n": 50,
+   "acc": 0.32,
+   "lo": 0.2,
+   "hi": 0.46
+  },
+  "direct_aya": {
+   "n": 50,
+   "acc": 0.14,
+   "lo": 0.06,
+   "hi": 0.24
+  },
+  "direct_lapa": {
+   "n": 50,
+   "acc": 0.22,
+   "lo": 0.12,
+   "hi": 0.34
+  },
+  "direct_mamay4": {
+   "n": 50,
+   "acc": 0.12,
+   "lo": 0.04,
+   "hi": 0.22
+  },
+  "think_aya": {
+   "n": 50,
+   "acc": 0.36,
+   "lo": 0.24,
+   "hi": 0.5
+  },
+  "think_lapa": {
+   "n": 50,
+   "acc": 0.2,
+   "lo": 0.1,
+   "hi": 0.32
+  },
+  "think_mamay4": {
+   "n": 50,
+   "acc": 0.26,
+   "lo": 0.14,
+   "hi": 0.38
+  },
+  "filter2_aya": {
+   "n": 50,
+   "acc": 0.28,
+   "lo": 0.16,
+   "hi": 0.4
+  },
+  "filter2_lapa": {
+   "n": 50,
+   "acc": 0.32,
+   "lo": 0.2,
+   "hi": 0.46
+  },
+  "filter2_mamay4": {
+   "n": 50,
+   "acc": 0.26,
+   "lo": 0.14,
+   "hi": 0.38
+  },
+  "direct_mamay12": {
+   "n": 50,
+   "acc": 0.48,
+   "lo": 0.34,
+   "hi": 0.62
+  },
+  "think_mamay12": {
+   "n": 50,
+   "acc": 0.38,
+   "lo": 0.24,
+   "hi": 0.52
+  },
+  "oracle_fixed": {
+   "n": 50,
+   "acc": 0.2,
+   "lo": 0.1,
+   "hi": 0.32
+  },
+  "oracle_commonsense": {
+   "n": 50,
+   "acc": 0.38,
+   "lo": 0.26,
+   "hi": 0.52
+  },
+  "hybrid_gated_v2": {
+   "n": 50,
+   "acc": 0.36,
+   "lo": 0.24,
+   "hi": 0.5
+  }
+ },
+ "paired": {
+  "hybrid_gated - direct_mamay12": {
+   "n": 50,
+   "diff": -0.16,
+   "lo": -0.32,
+   "hi": 0.0
+  },
+  "hybrid_gated - router_direct": {
+   "n": 50,
+   "diff": 0.16,
+   "lo": 0.0,
+   "hi": 0.32
+  },
+  "hybrid_gated - hybrid": {
+   "n": 48,
+   "diff": 0.22916666666666666,
+   "lo": 0.125,
+   "hi": 0.3541666666666667
+  },
+  "think_aya - direct_mamay12": {
+   "n": 50,
+   "diff": -0.12,
+   "lo": -0.28,
+   "hi": 0.04
+  },
+  "direct_mamay12 - router_direct": {
+   "n": 50,
+   "diff": 0.32,
+   "lo": 0.16,
+   "hi": 0.48
+  },
+  "think_mamay12 - direct_mamay12": {
+   "n": 50,
+   "diff": -0.1,
+   "lo": -0.24,
+   "hi": 0.06
+  },
+  "direct_mamay12 - direct_lapa": {
+   "n": 50,
+   "diff": 0.26,
+   "lo": 0.14,
+   "hi": 0.4
+  },
+  "oracle_fixed - oracle": {
+   "n": 50,
+   "diff": 0.16,
+   "lo": 0.04,
+   "hi": 0.28
+  },
+  "oracle_fixed - hybrid_gated": {
+   "n": 50,
+   "diff": -0.12,
+   "lo": -0.24,
+   "hi": 0.02
+  },
+  "oracle_fixed - router_direct": {
+   "n": 50,
+   "diff": 0.04,
+   "lo": -0.1,
+   "hi": 0.18
+  },
+  "oracle_fixed - direct_mamay12": {
+   "n": 50,
+   "diff": -0.28,
+   "lo": -0.44,
+   "hi": -0.12
+  },
+  "oracle_fixed - think_aya": {
+   "n": 50,
+   "diff": -0.16,
+   "lo": -0.32,
+   "hi": -0.02
+  },
+  "oracle_commonsense - oracle_fixed": {
+   "n": 50,
+   "diff": 0.18,
+   "lo": 0.02,
+   "hi": 0.34
+  },
+  "oracle_commonsense - direct_mamay12": {
+   "n": 50,
+   "diff": -0.1,
+   "lo": -0.24,
+   "hi": 0.04
+  },
+  "oracle_commonsense - hybrid_gated_v2": {
+   "n": 50,
+   "diff": 0.02,
+   "lo": -0.14,
+   "hi": 0.18
+  },
+  "oracle_commonsense - router_direct": {
+   "n": 50,
+   "diff": 0.22,
+   "lo": 0.06,
+   "hi": 0.38
+  },
+  "hybrid_gated_v2 - hybrid_gated": {
+   "n": 50,
+   "diff": 0.04,
+   "lo": -0.04,
+   "hi": 0.12
+  },
+  "hybrid_gated_v2 - router_direct": {
+   "n": 50,
+   "diff": 0.2,
+   "lo": 0.04,
+   "hi": 0.36
+  },
+  "hybrid_gated_v2 - hybrid": {
+   "n": 48,
+   "diff": 0.2708333333333333,
+   "lo": 0.146,
+   "hi": 0.396
+  },
+  "hybrid_gated_v2 - direct_mamay12": {
+   "n": 50,
+   "diff": -0.12,
+   "lo": -0.28,
+   "hi": 0.04
+  }
+ },
+ "solved_any_small": 29,
+ "solved_any": 35,
+ "m12_only": 5,
+ "rerun_noise": {
+  "note": "Same model, same prompt, T=0, seed 42, two runs (sequential runner vs 4 concurrent requests): answer text differed on 20 of 50 items and the score on 3 of 50.",
+  "text_differs": 20,
+  "score_flips": 3,
+  "n": 50
+ }
+}
