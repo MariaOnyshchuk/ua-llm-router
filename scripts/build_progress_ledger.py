@@ -263,8 +263,10 @@ REGISTRY: tuple[Run, ...] = (
         suite="mixed_ua_v6",
         n_repeats=1,
         scorer_epoch=SCORER_POST,
-        status="confirmed",
+        status="superseded",
         notes=(
+            "WITHDRAWN 12 Oct 2026: the v6 selection step was inverted and kept the items where "
+            "Mamay-4B, Lapa and Aya score the same (docs/mixed_ua_v6.md). Do not cite. "
             "Five solos on mixed_ua_v6, one pass, T=0, seed=42, max_tokens=1024, rescored 29 Sep "
             "2026 with the fixed scorer. v6 was built by dropping low-variance items using the "
             "Mamay-4B, Lapa and Aya screening runs, and its knowledge bucket is 99% multiple choice."
@@ -278,13 +280,45 @@ REGISTRY: tuple[Run, ...] = (
         suite="mixed_ua_v6",
         n_repeats=1,
         scorer_epoch=SCORER_POST,
-        status="confirmed",
+        status="superseded",
         notes=(
+            "WITHDRAWN 12 Oct 2026 with v6 (docs/mixed_ua_v6.md). Do not cite. "
             "Rules v2 router with few-shot alignment on mixed_ua_v6, bf16, three specialists on three "
             "GPUs, one pass, T=0, seed=42, max_tokens=1024. HTTP 2414/2414. Routing table frozen "
             "before the run (code at commit f3bc8ff). Same v6 limits as v6_solos."
         ),
         detail="results/v6_rules/scores_detail.jsonl",
+    ),
+    Run(
+        run_group="v7_dev_router",
+        date="2026-10-12",
+        path="results/v7_dev_router/scores_router_dev.json",
+        suite="mixed_ua_v7_dev",
+        n_repeats=1,
+        scorer_epoch=SCORER_POST,
+        status="provisional",
+        notes=(
+            "DEV split of mixed_ua_v7 (1487 items), not for claims. Rules v2 router with few-shot "
+            "alignment, bf16, one pass, T=0, seed=42, max_tokens=1024, HTTP 1487/1487. Latency is "
+            "not comparable: the lab was shared with other jobs during the run."
+        ),
+        detail="results/v7_dev_router/scores_router_dev_detail.jsonl",
+    ),
+    Run(
+        run_group="v7_dev_router",
+        date="2026-10-12",
+        path="results/v7_dev_router/scores_mamay12_dev.json",
+        suite="mixed_ua_v7_dev",
+        n_repeats=1,
+        scorer_epoch=SCORER_POST,
+        status="provisional",
+        notes=(
+            "DEV split of mixed_ua_v7 (1487 items), not for claims. Mamay-12B alone, baseline "
+            "prompts, taken from the whole-pool run of 12 Oct and scored on dev rows only. With "
+            "the router's few-shot alignment prompt its dev alignment is 0.738 instead of 0.730 "
+            "(results/v7_dev_router/scores_mamay12_fewshot_dev.json). Latency not comparable."
+        ),
+        detail="results/v7_dev_router/scores_mamay12_dev_detail.jsonl",
     ),
 )
 
@@ -326,12 +360,19 @@ def load_suites(bench_dir: Path) -> dict[str, dict[str, int]]:
     suites: dict[str, dict[str, int]] = {}
     for path in sorted(bench_dir.glob("*.jsonl")):
         counts: dict[str, int] = defaultdict(int)
+        by_split: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
         for line in path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            counts[json.loads(line).get("bucket", "?")] += 1
+            row = json.loads(line)
+            counts[row.get("bucket", "?")] += 1
+            if row.get("split"):
+                by_split[row["split"]][row.get("bucket", "?")] += 1
         suites[path.stem] = dict(counts)
+        # A suite with a split field (mixed_ua_v7) is also known as <stem>_dev, <stem>_test.
+        for split, split_counts in by_split.items():
+            suites.setdefault(f"{path.stem}_{split}", dict(split_counts))
     return suites
 
 

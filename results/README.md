@@ -24,6 +24,10 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`week_10_composite_hybrid_v3/`](week_10_composite_hybrid_v3/) | 27 Sep | Hybrid with missing `{{step.content}}` spliced in, 36×3: **0.8125** vs one-hop 0.812 and hybrid v2 0.768. |
 | [`week_11_pack_fp8/`](week_11_pack_fp8/) | 27 Sep | Rules v2, three specialists, online FP8, one GPU: **0.852** (rescored 29 Sep; 0.842 before) / p50 723 ms; 45 668 MiB resident. |
 | [`week_10_composite/`](week_10_composite/) | 1 Sep | Authoritative composite 36×3 summary: oracle **0.882**, one-hop **0.812**, hybrid planner **0.768**. |
+| [`week_10_composite_final/`](week_10_composite_final/) | 1 Sep | The 36×3 repeats behind the `week_10_composite/` summary (three specialists, one-hop router, oracle, hybrid): scores, item scores, run metadata. |
+| [`week_10_composite_hybrid_v2/`](week_10_composite_hybrid_v2/) | 1 Sep | Hybrid planner v2 on composite v1, 36×3: final **0.769**, plan exact match 0.806. Superseded by `week_10_composite_hybrid_v3/`. |
+| [`week_10_composite_smoke/`](week_10_composite_smoke/) | 1 Sep | Six-item wiring check before the full composite run. Not a result. |
+| [`week_10_composite_smoke_v3/`](week_10_composite_smoke_v3/) | 27 Sep | Six-item wiring check for hybrid v3. Not a result. |
 | [`week_12_composite_v2_selector/`](week_12_composite_v2_selector/) | 28 Sep | Offline constrained-template selector on composite v2 (200): exact workflow **1.000**. |
 | [`week_12_composite_v2_dev_ablation/`](week_12_composite_v2_dev_ablation/) | 28 Sep | Dev-only planner ablation; freeze **template**; distillation not warranted. |
 | [`week_12_composite_v2_test_bakeoff/`](week_12_composite_v2_test_bakeoff/) | 28 Sep | Held-out test planning **1.000**; fixture plumbing 60×3; live GPU bake-off via `cluster/eval_composite_v2_bakeoff.sbatch`. |
@@ -34,6 +38,11 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`v7_dev_router_bucketfs/`](v7_dev_router_bucketfs/) | 12 Oct | Same router with two worked examples per bucket (knowledge, translate, instruct). Worse than without: macro −0.014 [−0.027, −0.001]. Dropped. |
 | [`v7_dev_mamay12_fewshot/`](v7_dev_mamay12_fewshot/) | 12 Oct | Mamay-12B on the 400 dev alignment items with the same few-shot prompt the router uses (0.738; baseline prompt 0.730). |
 | [`v7_confidence/`](v7_confidence/) | 12 Oct | First-token probabilities of four models on dev knowledge and alignment (806 items). Confidence-based model choice did not help; see `analysis/v7_dev_router_experiments.json`. |
+| [`v6_screen/`](v6_screen/) | 4 Sep | Screening runs of Mamay-4B, Lapa and Aya on the 4237-item pool (old scorer). Not for claims; the same raw runs, rescored, are the item scores in `v7_pool/`. |
+| [`analysis/`](analysis/) | — | Derived summaries: bootstrap comparisons, planner split counts, v7 dev tables, AgentCoMa dev summary. Each file names its source run. |
+| [`tables/`](tables/) | — | Wide CSV exports of the score files. |
+| [`figures/`](figures/) | — | `tradeoff_v4.png` (v4 quality against latency). Report figures are in `docs/figures/`. |
+| `a2_agentcoma*/`, `a2_planner_grid/` | Sep | AgentCoMa and planner-grid generations. Local only: the source is gated, so nothing from these folders is in git. |
 | [`_empty_failed_stubs/`](_empty_failed_stubs/) | — | Zero-byte / aborted runs. Safe to ignore or delete. |
 
 Wide CSVs (open in Excel): [`tables/v4_model_bucket_quality.csv`](tables/v4_model_bucket_quality.csv), [`tables/v4_alignment_prompt_grid.csv`](tables/v4_alignment_prompt_grid.csv), [`tables/composite_v1.csv`](tables/composite_v1.csv), [`tables/v3_specialist_bakeoff.csv`](tables/v3_specialist_bakeoff.csv). Screening means: [`tables/v6_screen_not_for_claims.csv`](tables/v6_screen_not_for_claims.csv) — do not cite. Frozen-v6 **preview** (screening scores on the 2414 curated ids, not the 3× bake-off): [`tables/v6_preview_from_screen.csv`](tables/v6_preview_from_screen.csv), [`tables/v6_preview_model_bucket.csv`](tables/v6_preview_model_bucket.csv), [`tables/v6_preview_items.csv`](tables/v6_preview_items.csv). Rebuild with `python scripts/export_results_tables.py`. Long-format ledger: [`progress_ledger.csv`](progress_ledger.csv).

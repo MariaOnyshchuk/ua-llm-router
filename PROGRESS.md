@@ -65,7 +65,9 @@ every step is ticked or blocked.
   v7 dev number labelled **dev**. Update the ground rules in
   `docs/CLAUDE_CODE_PLAN.md` so they name v7 (dev for tuning, test for claims).
 
-- [ ] **6. Bookkeeping.**
+- [x] **6. Bookkeeping.**
+  Done 13 Oct: ledger rebuilt (567 rows; v6 runs now `superseded`, two v7 dev runs added as `provisional`);
+  `results/README.md` has a line for every results folder; HF card text and `HANDOFF.md` STATE/NEXT updated. Nothing uploaded.
   Rebuild the ledger with `python scripts/build_progress_ledger.py`. Add a
   one-line entry in `results/README.md` for every results folder that has none
   (`v7_pool`, `v7_dev_router`, `v7_dev_router_bucketfs`,

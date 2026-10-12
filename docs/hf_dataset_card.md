@@ -33,7 +33,11 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 | `week_*/*.meta.json` | Decoding (`T=0`, `seed=42`), model ids, GPU-seconds |
 | `week_*/routing_stats*.json` | Traffic mix for router runs |
 | `week_*/scores_detail.jsonl` | Item-level scores (ids + scores, no prompts) |
-| `v6_solos/scores.json` | Frozen `mixed_ua_v6` 1-pass dedicated solos (five models) |
+| `v7_pool/scores_specialists_detail.jsonl` | Item scores of Mamay-4B, Lapa and Aya on the whole 4237-item pool behind `mixed_ua_v7` (ids and scores, no prompts). Covers dev and test items; the test half is not summarised before the router is frozen |
+| `v7_dev_router/` | `mixed_ua_v7` **dev** split (1487): live rules v2 router and Mamay-12B, scores, item scores, run metadata. Development numbers, not claims |
+| `v7_dev_router_bucketfs/`, `v7_dev_mamay12_fewshot/`, `v7_confidence/` | Dev-only side runs: router with two worked examples per bucket (worse, dropped); Mamay-12B with the alignment few-shot prompt; first-token probabilities for a confidence cascade (no gain) |
+| `analysis/v7_dev_*.json`, `analysis/planner_gate_dev.json`, `analysis/agentcoma_dev_20261012_summary.json` | Dev summaries with paired bootstrap intervals: router against Mamay-12B, router experiments, the instruct profile, the planner gate, AgentCoMa-UK dev (scores only; AgentCoMa prompts are never published) |
+| `v6_solos/scores.json` | `mixed_ua_v6` 1-pass solos (five models). **Withdrawn as evidence 12 Oct 2026** |
 | `v6_solos/*.meta.json` | Decoding, GPU-seconds, model ids for those runs |
 | `tables/v6_solos_1pass.csv` | Same numbers as a wide CSV |
 | `tables/v6_preview_from_screen.csv` | Screening-sliced preview — do not mix with `v6_solos` |
@@ -42,8 +46,11 @@ This dataset is the **progress log of pinned JSON summaries**, not a dump of eve
 | `week_9_baselines/` | Mamay-12B alone on `mixed_ua_v4_balanced` (S2 baseline), 3 repeats: scores, item-level scores, run metadata |
 | `week_11_pack_fp8/` | Rules v2 router with three specialists in online FP8 on one GPU, 3 repeats: scores, item-level scores, run metadata, `nvidia-smi` after load |
 | `week_12_composite_v2_*/` | Composite v2 planning results (offline template selector on dev and test). `fixture/scores.json` is a code check, see the note below |
+| `analysis/planner_split_v7dev_hybrid.json`, `analysis/planner_split_v7dev_hybrid_gated.json` | The same count on 400 `mixed_ua_v7` dev items for the old `hybrid` planner (0.68 split) and the `hybrid_gated` profile (0.035 split) |
 | `analysis/planner_split_v6_hybrid.json` | How often the Mamay-4B `hybrid` planner splits single-skill `mixed_ua_v6` requests: 400 sampled items, 100 per claim bucket, counts and Wilson 95% intervals, no prompts. A planner diagnostic, not a system comparison |
 | `analysis/bootstrap_comparisons.json` | Paired item-level bootstrap (95% intervals) for router vs Mamay-12B comparisons on `mixed_ua_v4_balanced` |
+
+**State on 13 Oct 2026.** The claim suite is `mixed_ua_v7` (whole 4237-item pool, no score-based selection; dev 1487, test 2750). The test split has not been run or scored. On **dev** the rules v2 router scores 0.680 and Mamay-12B 0.710 on the macro of four buckets: difference −0.030, 95% interval [−0.048, −0.012], all of it in instruct; the router is +0.046 [+0.025, +0.069] above the best single specialist. These are development numbers.
 
 **Headline pinned numbers (do not mix suites):**
 

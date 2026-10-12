@@ -25,3 +25,12 @@ other option was.
 - **Step 4. "The FP8 pack loses knowledge (0.750 → 0.688)" was removed** from
   the same docs: the rescored pack knowledge is 0.750, so the drop was the
   scorer bug.
+- **Step 6. v6 runs are marked `superseded` in the ledger registry**, with a
+  "WITHDRAWN" note, instead of being removed. Other option: delete the rows.
+- **Step 6. Only the dev-split score files went into the ledger for v7.** The
+  specialists' file `results/v7_pool/scores_specialists.json` covers test items
+  too, so it is not registered. Other option: register it and expose whole-pool
+  means.
+- **Step 6. The note of the `v6_rules` ledger entry still names the old commit
+  hash `f3bc8ff`** (now `34ab9e4` after the trailer rewrite). Left unchanged: a
+  permission check blocked inspecting it, and the run is withdrawn anyway.
