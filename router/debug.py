@@ -33,16 +33,20 @@ from router.planner import PLANNER_PROFILES, generate_plan  # noqa: E402
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 LOG_DIR = ROOT / "logs" / "debug_sessions"
-DETAIL_GLOBS = ("results/v6_*/scores_detail.jsonl", "results/v6_*/scored/*detail.jsonl")
+DETAIL_GLOBS = ("results/v7_dev_*/scores*_dev_detail.jsonl", "results/v6_*/scores_detail.jsonl",
+                "results/v6_*/scored/*detail.jsonl")
 
 SUITES: dict[str, dict[str, Any]] = {
-    "v6": {"path": "benchmarks/mixed_ua_v6.jsonl", "kind": "single", "note": "claim suite, 2414 items"},
+    # Only the dev split is browsable: test items must stay unseen until the router is frozen.
+    "v7": {"path": "benchmarks/mixed_ua_v7.jsonl", "kind": "single", "split": "dev", "note": "claim suite, dev split (1487)"},
+    "v6": {"path": "benchmarks/mixed_ua_v6.jsonl", "kind": "single", "note": "withdrawn 12 Oct 2026 (2414 items)"},
     "v4": {"path": "benchmarks/mixed_ua_v4_balanced.jsonl", "kind": "single", "note": "dev suite, wiring checks"},
     "agentcoma": {
         "path": "benchmarks/agentcoma_uk_200_composite.jsonl",
         "merged": "benchmarks/agentcoma_uk_200_merged.jsonl",
         "kind": "composite",
-        "note": "AgentCoMa-UK 200, local only",
+        "split": "dev",
+        "note": "AgentCoMa-UK dev split (50), local only",
     },
 }
 
@@ -69,7 +73,8 @@ def _suite_items(suite: str) -> dict[str, dict[str, Any]]:
     path = ROOT / spec["path"]
     if not path.is_file():
         raise HTTPException(404, f"{spec['path']} not found on this machine")
-    items = {row["id"]: row for row in _read_jsonl(path)}
+    items = {row["id"]: row for row in _read_jsonl(path)
+             if not spec.get("split") or row.get("split") == spec["split"]}
     if spec.get("merged") and (ROOT / spec["merged"]).is_file():
         for row in _read_jsonl(ROOT / spec["merged"]):
             if row["id"] in items:

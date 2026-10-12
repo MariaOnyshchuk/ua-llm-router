@@ -9,7 +9,7 @@ client = TestClient(app)
 
 def test_page_served():
     r = client.get("/debug")
-    assert r.status_code == 200 and "Router debug" in r.text
+    assert r.status_code == 200 and "Ukrainian LLM router" in r.text
 
 
 def test_route_trace_shows_fired_rule_and_alternatives():

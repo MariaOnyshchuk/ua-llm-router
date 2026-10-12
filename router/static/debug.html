@@ -3,131 +3,212 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Router debug</title>
+<title>Ukrainian LLM router</title>
 <style>
   :root {
-    --bg: #f6f6f4; --panel: #ffffff; --ink: #1c1c1a; --muted: #6b6b66; --line: #dcdcd6;
-    --accent: #1f5fbf; --good: #1a7f37; --bad: #b42318; --warn: #a15c00; --mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --bg: #f5f4f0; --panel: #ffffff; --sunk: #f0efea; --ink: #17181a; --muted: #6a6b66; --line: #dddcd5;
+    --accent: #1f5fbf; --accent-soft: #e6eefb; --pick: #f4c20d; --pick-soft: #fff6d6;
+    --good: #1a7f37; --bad: #b42318; --warn: #a15c00;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace; --radius: 12px;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #16171a; --panel: #1f2125; --ink: #e8e8e4; --muted: #9a9a94; --line: #34363c;
-            --accent: #6ea8ff; --good: #4cc26a; --bad: #ff7b72; --warn: #e3a94a; }
+    :root { --bg: #131416; --panel: #1c1e21; --sunk: #17191b; --ink: #ecece8; --muted: #9c9d96; --line: #32353a;
+            --accent: #7fb1ff; --accent-soft: #1c2a40; --pick: #f4c20d; --pick-soft: #3a3210;
+            --good: #4cc26a; --bad: #ff7b72; --warn: #e3a94a; }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
-  header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line);
-           background: var(--panel); flex-wrap: wrap; }
-  header h1 { font-size: 15px; margin: 0; }
-  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip { font: 12px var(--mono); padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
-  .chip.up { color: var(--good); border-color: var(--good); }
-  .chip.down { color: var(--bad); border-color: var(--bad); }
-  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; padding: 16px; align-items: start; }
-  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; padding: 16px; } }
-  aside, .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
-  aside { position: sticky; top: 8px; max-height: calc(100vh - 24px); overflow: auto; }
-  @media (max-width: 900px) { aside { position: static; max-height: 60vh; } }
-  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
-  label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 2px; }
-  select, input, textarea, button { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
-           border-radius: 6px; padding: 6px 8px; }
-  select, input:not([type=checkbox]) { width: 100%; }
-  textarea { width: 100%; min-height: 130px; resize: vertical; font-family: inherit; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, select, input, textarea { font: inherit; color: var(--ink); }
   button { cursor: pointer; }
-  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  button:disabled { opacity: .5; cursor: default; }
-  .row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
-  .row > div { flex: 1 1 110px; }
-  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-  .seg button { border: 0; border-radius: 0; background: var(--panel); }
-  .seg button[aria-pressed=true] { background: var(--accent); color: #fff; }
-  .list { margin-top: 8px; }
-  .list button { display: block; width: 100%; text-align: left; margin: 0 0 4px; padding: 6px 8px; }
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- header ---------- */
+  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto; }
+  .brand h1 { font-size: 18px; margin: 0; letter-spacing: -.01em; }
+  .brand span { color: var(--muted); font-size: 14px; }
+  .ghost { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 14px; color: var(--muted); }
+  .ghost[aria-pressed=true] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  #mockwarn { color: var(--bad); border: 1px solid var(--bad); border-radius: 6px; padding: 2px 10px; font-size: 13px; }
+
+  /* ---------- layout ---------- */
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 0 24px 48px; max-width: 1080px; margin: 0 auto; }
+  body.tools .layout { grid-template-columns: 320px minmax(0, 1fr); max-width: 1480px; align-items: start; }
+  @media (max-width: 900px) { body.tools .layout { grid-template-columns: minmax(0, 1fr); } .layout { padding: 0 16px 32px; } header { padding: 12px 16px; } }
+  aside { display: none; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px;
+          position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; font-size: 14px; }
+  body.tools aside { display: block; }
+  @media (max-width: 900px) { aside { position: static; max-height: 60vh; } }
+  main > * + * { margin-top: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+  .muted { color: var(--muted); }
+  .err { color: var(--bad); }
+
+  /* ---------- ask ---------- */
+  textarea#prompt { width: 100%; min-height: 96px; resize: vertical; border: 0; background: transparent; font-size: 19px; line-height: 1.45; padding: 0; }
+  textarea#prompt:focus { outline: none; }
+  .examples { display: grid; gap: 8px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); }
+  .exrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .exlabel { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); width: 56px; flex: none; }
+  .examples button { background: var(--sunk); border: 1px solid transparent; border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--muted); }
+  .examples button:hover { border-color: var(--line); color: var(--ink); }
+  .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+  .seg { display: inline-flex; background: var(--sunk); border-radius: 10px; padding: 3px; }
+  .seg button { border: 0; background: transparent; border-radius: 8px; padding: 7px 14px; font-size: 15px; color: var(--muted); }
+  .seg button[aria-pressed=true] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); font-weight: 600; }
+  .bar .spacer { flex: 1; }
+  .primary { background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 9px 22px; font-weight: 600; }
+  @media (prefers-color-scheme: dark) { .primary { color: #0e1726; } }
+  button:disabled { opacity: .45; cursor: default; }
+  #stop { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; }
+  .inline { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+  .inline select { background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+  details.settings { margin-top: 12px; font-size: 14px; }
+  details.settings summary, details.more summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 14px; margin-top: 10px; }
+  .grid label, aside label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .grid select, .grid input:not([type=checkbox]), aside select, aside input { width: 100%; background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+  aside label { margin-top: 10px; }
+
+  /* ---------- route strip ---------- */
+  .strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 640px) { .strip { grid-template-columns: minmax(0, 1fr); } }
+  .spec { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; background: var(--panel); transition: all .18s ease; position: relative; }
+  .spec b { display: block; font-size: 17px; }
+  .spec small { color: var(--muted); font-size: 13px; }
+  .spec .dot { position: absolute; top: 14px; right: 14px; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); }
+  .spec.up .dot { background: var(--good); }
+  .spec.dim { opacity: .45; }
+  .spec.pick { border-color: var(--pick); background: var(--pick-soft); box-shadow: 0 0 0 2px var(--pick); opacity: 1; }
+  .why { margin-top: 12px; font-size: 16px; min-height: 26px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .tag { font: 13px var(--mono); padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+  .tag.plain { background: var(--sunk); color: var(--muted); }
+  .tag.good { background: transparent; border: 1px solid var(--good); color: var(--good); }
+  .tag.bad { background: transparent; border: 1px solid var(--bad); color: var(--bad); }
+  .tag.warn { background: transparent; border: 1px solid var(--warn); color: var(--warn); }
+
+  /* ---------- answers ---------- */
+  .lanes { display: grid; gap: 16px; }
+  .lanes.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 900px) { .lanes.two { grid-template-columns: minmax(0, 1fr); } }
+  .lane h3 { margin: 0 0 4px; font-size: 17px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .lane .sub { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+  .answer { font-size: 17px; line-height: 1.6; overflow-wrap: anywhere; min-height: 28px; }
+  .answer p { margin: 0 0 .7em; } .answer p:last-child { margin-bottom: 0; }
+  .answer ul, .answer ol { margin: 0 0 .7em; padding-left: 1.3em; }
+  .answer pre { background: var(--sunk); border-radius: 8px; padding: 12px; overflow-x: auto; font: 14px/1.5 var(--mono); margin: 0 0 .7em; }
+  .answer code { font: .9em var(--mono); background: var(--sunk); padding: 1px 5px; border-radius: 4px; }
+  .answer pre code { background: transparent; padding: 0; }
+  .answer.streaming { white-space: pre-wrap; }
+  .answer.streaming::after { content: "▍"; color: var(--accent); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .stats { display: flex; gap: 8px 18px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  .stats b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  details.more { margin-top: 10px; }
+  pre.raw { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.45 var(--mono); background: var(--sunk); padding: 10px; border-radius: 8px; max-height: 360px; overflow: auto; }
+  .rule { font: 13px var(--mono); display: flex; gap: 8px; color: var(--muted); padding: 1px 0; }
+  .rule.fired { color: var(--accent); font-weight: 600; }
+
+  /* ---------- multi-step ---------- */
+  .gate { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 17px; }
+  .gate .big { font-weight: 600; }
+  .steps { margin-top: 16px; display: grid; gap: 0; }
+  .step { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+  .step .rail { display: flex; flex-direction: column; align-items: center; }
+  .step .num { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-weight: 600; font-size: 14px; background: var(--panel); flex: none; }
+  .step .rail::after { content: ""; flex: 1; width: 2px; background: var(--line); margin: 4px 0; }
+  .step:last-child .rail::after { display: none; }
+  .step.running .num { border-color: var(--accent); color: var(--accent); animation: pulse 1s ease-in-out infinite; }
+  .step.done .num { border-color: var(--good); color: var(--good); }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 5px var(--accent-soft); } }
+  .step .body { padding-bottom: 18px; min-width: 0; }
+  .step .head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-weight: 600; }
+  .step .task { color: var(--muted); font-size: 15px; margin-top: 2px; }
+  .step .outp { margin-top: 8px; background: var(--sunk); border-radius: 8px; padding: 10px 12px; font-size: 15px; overflow-wrap: anywhere; max-height: 220px; overflow: auto; }
+  .step .outp p { margin: 0 0 .5em; } .step .outp p:last-child { margin-bottom: 0; } .step .outp ul, .step .outp ol { margin: 0 0 .5em; padding-left: 1.3em; }
+  .step .outp pre { background: var(--panel); border-radius: 6px; padding: 8px; overflow-x: auto; font: 13px/1.45 var(--mono); margin: 0 0 .5em; }
+  .final { border-color: var(--good); }
+
+  /* ---------- tools ---------- */
+  .list { margin-top: 10px; }
+  .list button { display: block; width: 100%; text-align: left; margin: 0 0 4px; padding: 7px 9px; background: var(--sunk); border: 1px solid transparent; border-radius: 8px; font-size: 13px; overflow-wrap: anywhere; }
   .list button[aria-current=true] { border-color: var(--accent); }
   .list small { display: block; color: var(--muted); }
-  .stack > * + * { margin-top: 12px; }
-  .lanes { display: grid; gap: 12px; }
-  .lanes.two { grid-template-columns: 1fr 1fr; }
-  @media (max-width: 1100px) { .lanes.two { grid-template-columns: 1fr; } }
-  .lane h3 { margin: 0 0 6px; font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 13px; }
-  .kv dt { color: var(--muted); } .kv dd { margin: 0; word-break: break-word; }
-  pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.45 var(--mono); }
-  .out { padding: 8px; border: 1px solid var(--line); border-radius: 6px; min-height: 60px; background: var(--bg); }
-  .out.streaming::after { content: "▍"; color: var(--accent); animation: blink 1s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  .badge { font: 12px var(--mono); padding: 1px 8px; border-radius: 4px; border: 1px solid var(--line); }
-  .badge.good { color: var(--good); border-color: var(--good); }
-  .badge.bad { color: var(--bad); border-color: var(--bad); }
-  .badge.warn { color: var(--warn); border-color: var(--warn); }
-  .muted { color: var(--muted); }
-  details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); font-size: 12px; }
-  .rule { font: 12px var(--mono); display: flex; gap: 8px; } .rule .dot { width: 8px; }
-  .rule.hit { color: var(--ink); } .rule.miss { color: var(--muted); }
-  .rule.fired { font-weight: 600; color: var(--accent); }
-  .step { border: 1px solid var(--line); border-radius: 6px; padding: 8px; margin-top: 8px; }
-  .err { color: var(--bad); }
-  .gold { border-left: 3px solid var(--good); padding-left: 8px; }
+  .pager { display: flex; gap: 6px; margin-top: 8px; } .pager button { background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px; }
+  .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 12px; font-size: 14px; margin: 0; }
+  .kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+  .kv pre { margin: 0; white-space: pre-wrap; font: 13px/1.45 var(--mono); }
+  .gold { border-left: 3px solid var(--good); padding-left: 10px; }
+  #itemcard .rowb { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  #itemcard .rowb button { background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; font-size: 13px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Router debug</h1>
-  <div class="chips" id="health"></div>
-  <span class="badge bad" id="mockwarn" hidden>MOCK BACKENDS: answers are fake, scores mean nothing</span>
-  <span class="muted" id="hint">local only · runs are logged to logs/debug_sessions/</span>
+  <div class="brand"><h1>Ukrainian LLM router</h1><span>three small specialists, one entry point</span></div>
+  <span id="mockwarn" hidden>MOCK BACKENDS: answers are fake</span>
+  <button class="ghost" id="toolsbtn" aria-pressed="false">Benchmark tools</button>
 </header>
 
 <div class="layout">
   <aside>
     <h2>Benchmark browser</h2>
-    <label>Suite</label><select id="suite"></select>
+    <label style="margin-top:0">Suite</label><select id="suite"></select>
     <label>Bucket / family</label><select id="bucket"><option value="">all</option></select>
     <label>Search</label><input id="q" placeholder="text or id">
-    <label>Only items a system got wrong (Phase 2 lists)</label>
+    <label>Only items a system got wrong</label>
     <select id="detail"><option value="">off</option></select>
     <select id="system" style="margin-top:4px" disabled><option value="">system</option></select>
     <label>Score below</label><input id="maxscore" type="number" step="0.05" value="1">
-    <div class="muted" id="count" style="margin-top:8px"></div>
+    <div class="muted" id="count" style="margin-top:10px"></div>
     <div class="list" id="list"></div>
-    <div class="row"><button id="prev">‹</button><button id="next">›</button></div>
+    <div class="pager"><button id="prev" aria-label="Previous page">‹</button><button id="next" aria-label="Next page">›</button></div>
+    <details class="more" id="logbox"><summary>Session log (logs/debug_sessions/)</summary><div id="log"></div></details>
   </aside>
 
-  <main class="stack">
+  <main>
     <section class="card" id="itemcard" hidden></section>
 
     <section class="card">
-      <h2>Prompt</h2>
-      <textarea id="prompt" placeholder="Напиши запит або вибери задачу зліва"></textarea>
-      <div class="row" style="margin-top:8px">
-        <div style="flex:0 0 auto"><label>Mode</label>
-          <div class="seg" id="mode">
-            <button data-m="router" aria-pressed="true">Router</button>
-            <button data-m="model" aria-pressed="false">Single model</button>
-            <button data-m="compare" aria-pressed="false">Compare</button>
-            <button data-m="composite" aria-pressed="false">Composite</button>
-          </div></div>
-        <div id="modelbox"><label id="modellabel">Model</label><select id="model"></select></div>
-        <div id="profilebox"><label>Router table</label><select id="profile"></select></div>
-        <div id="alignbox"><label>Alignment prompt</label>
-          <select id="align"><option value="baseline">baseline</option><option value="fewshot">fewshot</option></select></div>
-        <div id="plannerbox" hidden><label>Planner</label><select id="planner"></select>
-          <label style="display:flex;gap:6px;align-items:center;margin-top:6px"><input type="checkbox" id="oracle"> use oracle plan</label></div>
+      <textarea id="prompt" placeholder="Напишіть запит українською або виберіть приклад нижче" aria-label="Request"></textarea>
+      <div class="examples" id="examples"></div>
+      <div class="bar">
+        <div class="seg" id="mode" role="group" aria-label="Mode">
+          <button data-m="router" aria-pressed="true">Router</button>
+          <button data-m="compare" aria-pressed="false">Router vs one model</button>
+          <button data-m="composite" aria-pressed="false">Multi-step</button>
+          <button data-m="model" aria-pressed="false">One model</button>
+        </div>
+        <span class="inline" id="modelbox" hidden><span id="modellabel">Model</span><select id="model" aria-label="Model"></select></span>
+        <span class="spacer"></span>
+        <button id="stop" disabled>Stop</button>
+        <button class="primary" id="run">Run</button>
       </div>
-      <div class="row">
-        <div><label>Temperature</label><input id="temp" type="number" step="0.1" value="0"></div>
-        <div><label>max_tokens</label><input id="maxtok" type="number" value="1024"></div>
-        <div><label>seed</label><input id="seed" type="number" value="42"></div>
-        <div style="flex:0 0 auto"><button class="primary" id="run">Run</button> <button id="stop" disabled>Stop</button></div>
-      </div>
+      <details class="settings">
+        <summary>Settings</summary>
+        <div class="grid">
+          <div id="profilebox"><label for="profile">Router table</label><select id="profile"></select></div>
+          <div id="alignbox"><label for="align">Alignment prompt</label>
+            <select id="align"><option value="fewshot">fewshot</option><option value="baseline">baseline</option></select></div>
+          <div id="plannerbox"><label for="planner">Planner</label><select id="planner"></select></div>
+          <div id="oraclebox"><label for="oracle">Benchmark item plan</label>
+            <label style="display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="oracle"> use the gold (oracle) plan</label></div>
+          <div><label for="temp">Temperature</label><input id="temp" type="number" step="0.1" value="0"></div>
+          <div><label for="maxtok">max_tokens</label><input id="maxtok" type="number" value="1024"></div>
+          <div><label for="seed">seed</label><input id="seed" type="number" value="42"></div>
+        </div>
+      </details>
+    </section>
+
+    <section class="card" id="routecard">
+      <h2 id="routetitle">Where this request goes</h2>
+      <div class="strip" id="strip"></div>
+      <div class="why" id="why"><span class="muted">Start typing: the route is decided by rules before any model is called.</span></div>
     </section>
 
     <section id="lanes" class="lanes"></section>
-
-    <details class="card" id="logbox">
-      <summary>Session log (latest runs, from logs/debug_sessions/)</summary>
-      <div id="log"></div>
-    </details>
   </main>
 </div>
 
@@ -136,12 +217,63 @@ const $ = (id) => document.getElementById(id);
 function h(tag, attrs, ...kids) {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
     if (k === "class") el.className = v; else if (k.startsWith("on")) el[k] = v; else el.setAttribute(k, v);
   }
-  for (const kid of kids.flat()) if (kid != null) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
   return el;
 }
-const state = { mode: "router", item: null, itemPrompt: "", offset: 0, suites: [], abort: null, health: {} };
+const NAMES = { mamay4: "Mamay-4B", lapa: "Lapa-12B", aya: "Aya-8B", mamay12: "Mamay-12B", mamay27: "Mamay-27B", qwen: "Qwen-Coder-3B", qwen7: "Qwen-Coder-7B" };
+const nice = (a) => NAMES[a] || a;
+/* replaceChildren would print a literal "null" for a missing optional child */
+const put = (el, ...kids) => el.replaceChildren(...kids.flat().filter((k) => k != null && k !== false));
+const POOL = [
+  { alias: "aya", role: "translation · conversation" },
+  { alias: "lapa", role: "knowledge · ethics" },
+  { alias: "mamay4", role: "instructions · code · planning" },
+];
+const INTENT_MODEL = { translate: "aya", chat: "aya", knowledge: "lapa", alignment: "lapa", instruct: "mamay4", code: "mamay4" };
+const EXAMPLES = [
+  { label: "Translation", text: "Переклади англійською: Я запізнюсь на 10 хвилин." },
+  { label: "Knowledge", text: "Що таке фотосинтез? Поясни коротко." },
+  { label: "Format rules", text: "Напиши привітання колезі з днем народження, рівно три речення." },
+  { label: "Ethics", text: "Оціни, чи є описана дія морально неприйнятною. Відповідай лише цифрою: 0 — прийнятна, 1 — неприйнятна.\n\nЯ взяв чужу парасольку без дозволу, бо йшов дощ." },
+  { label: "Code", text: "Напиши SQL-запит, що вибирає користувачів, старших за 30." },
+  { label: "Conversation", text: "Що подарувати татові на 60-річчя? Він любить риболовлю." },
+  { label: "Word problem", mode: "composite", text: "У гаражі є 1 дриль, 6 молотків, 3 подовжувачі, 1 повітродувка для листя і 7 викруток. Усі електричні прилади треба скласти у водонепроникну шафу. Скільки предметів піде у шафу?" },
+  { label: "Two tasks in one", mode: "composite", text: "Переклади українською \"The early bird catches the worm\" і поясни значення вислову." },  /* Hard: answers read and judged correct on 13 Oct 2026, in the mode set here (repeat runs gave identical text). */
+  { group: "hard", label: "Facts → table", mode: "composite", text: "Назви три найбільші за населенням міста України і подай відповідь таблицею Markdown зі стовпцями «Місто» і «Область»." },
+  { group: "hard", label: "Extract → classify → JSON", mode: "composite", text: "Опрацюй оголошення: спочатку визнач тему й терміновість, а потім поверни лише JSON з ключами \"topic\" (utilities, culture або education) і \"urgency\" (low, medium або high).\n\nОголошення: Увага! Через прорив труби на вулиці Шевченка сьогодні з 10:00 до 18:00 не буде холодної води. Аварійна бригада вже працює." },
+  { group: "limits", label: "Who is second youngest", mode: "composite", text: "Оля старша за Іру, Іра старша за Марка, а Марко старший за Данила. Хто з них другий наймолодший? Відповідай іменем і одним реченням пояснення." },
+  { group: "hard", label: "English spec → code", mode: "router", text: "Ось опис англійською: \"Write a function that returns the n-th Fibonacci number without recursion.\" Переклади опис українською, а потім напиши цю функцію на Python." },
+  { group: "hard", label: "News → one-line JSON", mode: "router", text: "Ось новина англійською: \"The city council approved a new tram line that will connect the railway station with the university by 2027. Construction starts next spring and will cost 40 million euros.\" Переклади її українською, стисни до одного речення і поверни лише JSON з ключами \"topic\" і \"summary\"." },
+  { group: "hard", label: "Read → answer → 3-line poem", mode: "router", text: "Прочитай текст: \"Penicillin was discovered in 1928 by Alexander Fleming, who noticed that mould killed bacteria in a dish he had left by the window.\" Скажи українською, хто і коли зробив це відкриття, а потім напиши про це вірш рівно з трьох рядків." },
+  { group: "hard", label: "SQL + explanation", mode: "router", text: "Є таблиця orders(id, customer, amount, created_at). Напиши SQL-запит, що повертає трьох клієнтів із найбільшою загальною сумою замовлень за 2025 рік, і поясни українською двома реченнями, як він працює." },
+  { group: "hard", label: "Prices in English → sum", mode: "router", text: "Ось ціни англійською: apples $3 each, bread $2 per loaf, milk $1.5 per bottle. Переклади цей список українською і порахуй, скільки коштують 2 яблука, 1 хліб і 3 пляшки молока разом." },
+  { group: "hard", label: "Only the fruit", mode: "composite", text: "Я купую продукти для фруктового салату: 3 яблука по 12 грн, 2 банани по 8 грн, пачку солі за 15 грн і 1 лимон за 10 грн. Скільки гривень я заплачу лише за фрукти?" },
+  { group: "hard", label: "Sick pupils", mode: "composite", text: "У класі 12 парт, за кожною сидять по 2 учні. Троє учнів сьогодні хворіють і залишились удома. Учителька роздає по 2 зошити кожному присутньому учневі. Скільки зошитів вона роздасть?" },
+  { group: "hard", label: "Three shelves of books", mode: "composite", text: "У Олі 10 книжок. У Петра на 5 книжок більше, ніж у Олі. У Марії вдвічі більше книжок, ніж у Петра. Скільки книжок у всіх трьох разом?" },
+  { group: "hard", label: "Train arrival", mode: "router", text: "Поїзд виїхав о 14:35 і їде зі швидкістю 90 км/год. О котрій годині він проїде 60 км?" },
+  { group: "hard", label: "Years between two events", mode: "router", text: "Скільки років минуло від Хрещення Русі до проголошення незалежності України? Назви обидва роки і різницю." },
+  /* Limits: the specialists get these wrong (weekday arithmetic, a commonsense filter, a receipt, an ordering puzzle). */
+  { group: "limits", label: "Day of the week", mode: "router", text: "Сьогодні середа, 14 жовтня. Зустріч відбудеться рівно через 10 днів. Яка це буде дата і який день тижня?" },
+  { group: "limits", label: "What do you drink from", mode: "composite", text: "На полиці стоять 4 склянки, 3 чашки, 2 тарілки і 5 келихів. Мені треба порахувати лише той посуд, з якого п'ють. Поверни лише JSON у форматі {\"answer\": число}." },
+  { group: "limits", label: "Receipt total", mode: "router", text: "Ось чек: «Кава 2 шт по 45 грн, круасан 1 шт 60 грн, вода 3 шт по 20 грн. Знижка 10 грн». Порахуй суму до сплати і поверни лише JSON з ключами \"items\" (кількість позицій у чеку) і \"total\"." },
+];
+const WHY = {
+  translate: "the request asks for a translation",
+  knowledge: "a factual or test question",
+  alignment: "a moral or social judgement",
+  instruct: "the request sets strict rules for the form of the answer",
+  code: "the request is about code",
+  chat: "no specific rule matched, so it is treated as conversation",
+};
+const GATES = {
+  single: "The planner judged this to be one task, so it is answered in one call.",
+  single_word_problem: "Rule: a word problem with numbers. One call, with a request to reason before computing.",
+  single_symbol_answer: "Rule: the answer is a single letter or digit. One call, no planning.",
+};
+const state = { mode: "router", item: null, itemPrompt: "", offset: 0, suites: [], abort: null, health: {}, files: {} };
 const LIMIT = 40;
 
 async function api(path, opts) {
@@ -154,21 +286,85 @@ function fill(sel, values, keep) {
   for (const v of values) sel.append(h("option", { value: v.value ?? v }, v.label ?? v));
   if (keep && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
 }
+const ms = (v) => v == null ? "—" : v >= 1000 ? (v / 1000).toFixed(1) + " s" : Math.round(v) + " ms";
+
+/* ---------- tiny safe markdown: text is escaped by the DOM, only structure is added ---------- */
+function inline(text) {
+  const out = [];
+  for (const part of text.split(/(\*\*[^*\n]+\*\*|`[^`\n]+`)/g)) {
+    if (!part) continue;
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) out.push(h("strong", {}, part.slice(2, -2)));
+    else if (part.startsWith("`") && part.endsWith("`") && part.length > 2) out.push(h("code", {}, part.slice(1, -1)));
+    else out.push(part);
+  }
+  return out;
+}
+function markdown(text) {
+  const root = document.createDocumentFragment();
+  const blocks = String(text || "").split(/```/);
+  blocks.forEach((block, i) => {
+    if (i % 2) { root.append(h("pre", {}, h("code", {}, block.replace(/^[a-zA-Z0-9_+-]*\n/, "").replace(/\n$/, "")))); return; }
+    let list = null, para = [];
+    const flush = () => { if (para.length) { const p = h("p"); para.forEach((l, j) => { if (j) p.append(h("br")); p.append(...inline(l)); }); root.append(p); para = []; } };
+    for (const line of block.split("\n")) {
+      const item = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/), head = line.match(/^\s*#{1,6}\s+(.*)$/);
+      if (item) {
+        flush();
+        const ordered = /^\s*\d/.test(line);
+        if (!list || (list.tagName === "OL") !== ordered) { list = h(ordered ? "ol" : "ul"); root.append(list); }
+        list.append(h("li", {}, ...inline(item[1])));
+      } else if (head) { flush(); list = null; root.append(h("p", {}, h("strong", {}, ...inline(head[1])))); }
+      else if (!line.trim()) { flush(); list = null; }
+      else { list = null; para.push(line); }
+    }
+    flush();
+  });
+  return root;
+}
 
 /* ---------- health + setup ---------- */
 async function loadHealth() {
   const d = await api("/debug/api/health");
   state.health = d.backends;
   $("mockwarn").hidden = !Object.values(d.backends).some((b) => b.up && b.mock);
-  $("health").replaceChildren(...Object.entries(d.backends).map(([a, b]) =>
-    h("span", { class: "chip " + (b.up ? "up" : "down"), title: b.base }, a + (b.up ? (b.mock ? " MOCK" : " up") : " down"))));
-  fill($("model"), Object.keys(d.backends), true);
-  if (!$("model").value || $("model").value === "mamay4") $("model").value = "mamay12";
+  const aliases = Object.keys(d.backends).sort((a, b) => Number(d.backends[b].up) - Number(d.backends[a].up));
+  fill($("model"), aliases.map((a) => ({ value: a, label: nice(a) + (d.backends[a].up ? "" : " (offline)") })), true);
+  const up = (a) => d.backends[a] && d.backends[a].up;
+  $("model").value = ["mamay12", "aya", "lapa", "mamay4"].find(up) || aliases[0];
   fill($("profile"), d.profiles, true); $("profile").value = "v2";
-  fill($("planner"), d.planners, true); $("planner").value = "hybrid";
+  fill($("planner"), d.planners, true);
+  $("planner").value = d.planners.includes("hybrid_gated") ? "hybrid_gated" : "hybrid";
+  renderStrip(null);
+}
+function renderStrip(pick) {
+  const picks = [].concat(pick || []), known = POOL.some((p) => picks.includes(p.alias));
+  const cards = POOL.map((p) => h("div", { class: "spec" + ((state.health[p.alias] || {}).up ? " up" : "") + (picks.includes(p.alias) ? " pick" : known ? " dim" : "") },
+    h("span", { class: "dot", title: (state.health[p.alias] || {}).up ? "online" : "offline" }), h("b", {}, nice(p.alias)), h("small", {}, p.role)));
+  $("strip").replaceChildren(...cards);
+}
+function showWhy(trace, live) {
+  if (!trace) { $("why").replaceChildren(h("span", { class: "muted" }, "Start typing: the route is decided by rules before any model is called.")); renderStrip(null); return; }
+  renderStrip(trace.model);
+  put($("why"), h("span", { class: "tag" }, trace.intent), h("span", {}, "→ ", h("b", {}, nice(trace.model))),
+    h("span", { class: "muted", title: trace.reason || "" }, trace.learned ? "chosen by the learned router" : (WHY[trace.intent] || trace.reason || "")),
+    live ? null : h("span", { class: "tag plain" }, "preview"));
+}
+let previewTimer = null;
+function preview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(async () => {
+    const text = $("prompt").value.trim();
+    if (state.mode === "model" || state.mode === "composite") return;
+    if (!text) return showWhy(null);
+    try {
+      const t = await api("/debug/api/route", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: text, profile: $("profile").value || "v2" }) });
+      if ($("prompt").value.trim() === text && state.shown !== text) showWhy(t, false);
+    } catch (e) { /* the preview is optional */ }
+  }, 250);
 }
 
-/* ---------- benchmark browser ---------- */
+/* ---------- benchmark tools ---------- */
 async function loadSuites() {
   state.suites = await api("/debug/api/bench/suites");
   fill($("suite"), state.suites.filter((s) => s.available).map((s) => ({ value: s.name, label: s.name + " — " + s.note })));
@@ -184,9 +380,8 @@ async function loadList() {
   if ($("bucket").options.length <= 1) fill($("bucket"), [{ value: "", label: "all" }, ...d.buckets.filter(Boolean)], true);
   $("count").textContent = d.total + " items";
   $("list").replaceChildren(...d.items.map((it) => {
-    const b = h("button", { "aria-current": state.item && state.item.id === it.id },
-      it.id + "  ·  " + it.bucket + (it.score != null ? "  ·  score " + it.score : ""),
-      h("small", {}, it.snippet));
+    const b = h("button", { "aria-current": state.item && state.item.id === it.id ? "true" : null },
+      it.id + " · " + it.bucket + (it.score != null ? " · score " + it.score : ""), h("small", {}, it.snippet));
     b.onclick = () => openItem(it.id);
     return b;
   }));
@@ -196,23 +391,23 @@ async function openItem(id) {
   state.item = { suite: $("suite").value, id, kind: it.kind, data: it };
   $("prompt").value = state.itemPrompt = it.prompt;
   setMode(it.kind === "composite" ? "composite" : (state.mode === "composite" ? "router" : state.mode));
-  renderItem(it); loadList();
+  renderItem(it); loadList(); preview();
 }
 function renderItem(it) {
-  const box = $("itemcard"); box.hidden = false;
-  const kids = [h("h2", {}, "Item " + it.id + " · " + (it.bucket || it.family))];
+  const box = $("itemcard"); box.hidden = false; box.style.opacity = 1;
+  const kids = [h("h2", {}, "Benchmark item " + it.id + " · " + (it.bucket || it.family))];
   if (it.kind === "single") {
     kids.push(h("dl", { class: "kv gold" }, h("dt", {}, "gold"), h("dd", {}, h("pre", {}, String(it.reference))),
       it.notes ? h("dt", {}, "notes") : null, it.notes ? h("dd", {}, it.notes) : null));
   } else {
-    kids.push(h("dl", { class: "kv gold" }, h("dt", {}, "gold final"), h("dd", {}, String(it.answer_composition)),
-      h("dt", {}, "oracle plan"), h("dd", {}, h("pre", {}, it.oracle_plan.steps.map((s) =>
+    kids.push(h("dl", { class: "kv gold" }, h("dt", {}, "gold answer"), h("dd", {}, String(it.answer_composition)),
+      h("dt", {}, "gold plan"), h("dd", {}, h("pre", {}, it.oracle_plan.steps.map((s) =>
         s.id + " [" + s.intent + "]" + (s.depends_on.length ? " ← " + s.depends_on.join(",") : "") + "  gold: " + JSON.stringify(s.rubric)).join("\n")))));
     if (it.steps_alone) {
-      const use = (t) => { $("prompt").value = t; state.item = null; setMode("router"); };
-      kids.push(h("div", { class: "row", style: "margin-top:8px" },
-        h("button", { onclick: () => use(it.steps_alone.commonsense) }, "Load commonsense step alone (gold: " + JSON.stringify(it.steps_alone.commonsense_gold) + ")"),
-        h("button", { onclick: () => use(it.steps_alone.math) }, "Load math step alone (gold: " + it.steps_alone.math_gold + ")")));
+      const use = (t) => { $("prompt").value = t; state.item = null; box.hidden = true; setMode("router"); preview(); };
+      kids.push(h("div", { class: "rowb" },
+        h("button", { onclick: () => use(it.steps_alone.commonsense) }, "Load the commonsense step alone (gold: " + JSON.stringify(it.steps_alone.commonsense_gold) + ")"),
+        h("button", { onclick: () => use(it.steps_alone.math) }, "Load the math step alone (gold: " + it.steps_alone.math_gold + ")")));
     }
   }
   box.replaceChildren(...kids);
@@ -223,118 +418,117 @@ function setMode(m) {
   state.mode = m;
   document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m));
   $("modelbox").hidden = m === "router" || m === "composite";
-  $("modellabel").textContent = m === "compare" ? "Compare against (lane B)" : "Model";
+  $("modellabel").textContent = m === "compare" ? "against" : "Model";
   $("profilebox").hidden = m === "model";
   $("alignbox").hidden = m === "composite";
-  $("plannerbox").hidden = m !== "composite";
-  if (m === "composite" && $("maxtok").value === "1024") $("maxtok").value = 256;
-  if (m !== "composite" && $("maxtok").value === "256") $("maxtok").value = 1024;
+  $("plannerbox").hidden = $("oraclebox").hidden = m !== "composite";
+  $("routecard").hidden = m === "model";
+  $("routetitle").textContent = m === "composite" ? "The specialists a plan can use" : "Where this request goes";
+  if (m === "composite") showWhy(null), $("why").replaceChildren(h("span", { class: "muted" }, "A gate decides first whether this is one task or several. Most requests are one task."));
+  else preview();
 }
 
-/* ---------- lanes ---------- */
-function newLane(title) {
+/* ---------- single answers ---------- */
+function newLane(title, sub) {
   const lane = {
-    root: h("section", { class: "card lane" }), title,
-    head: h("h3", {}, title), route: h("div"), sent: h("div"), out: h("pre", { class: "out streaming" }),
-    score: h("div"), meta: h("div", { class: "muted" }), raw: h("details", {}, h("summary", {}, "Raw request / response")),
-    rawBody: h("pre"), text: "",
+    root: h("section", { class: "card lane" }), head: h("h3", {}, title), sub: h("div", { class: "sub" }, sub || ""),
+    out: h("div", { class: "answer streaming" }), stats: h("div", { class: "stats" }), more: h("div"), text: "", trace: null,
   };
-  lane.raw.append(lane.rawBody);
-  lane.root.append(lane.head, lane.route, lane.sent, lane.out, lane.score, lane.meta, lane.raw);
+  lane.root.append(lane.head, lane.sub, lane.out, lane.stats, lane.more);
   return lane;
 }
-function showRoute(lane, ev) {
-  const t = ev.trace, dl = h("dl", { class: "kv" },
-    h("dt", {}, "intent"), h("dd", {}, t.intent), h("dt", {}, "model"), h("dd", {}, t.model + (ev.alias !== t.model ? " (→ " + ev.alias + ")" : "")),
-    h("dt", {}, "why"), h("dd", {}, t.reason));
-  lane.head.append(h("span", { class: "chip up" }, ev.alias));
-  const box = h("div", {}, h("h2", {}, "Routing"), dl);
-  if (t.rules && t.rules.length) {
-    const firstHit = t.rules.findIndex((r) => r.matched);
-    const rules = h("details", {}, h("summary", {}, "Rule table: " + t.rules.filter((r) => r.matched).length + " matched, first match wins"),
-      ...t.rules.map((r, i) => h("div", { class: "rule " + (r.matched ? "hit" : "miss") + (i === firstHit ? " fired" : "") },
-        h("span", { class: "dot" }, r.matched ? "●" : "○"), r.intent + " → " + r.model,
-        r.matched ? h("span", { class: "muted" }, "“" + r.match_text + "”") : null)));
-    box.append(rules);
-    if (t.learned) box.append(h("div", { class: "muted" }, "learned router profile: rule table not applicable"));
-  }
-  lane.route.replaceChildren(box);
+function ruleTable(t) {
+  if (!t.rules || !t.rules.length) return null;
+  const first = t.rules.findIndex((r) => r.matched);
+  return h("details", { class: "more" }, h("summary", {}, "Rule table (" + t.rules.filter((r) => r.matched).length + " matched, the first match wins)"),
+    ...t.rules.map((r, i) => h("div", { class: "rule" + (i === first ? " fired" : "") },
+      h("span", {}, r.matched ? "●" : "○"), r.intent + " → " + r.model, r.matched ? h("span", {}, "“" + r.match_text + "”") : null)));
 }
-function showPrompt(lane, ev) {
-  lane.sent.replaceChildren(h("details", {}, h("summary", {}, "Prompt sent" + (ev.changed ? " (differs from your text: alignment variant)" : "")), h("pre", {}, ev.text)));
-}
-function showScore(lane, sc) {
-  const s = sc.score;
-  const cls = s == null ? "warn" : s >= 1 ? "good" : s > 0 ? "warn" : "bad";
-  lane.score.replaceChildren(h("span", { class: "badge " + cls }, "score " + (s == null ? "—" : s)),
-    " ", h("span", { class: "muted" }, sc.detail || ""));
-}
-function handleLane(lane, ev) {
-  if (ev.type === "route") showRoute(lane, ev);
-  else if (ev.type === "prompt") showPrompt(lane, ev);
-  else if (ev.type === "request") lane.request = ev;
+function handleLane(lane, ev, isRouter) {
+  if (ev.type === "route") {
+    lane.trace = ev.trace;
+    if (isRouter) { showWhy(ev.trace, true); lane.sub.replaceChildren(h("span", { class: "tag" }, ev.trace.intent), " answered by ", h("b", {}, nice(ev.alias))); }
+    const rules = isRouter ? ruleTable(ev.trace) : null; if (rules) lane.more.append(rules);
+  } else if (ev.type === "prompt") {
+    lane.more.append(h("details", { class: "more" }, h("summary", {}, "Prompt sent to the model" + (ev.changed ? " (alignment variant applied)" : "")), h("pre", { class: "raw" }, ev.text)));
+  } else if (ev.type === "request") lane.request = ev;
   else if (ev.type === "delta") { lane.text += ev.text; lane.out.textContent = lane.text; }
   else if (ev.type === "done") {
-    lane.out.classList.remove("streaming");
-    lane.meta.textContent = [ev.ttft_ms != null ? "first token " + ev.ttft_ms + " ms" : null, "total " + ev.latency_ms + " ms",
-      ev.usage ? ev.usage.completion_tokens + " completion / " + ev.usage.prompt_tokens + " prompt tokens" : null,
-      "finish: " + ev.finish_reason].filter(Boolean).join(" · ");
-    if (ev.finish_reason === "length") lane.meta.append(" ", h("span", { class: "badge warn" }, "cut off by max_tokens"));
-    lane.rawBody.textContent = JSON.stringify({ request: lane.request, response: { ...ev, content: undefined } }, null, 2);
-  } else if (ev.type === "score") showScore(lane, ev.score);
-  else if (ev.type === "error") { lane.out.classList.remove("streaming"); lane.out.append(h("div", { class: "err" }, ev.message)); }
+    lane.out.classList.remove("streaming"); lane.out.replaceChildren(markdown(ev.content || lane.text));
+    put(lane.stats,
+      h("span", {}, "first token ", h("b", {}, ms(ev.ttft_ms))), h("span", {}, "total ", h("b", {}, ms(ev.latency_ms))),
+      ev.usage ? h("span", {}, h("b", {}, ev.usage.completion_tokens), " tokens") : null,
+      ev.finish_reason === "length" ? h("span", { class: "tag warn" }, "cut off by max_tokens") : null);
+    lane.more.append(h("details", { class: "more" }, h("summary", {}, "Raw request and response"),
+      h("pre", { class: "raw" }, JSON.stringify({ request: lane.request, response: { ...ev, content: undefined } }, null, 2))));
+  } else if (ev.type === "score") {
+    const s = ev.score.score, cls = s == null ? "warn" : s >= 1 ? "good" : s > 0 ? "warn" : "bad";
+    lane.stats.append(h("span", { class: "tag " + cls }, "score " + (s == null ? "—" : s)), h("span", {}, ev.score.detail || ""));
+  } else if (ev.type === "error") { lane.out.classList.remove("streaming"); lane.out.append(h("div", { class: "err" }, ev.message)); }
 }
 
-/* ---------- composite ---------- */
-function renderComposite(root) {
-  const c = { root: h("section", { class: "card lane" }, h("h3", {}, "Composite run")), plan: h("div"), calls: h("div"), final: h("div"), n: 0 };
-  c.root.append(c.plan, c.calls, c.final); root.append(c.root); return c;
+/* ---------- multi-step ---------- */
+function newComposite(root) {
+  const c = { gate: h("div", { class: "gate" }, h("span", { class: "muted" }, "Deciding whether this needs a plan…")), steps: h("div", { class: "steps" }),
+    more: h("div"), final: null, cards: [], n: 0, planned: false, plannerCalls: 0, used: [] };
+  renderStrip(null);
+  c.root = h("section", { class: "card lane" }, h("h2", {}, "Plan"), c.gate, c.steps, c.more);
+  root.append(c.root); return c;
+}
+function stepCard(index, step) {
+  const model = INTENT_MODEL[step.intent];
+  const el = { num: h("div", { class: "num" }, index + 1), who: h("span", {}, model ? nice(model) : ""), time: h("span", { class: "muted", style: "font-weight:400" }),
+    flags: h("span"), outp: h("div", { class: "outp", hidden: "" }) };
+  /* the last step's prompt is wrapped by the planner; show the action, not the wrapper */
+  const marker = "Твоя дія на останньому кроці:\n", at = step.prompt.indexOf(marker);
+  const task = (at >= 0 ? step.prompt.slice(at + marker.length) : step.prompt).split("\n")[0].slice(0, 180);
+  el.root = h("div", { class: "step" }, h("div", { class: "rail" }, el.num),
+    h("div", { class: "body" }, h("div", { class: "head" }, h("span", { class: "tag" }, step.intent), el.who, el.time, el.flags),
+      h("div", { class: "task" }, task), el.outp));
+  return el;
 }
 function handleComposite(c, ev) {
   if (ev.type === "plan") {
-    const pl = ev.planning || {}, attempts = pl.attempts || [];
-    c.calls.replaceChildren(); c.n = 0;   // planner calls are shown in the planning log below, not as step calls
-    const badge = pl.fallback ? h("span", { class: "badge bad" }, "FALLBACK plan: " + (pl.fallback_reason || "")) :
-      pl.repaired ? h("span", { class: "badge warn" }, "valid after repair") :
-      pl.valid ? h("span", { class: "badge good" }, "valid") : h("span", { class: "badge bad" }, "invalid");
-    const log = [h("h2", {}, "Planning"),
-      h("dl", { class: "kv" }, h("dt", {}, "planner"), h("dd", {}, (pl.mode || "planner") + (pl.profile ? " · " + pl.profile : "") + (pl.template_id ? " · template " + pl.template_id : "")),
-        h("dt", {}, "result"), h("dd", {}, badge, pl.error ? h("div", { class: "err" }, pl.error) : null),
-        h("dt", {}, "planner calls"), h("dd", {}, String(attempts.length)))];
-    attempts.forEach((a, i) => log.push(h("details", { open: "" },
-      h("summary", {}, "planner attempt " + (i + 1) + (i === 1 ? " (repair)" : "") + " → " + (a.alias || "?") + " · " + (a.latency_ms ?? "?") + " ms" + (a.ok === false ? " · FAILED" : "")),
-      h("pre", { class: "out" }, a.content || ""))));
-    log.push(h("h2", { style: "margin-top:12px" }, "Plan that will run"),
-      h("pre", {}, ev.plan.steps.map((st) => st.id + " [" + st.intent + "]" + (st.depends_on.length ? " ← " + st.depends_on.join(",") : "") + "\n    " + st.prompt.slice(0, 240).replace(/\n/g, " ")).join("\n")));
-    c.plan.replaceChildren(...log);
+    const pl = ev.planning || {}, steps = ev.plan.steps, attempts = pl.attempts || [];
+    c.planned = true; c.n = 0;
+    const gate = pl.gate ? GATES[pl.gate] : null;
+    const label = pl.mode === "oracle" ? "Gold plan from the benchmark" : steps.length > 1 ? steps.length + " steps planned" : "One task → one call";
+    put(c.gate, h("span", { class: "big" }, label),
+      pl.fallback && !pl.gate ? h("span", { class: "tag bad" }, "planner output unusable: single call instead") : null,
+      pl.repaired && !pl.fallback ? h("span", { class: "tag warn" }, "valid after one repair") : null,
+      h("span", { class: "muted", style: "font-size:15px;flex-basis:100%" },
+        gate || (steps.length > 1 ? "Each step goes to the specialist for its skill; the last step writes the full answer." : "")));
+    c.cards = steps.map((s, i) => stepCard(i, s)); c.steps.replaceChildren(...c.cards.map((x) => x.root));
+    if (attempts.length) c.more.append(h("details", { class: "more" },
+      h("summary", {}, "Planner output (" + attempts.length + (attempts.length > 1 ? " calls" : " call") + " to " + nice(attempts[0].alias || "mamay4") + ", " + ms(attempts.reduce((a, x) => a + (x.latency_ms || 0), 0)) + ")"),
+      ...attempts.map((a) => h("pre", { class: "raw" }, a.content || ""))));
   } else if (ev.type === "call_start") {
-    c.n += 1; c.current = h("div", { class: "step" }, h("b", {}, "call " + c.n + " → " + ev.alias), h("span", { class: "muted" }, "  running…"));
-    c.calls.append(c.current);
+    if (!c.planned) { c.plannerCalls += 1; c.gate.replaceChildren(h("span", { class: "muted" }, "Asking " + nice(ev.alias) + " whether this needs a plan…")); return; }
+    const card = c.cards[c.n]; if (!card) return;
+    card.root.classList.add("running"); card.who.textContent = nice(ev.alias); card.time.textContent = "running…";
+    c.used.push(ev.alias); renderStrip(c.used);
   } else if (ev.type === "call_done") {
-    c.current.replaceChildren(h("b", {}, "call " + c.n + " → " + ev.alias), h("span", { class: "muted" }, "  " + ev.latency_ms + " ms" + (ev.ok ? "" : " · FAILED")),
-      ev.finish_reason === "length" ? h("span", { class: "badge warn", style: "margin-left:8px" }, "CUT OFF by max_tokens") : null,
-      h("pre", {}, ev.content || ""));
+    if (!c.planned) return;
+    const card = c.cards[c.n]; c.n += 1; if (!card) return;
+    card.root.classList.remove("running"); card.root.classList.add("done");
+    card.time.textContent = ms(ev.latency_ms) + (ev.ok ? "" : " · failed");
+    if (ev.finish_reason === "length") card.flags.replaceChildren(h("span", { class: "tag warn" }, "cut off by max_tokens"));
+    card.outp.hidden = false; card.outp.replaceChildren(markdown(ev.content || ""));
   } else if (ev.type === "final") {
     const ex = ev.execution, sc = ev.score;
-    c.calls.replaceChildren();
-    const cards = ex.steps.map((s, i) => {
-      const st = sc && sc.stage_scores[i];
-      return h("div", { class: "step" },
-        h("b", {}, s.id + " · declared " + s.intent + " → detected " + s.route.detected_intent + " → " + s.route.model),
-        h("span", { class: "muted" }, "  " + s.latency_ms + " ms" + (s.depends_on.length ? " · after " + s.depends_on.join(",") : "")),
-        st ? h("span", { class: "badge " + (st.score >= 1 ? "good" : "bad"), style: "margin-left:8px" }, "stage " + st.score + " · " + st.detail) : null,
-        s.finish_reason === "length" ? h("span", { class: "badge warn", style: "margin-left:8px" }, "CUT OFF by max_tokens (" + ((s.usage && s.usage.completion_tokens) || "?") + " tokens): the next step got truncated text") : null,
-        h("details", {}, h("summary", {}, "Prompt sent to " + s.route.model), h("pre", {}, s.prompt)),
-        h("pre", { class: "out" }, s.content || ""));
+    ex.steps.forEach((s, i) => {
+      const card = c.cards[i]; if (!card) return;
+      card.who.textContent = nice(s.route.model);
+      const st = sc && sc.stage_scores && sc.stage_scores[i];
+      if (st) card.flags.append(h("span", { class: "tag " + (st.score >= 1 ? "good" : "bad") }, "stage " + st.score));
+      card.outp.after(h("details", { class: "more" }, h("summary", {}, "Prompt sent to " + nice(s.route.model)), h("pre", { class: "raw" }, s.prompt)));
     });
-    c.calls.append(...cards);
-    const kv = [h("dt", {}, "final output"), h("dd", {}, h("pre", {}, ex.final_output || "")),
-      h("dt", {}, "calls / latency"), h("dd", {}, ex.calls + " calls · " + ex.latency_ms + " ms")];
-    if (sc) kv.push(h("dt", {}, "final score"), h("dd", {}, h("span", { class: "badge " + (sc.final_score >= 1 ? "good" : "bad") }, sc.final_score + " · " + sc.final_detail)),
-      h("dt", {}, "plan match"), h("dd", {}, String(sc.plan_match) + (sc.workflow_error ? " · " + sc.workflow_error : "")),
-      h("dt", {}, "all stages pass"), h("dd", {}, String(sc.all_stages_pass)));
-    c.final.replaceChildren(h("h2", {}, "Result"), h("dl", { class: "kv" }, ...kv));
-  } else if (ev.type === "error") c.final.append(h("div", { class: "err" }, ev.message));
+    const stats = h("div", { class: "stats" }, h("span", {}, h("b", {}, ex.calls + c.plannerCalls), ex.calls + c.plannerCalls === 1 ? " model call" : " model calls"), h("span", {}, "total ", h("b", {}, ms(ex.latency_ms))));
+    if (sc) stats.append(h("span", { class: "tag " + (sc.final_score >= 1 ? "good" : "bad") }, "score " + sc.final_score), h("span", {}, sc.final_detail || ""),
+      h("span", {}, "plan matches gold: ", h("b", {}, String(sc.plan_match)), sc.workflow_error ? " (" + sc.workflow_error + ")" : ""));
+    c.final = h("section", { class: "card lane final" }, h("h2", {}, "Answer"), h("div", { class: "answer" }, markdown(ex.final_output || "")), stats);
+    c.root.after(c.final);
+  } else if (ev.type === "error") c.root.append(h("div", { class: "err" }, ev.message));
 }
 
 /* ---------- run ---------- */
@@ -345,13 +539,17 @@ async function run() {
     profile: $("profile").value, align_prompt: $("align").value, planner_profile: $("planner").value, use_oracle: $("oracle").checked,
     temperature: parseFloat($("temp").value || 0), max_tokens: parseInt($("maxtok").value || 1024), seed: $("seed").value === "" ? null : parseInt($("seed").value) };
   if (attached) { body.suite = state.item.suite; body.item_id = state.item.id; }
-  const lanes = $("lanes"); lanes.replaceChildren();
+  const lanes = $("lanes"); lanes.replaceChildren(); lanes.className = "lanes";
   const path = { router: "chat", model: "chat", compare: "compare", composite: "composite" }[state.mode];
-  const byside = {};
-  if (state.mode === "compare") { lanes.className = "lanes two"; byside.a = newLane("A · Router"); byside.b = newLane("B · " + body.model_b); lanes.append(byside.a.root, byside.b.root); }
-  else if (state.mode === "composite") { lanes.className = "lanes"; byside.c = renderComposite(lanes); }
-  else { lanes.className = "lanes"; byside.a = newLane(state.mode === "router" ? "Router" : body.model); lanes.append(byside.a.root); }
-  if (!attached && state.item) lanes.prepend(h("div", { class: "muted" }, "Prompt was edited, so this run is not scored against the loaded item."));
+  const by = {};
+  if (state.mode === "compare") {
+    lanes.className = "lanes two";
+    by.a = newLane("Router"); by.b = newLane(nice(body.model_b), "one model answers everything");
+    lanes.append(by.a.root, by.b.root);
+  } else if (state.mode === "composite") by.c = newComposite(lanes);
+  else { by.a = newLane(state.mode === "router" ? "Answer" : nice(body.model), state.mode === "router" ? "" : "one model, no routing"); lanes.append(by.a.root); }
+  if (!attached && state.item) lanes.prepend(h("div", { class: "muted" }, "The prompt was edited, so this run is not scored against the loaded item."));
+  clearTimeout(previewTimer); state.shown = prompt;   /* a late preview must not overwrite the live route */
   state.abort = new AbortController(); $("run").disabled = true; $("stop").disabled = false;
   try {
     const resp = await fetch("/debug/api/" + path, { method: "POST", headers: { "Content-Type": "application/json" },
@@ -365,14 +563,16 @@ async function run() {
         const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
         if (!chunk.startsWith("data:")) continue;
         const ev = JSON.parse(chunk.slice(5));
-        if (state.mode === "composite") handleComposite(byside.c, ev); else handleLane(byside[ev.side || "a"], ev);
+        if (state.mode === "composite") handleComposite(by.c, ev);
+        else { const side = ev.side || "a"; handleLane(by[side], ev, side === "a" && state.mode !== "model"); }
       }
     }
   } catch (e) {
-    if (e.name !== "AbortError") lanes.append(h("div", { class: "err" }, String(e)));
+    if (e.name !== "AbortError") lanes.append(h("div", { class: "card err" }, String(e)));
   } finally {
-    Object.values(byside).forEach((l) => l.out && l.out.classList.remove("streaming"));
-    $("run").disabled = false; $("stop").disabled = true; loadLog();
+    Object.values(by).forEach((l) => l.out && l.out.classList.remove("streaming"));
+    $("run").disabled = false; $("stop").disabled = true;
+    if (document.body.classList.contains("tools")) loadLog();
   }
 }
 
@@ -382,19 +582,34 @@ async function loadLog() {
   $("log").replaceChildren(...rows.map((r) => {
     const lanes = Object.entries(r.lanes || {}).map(([s, l]) => s + ": " + ((l.route && l.route.trace && l.route.trace.model) || (l.done && l.done.alias) || "") +
       (l.score ? " score " + (l.score.score && l.score.score.score) : "") + (l.error ? " ERROR" : "")).join(" | ");
-    return h("div", { class: "muted", style: "margin-top:6px" }, r.ts + " · " + r.kind + " · " + (r.item_id || "free text") + " · " + lanes);
+    return h("div", { class: "muted", style: "margin-top:6px;font-size:13px" }, r.ts + " · " + r.kind + " · " + (r.item_id || "free text") + " · " + lanes);
   }));
 }
 
 /* ---------- wiring ---------- */
+function setTools(on) {
+  document.body.classList.toggle("tools", on); $("toolsbtn").setAttribute("aria-pressed", on);
+  try { localStorage.setItem("router-debug-tools", on ? "1" : "0"); } catch (e) { /* storage is optional */ }
+  if (on && !state.suites.length) loadSuites().then(loadList).then(loadLog).catch((e) => $("count").textContent = String(e));
+}
+$("toolsbtn").onclick = () => setTools(!document.body.classList.contains("tools"));
+const GROUPS = [["", "Basics"], ["hard", "Hard"], ["limits", "Limits"]];
+$("examples").replaceChildren(...GROUPS.map(([key, title]) => h("div", { class: "exrow" }, h("span", { class: "exlabel" }, title),
+  ...EXAMPLES.filter((ex) => (ex.group || "") === key).map((ex) => h("button", { onclick: () => {
+    $("prompt").value = ex.text; state.item = null; state.shown = null; $("itemcard").hidden = true; $("lanes").replaceChildren();
+    setMode(ex.mode || (state.mode === "composite" ? "router" : state.mode)); preview(); $("prompt").focus();
+  } }, ex.label)))));
 $("mode").onclick = (e) => e.target.dataset.m && setMode(e.target.dataset.m);
 $("prompt").addEventListener("input", () => {
+  state.shown = null;
   const box = $("itemcard"), detached = state.item && $("prompt").value !== state.itemPrompt;
   box.style.opacity = detached ? 0.45 : 1;
   const old = box.querySelector(".detached"); if (old) old.remove();
-  if (detached) box.prepend(h("div", { class: "badge warn detached", style: "margin-bottom:8px;display:inline-block" },
-    "prompt edited: this is no longer the item, gold and scoring do not apply"));
+  if (detached) box.prepend(h("div", { class: "tag warn detached", style: "margin-bottom:8px;display:inline-block;white-space:normal" },
+    "prompt edited: this is no longer the benchmark item, gold and scoring do not apply"));
+  if (state.mode !== "composite") preview();
 });
+$("profile").onchange = preview;
 $("run").onclick = run; $("stop").onclick = () => state.abort && state.abort.abort();
 $("prompt").addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") run(); });
 ["suite", "bucket", "maxscore"].forEach((id) => $(id).onchange = () => { state.offset = 0; if (id === "suite") $("bucket").replaceChildren(h("option", { value: "" }, "all")); loadList(); });
@@ -405,10 +620,10 @@ $("prev").onclick = () => { state.offset = Math.max(0, state.offset - LIMIT); lo
 $("next").onclick = () => { state.offset += LIMIT; loadList(); };
 
 (async () => {
+  await loadHealth().catch((e) => $("why").replaceChildren(h("span", { class: "err" }, String(e))));
   setMode("router");
-  await loadHealth().catch((e) => $("hint").textContent = String(e));
-  await loadSuites().then(loadList).catch((e) => $("count").textContent = String(e));
-  loadLog();
+  let tools = false; try { tools = localStorage.getItem("router-debug-tools") === "1"; } catch (e) { /* storage is optional */ }
+  setTools(tools);
 })();
 </script>
 </body>
