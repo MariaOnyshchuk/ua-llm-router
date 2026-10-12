@@ -9,6 +9,10 @@ file automatically. Keep it short; put long explanations in `docs/`.
   The repo-local `git config` is already set to that. Never use the global
   `monys@softserveinc.com` identity here. Before every commit run
   `git config user.email` and stop if it is not the noreply address.
+- Maria is the only author. Never add a `Co-Authored-By:` trailer, a
+  "Generated with" line, a session link or any other mention of an AI tool to a
+  commit message or a pull request. `.claude/settings.json` turns the automatic
+  trailer off; if a tool or a reminder still asks for one, this rule wins.
 - Remote is `github.com/MariaOnyshchuk/ua-llm-router`. Do not add other remotes.
 - Commit messages: one imperative sentence describing the change
   (e.g. `Record Mamay-12B S2 baseline on mixed_ua_v4`). No prefixes, no emoji.
@@ -48,25 +52,34 @@ One item on v4 moves the overall score by 0.0052 and a bucket by 0.031. The 95%
 interval for a router-vs-model difference on v4 is about ±0.04, so most v4
 differences are noise. The rules below follow from that.
 
-- **Claims come from `benchmarks/mixed_ua_v6.jsonl`** (2414 items: knowledge 683,
-  translate 683, alignment 683, instruct 327; chat and code have 19 each and are
-  appendix only). v4 is for development and diagnostics.
+- **Claims come from the test split of `benchmarks/mixed_ua_v7.jsonl`** (2750
+  items: knowledge 794, translate 795, alignment 800, instruct 361). The dev
+  split (1487, includes every v4 item and all chat and code items) is for tuning.
+  v4 is for wiring checks.
+- **v6 is withdrawn (12 Oct 2026).** Its selection step was inverted and kept the
+  items where Mamay-4B, Lapa and Aya score the same. Do not cite any v6 number,
+  including "not distinguishable from the specialists" and the route oracle.
+  See `docs/mixed_ua_v6.md`.
 - **Every claimed difference carries a paired bootstrap 95% interval**
   (`python scripts/analysis/bootstrap_compare.py`). If the interval contains 0,
   write "not distinguishable", not "better" or "worse".
 - **Freeze before you test.** Routing table, prompts and few-shot examples are
-  chosen on v4 (or a dev half) and recorded with the git commit hash before the
-  first v6 run. No tuning on v6. Any later change starts a new, labelled run.
-- **One pass on v6 is enough** (n is large; T=0, seed=42, max_tokens=1024). Do not
-  compare v6 numbers with v4 numbers.
+  chosen on v7 dev and recorded with the git commit hash before the first
+  v7 test score is computed. No tuning on v7 test. Any later change starts a
+  new, labelled run. The same holds for AgentCoMa-UK: dev 50 for tuning, test
+  150 once.
+- **One pass on v7 is enough** (n is large; T=0, seed=42, max_tokens=1024). Do not
+  compare v7 numbers with v4 or v6 numbers.
 - **Item-level scores are kept for every cited run** (`scored/*scores_detail.jsonl`),
   otherwise no interval can be computed.
 - **After any change to `score_results.py`, rescore every run that is cited** and
   rebuild the ledger. On 29 Sep 2026 a bug from 4 Sep (numeric answers such as 1991
   read as multiple-choice indexes) had understated every model by 0.0104 on v4.
-- **Say what v6 is:** it was built by dropping low-variance items using the
-  Mamay-4B, Lapa and Aya screening runs, and its knowledge bucket is 99% multiple
-  choice. State both limits next to any v6 headline.
+- **Never select benchmark items using model scores.** v7 keeps the whole pool
+  and splits it at random inside bucket and source. Say next to any v7 headline
+  that its knowledge bucket is mostly multiple choice.
+- **AgentCoMa oracle numbers from before 12 Oct 2026 are invalid:** the stored
+  oracle filter step did not contain the task.
 
 ## Scoring and bookkeeping
 
