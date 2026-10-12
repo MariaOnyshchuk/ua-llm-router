@@ -432,36 +432,48 @@ test runs.
 | Escalate word problems to Mamay-12B | Decided on 12 Oct: no. Mamay-12B is a reference baseline only. |
 | Run the planner (`hybrid_gated`) on v7 test, or only one-hop rules v2 | Open. v7 items are single-skill, so the planner can only cost calls there; the dev false-split rate is 0.035. One-hop rules v2 is the comparable row to the solo models. |
 
-### What is missing before the test runs can be submitted
+### Jobs for the test runs
 
-The existing jobs cannot run v7 test as they are. Commands are therefore not
-given for those; writing them here would be inventing them.
+The v6 jobs are pinned to the v6 file and to the `results/v6_*` folders, so
+they are not used. Two new jobs take the suite split as a variable, and the
+AgentCoMa jobs now take `MAX_TOKENS` and `REPEATS` (old defaults kept).
+**None of these has been run yet.** They pass `bash -n`; the first real check
+is a dev-split run, which must reproduce the dev numbers in this report.
 
-| Run | Job file | Exists | What is missing |
-|---|---|---|---|
-| v7 test, three specialists and Mamay-12B alone | `cluster/eval_v6_solo.sbatch` | yes | It calls `scripts/week_v6_eval_pipeline.sh`, which pins `V6="benchmarks/mixed_ua_v6.jsonl"` and writes to `results/v6_solos`. It takes no suite or split argument, and `scripts/run_small_router_cluster.py` has no `--split`. Running it would score v6 again and overwrite `results/v6_solos/scores.json`. |
-| v7 test, rules v2 router | `cluster/eval_v6_router.sbatch` | yes | Same pipeline, same pin; writes to `results/v6_rules`. |
-| Mamay-27B FP8 on v7 test | `cluster/eval_v6_solo.sbatch` with `ALIAS=mamay27` | yes | Same pin. |
-| AgentCoMa-UK test, router systems | `cluster/eval_agentcoma_200.sbatch` | yes | Accepts `SPLIT`, `SYSTEMS` and `REPEATS`, but `--max-tokens 256` is hard-coded (line 114). Dev tuning used 1024, and at 256 the reasoning answers are cut off. |
-| AgentCoMa-UK test, one model alone | `cluster/eval_agentcoma_solo.sbatch` | yes | Accepts `SPLIT` and `ALIAS`, but `--max-tokens 256` and `--repeats 1` are hard-coded. |
+| Run | Job | Writes to |
+|---|---|---|
+| One model alone on v7 | `cluster/eval_v7_solo.sbatch` (`ALIAS`, `SPLIT`) | `results/v7_<split>_solos/` |
+| Rules v2 router on v7 | `cluster/eval_v7_router.sbatch` (`SPLIT`) | `results/v7_<split>_router/` |
+| AgentCoMa-UK, router systems | `cluster/eval_agentcoma_200.sbatch` (`SPLIT`, `SYSTEMS`, `REPEATS`, `MAX_TOKENS`) | `results/week_13_agentcoma_200_<split>/` |
+| AgentCoMa-UK, one model alone | `cluster/eval_agentcoma_solo.sbatch` (`ALIAS`, `SPLIT`, `REPEATS`, `MAX_TOKENS`) | same folder, plus the step questions |
 
-Smallest change that closes the gap (to do with Maria, then try once on the
-**dev** split before any test run):
-
-1. A test-only suite file on the lab, made from `benchmarks/mixed_ua_v7.jsonl`
-   by keeping the rows with `"split": "test"` (the dev file
-   `benchmarks/mixed_ua_v7_dev.jsonl` is already there).
-2. A job `cluster/eval_v7.sbatch` copied from the two v6 jobs, with the suite
-   path and the output folder as variables (`results/v7_test_solos`,
-   `results/v7_test_router`), calling `run_small_router_cluster.py` directly.
-3. `MAX_TOKENS` and `REPEATS` as variables in the two AgentCoMa jobs.
-
-Once the two AgentCoMa jobs take `MAX_TOKENS`, their submit lines would be
-(`SPLIT`, `SYSTEMS`, `REPEATS`, `ALIAS` are already supported):
+Step 1, dev check (safe to repeat; compare with the dev table above):
 
 ```bash
+sbatch cluster/eval_v7_router.sbatch
+sbatch --job-name=v7-mamay12 --export=ALL,ALIAS=mamay12 cluster/eval_v7_solo.sbatch
+```
+
+Step 2, test runs, once, after the freeze commit is recorded:
+
+```bash
+SPLIT=test sbatch cluster/eval_v7_router.sbatch
+sbatch --job-name=v7-mamay12 --export=ALL,ALIAS=mamay12,SPLIT=test cluster/eval_v7_solo.sbatch
+sbatch --job-name=v7-mamay4 --export=ALL,ALIAS=mamay4,SPLIT=test cluster/eval_v7_solo.sbatch
+sbatch --job-name=v7-lapa --export=ALL,ALIAS=lapa,SPLIT=test cluster/eval_v7_solo.sbatch
+sbatch --job-name=v7-aya --export=ALL,ALIAS=aya,SPLIT=test cluster/eval_v7_solo.sbatch
+sbatch --job-name=v7-mamay27 --export=ALL,ALIAS=mamay27,SPLIT=test cluster/eval_v7_solo.sbatch
 SPLIT=test SYSTEMS=router_direct,hybrid_gated,oracle REPEATS=3 MAX_TOKENS=1024 sbatch cluster/eval_agentcoma_200.sbatch
 sbatch --job-name=ac-mamay12 --export=ALL,ALIAS=mamay12,SPLIT=test,REPEATS=3,MAX_TOKENS=1024 cluster/eval_agentcoma_solo.sbatch
+```
+
+The router job needs three cards and each solo job one; the node has four and
+is shared, so these do not all fit at once. Submit the router job first.
+
+Step 3, comparison with intervals (after the scored files are pulled back):
+
+```bash
+python scripts/analysis/v7_compare.py --split test --a results/v7_test_router/scores_router_detail.jsonl --b results/v7_test_solos/scores_mamay12_detail.jsonl
 ```
 
 ### Files to copy to the lab first
@@ -473,6 +485,8 @@ checksums before any run:
 |---|---|
 | `router/planner.py` | `hybrid_gated` profile |
 | `router/intent_rules.py` | `v3_instruct` added; `v2` unchanged |
+| `scripts/run_small_router_cluster.py` | new `--split` option |
+| `cluster/eval_v7_solo.sbatch`, `cluster/eval_v7_router.sbatch`, `cluster/eval_agentcoma_200.sbatch`, `cluster/eval_agentcoma_solo.sbatch` | new and changed jobs |
 | `benchmarks/mixed_ua_v7.jsonl` | claim suite (only the dev file is on the lab) |
 | `benchmarks/agentcoma_uk_200_composite.jsonl` | rebuilt with the fixed oracle plan; local only, never in git |
 | `scripts/build_progress_ledger.py`, `tests/` | not needed for the runs |

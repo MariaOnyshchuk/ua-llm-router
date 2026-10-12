@@ -19,7 +19,7 @@
 # benchmarks/agentcoma_uk_200_composite.jsonl are NOT in git: scp them to the
 # lab first. Generation JSONL stays on the lab / HF; only scores come back.
 #
-# Optional env: SPLIT=dev|test  SYSTEMS=...  REPEATS=3
+# Optional env: SPLIT=dev|test  SYSTEMS=...  REPEATS=3  MAX_TOKENS=256
 
 set -euo pipefail
 
@@ -37,6 +37,8 @@ export VLLM_USE_FLASHINFER_SAMPLER=0
 SPLIT="${SPLIT:-dev}"
 SYSTEMS="${SYSTEMS:-router_direct,oracle,hybrid,template}"
 REPEATS="${REPEATS:-3}"
+# 256 is the old default; the hybrid_gated dev runs of 12 Oct used 1024 (reasoning answers are cut at 256).
+MAX_TOKENS="${MAX_TOKENS:-256}"
 OUT_DIR="${ROOT}/results/week_13_agentcoma_200_${SPLIT}"
 BENCH="${ROOT}/benchmarks/agentcoma_uk_200_composite.jsonl"
 
@@ -111,7 +113,7 @@ python scripts/run_composite_router.py \
   --repeats "${REPEATS}" \
   --temperature 0 \
   --seed 42 \
-  --max-tokens 256 \
+  --max-tokens "${MAX_TOKENS}" \
   --out-dir "${OUT_DIR}"
 
 python - "${OUT_DIR}" <<'PY'

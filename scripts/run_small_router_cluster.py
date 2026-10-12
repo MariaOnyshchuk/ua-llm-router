@@ -510,6 +510,11 @@ def main() -> None:
         help="Optional id prefix filter, e.g. zno- for ZNO-only",
     )
     p.add_argument(
+        "--split",
+        default="",
+        help="Keep only rows with this value in their 'split' field (mixed_ua_v7: dev or test).",
+    )
+    p.add_argument(
         "--vram-interval",
         type=float,
         default=0.5,
@@ -549,6 +554,8 @@ def main() -> None:
         items = [x for x in items if x.get("bucket") in buckets]
     if args.id_prefix:
         items = [x for x in items if str(x.get("id", "")).startswith(args.id_prefix)]
+    if args.split:
+        items = [x for x in items if x.get("split") == args.split]
     if not items:
         raise SystemExit(f"No items after filters in {bench_path}")
 
@@ -657,6 +664,8 @@ def main() -> None:
             SEED = base_seed
 
         bench_tag = bench_path.stem
+        if args.split:
+            bench_tag += f"_{args.split}"
         if args.id_prefix:
             bench_tag += (
                 "_zno" if args.id_prefix.startswith("zno") else f"_{args.id_prefix.rstrip('-')}"

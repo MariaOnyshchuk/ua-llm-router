@@ -36,6 +36,9 @@ export VLLM_USE_FLASHINFER_SAMPLER=0
 
 ALIAS="${ALIAS:-mamay12}"
 SPLIT="${SPLIT:-dev}"
+# Old defaults kept; the 12 Oct dev runs used MAX_TOKENS=1024, and the test run needs REPEATS=3.
+REPEATS="${REPEATS:-1}"
+MAX_TOKENS="${MAX_TOKENS:-256}"
 QUANT=""
 case "${ALIAS}" in
   mamay4)  MODEL="INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0"; PORT=8003 ;;
@@ -85,7 +88,7 @@ curl -sf "http://127.0.0.1:${PORT}/v1/models" >/dev/null || { echo "[ac-solo] TI
 
 cd "${ROOT}"
 python scripts/run_composite_router.py --bench "${COMPOSITE}" --systems "${ALIAS}" \
-  --split "${SPLIT}" --repeats 1 --temperature 0 --seed 42 --max-tokens 256 \
+  --split "${SPLIT}" --repeats "${REPEATS}" --temperature 0 --seed 42 --max-tokens "${MAX_TOKENS}" \
   --out-dir "${COMP_DIR}"
 python scripts/run_agentcoma_steps.py run --alias "${ALIAS}" --split "${SPLIT}" \
   --out-dir "results/week_13_agentcoma_steps/${SPLIT}"
