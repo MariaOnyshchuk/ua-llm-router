@@ -1,0 +1,66 @@
+{
+  "suite": "mixed_ua_v7",
+  "pool": "benchmarks/mixed_ua_v6_screen.jsonl",
+  "pool_sha1": "81c10b46fb1a0be864de430741df30d4356b6e32",
+  "selection": "none (every pool item kept); split is random inside bucket/source strata",
+  "kept_together": "both directions of a FLORES or WMT-22 sentence pair; items with an identical prompt",
+  "seed": 42,
+  "dev_share": 0.3333333333333333,
+  "n": 4237,
+  "forced_dev_from_v4": 128,
+  "claim_buckets": [
+    "knowledge",
+    "translate",
+    "alignment",
+    "instruct"
+  ],
+  "appendix_buckets": [
+    "chat",
+    "code"
+  ],
+  "by_split_bucket": {
+    "dev": {
+      "alignment": 400,
+      "chat": 32,
+      "code": 32,
+      "instruct": 212,
+      "knowledge": 406,
+      "translate": 405
+    },
+    "test": {
+      "alignment": 800,
+      "instruct": 361,
+      "knowledge": 794,
+      "translate": 795
+    }
+  },
+  "by_split_stratum": {
+    "dev": {
+      "alignment/ualign-ethics": 127,
+      "alignment/ualign-social": 273,
+      "chat/chat": 32,
+      "code/code": 32,
+      "instruct/if": 32,
+      "instruct/ifeval": 180,
+      "knowledge/arc": 100,
+      "knowledge/belebele": 83,
+      "knowledge/know": 8,
+      "knowledge/mmlu": 92,
+      "knowledge/zno": 123,
+      "translate/flores": 199,
+      "translate/tr": 8,
+      "translate/wmt22": 198
+    },
+    "test": {
+      "alignment/ualign-ethics": 254,
+      "alignment/ualign-social": 546,
+      "instruct/ifeval": 361,
+      "knowledge/arc": 200,
+      "knowledge/belebele": 165,
+      "knowledge/mmlu": 183,
+      "knowledge/zno": 246,
+      "translate/flores": 398,
+      "translate/wmt22": 397
+    }
+  }
+}

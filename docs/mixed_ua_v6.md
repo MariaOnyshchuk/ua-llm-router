@@ -1,5 +1,19 @@
 # mixed_ua_v6 methods
 
+> **Withdrawn as the claim suite on 12 Oct 2026.** The curation step was
+> inverted: `curate_discriminative_suite.py` sorted items by variance, highest
+> first, and kept `pool[drop_n:]`, so it dropped the 43% of items with the
+> **highest** between-model variance and kept the lowest. On the kept items
+> Mamay-4B, Lapa and Aya get the same score on 99% (knowledge), 99.9%
+> (alignment) and 94% (instruct) of items; on the dropped items almost never
+> (`results/analysis/v6_selection_check.json`,
+> `docs/figures/v6_selection_effect.png`). v6 therefore cannot show a routing
+> effect, and its gap to Mamay-12B (which was not used for selection) is biased
+> against the router. The file stays frozen for the record. The script is
+> fixed. Claims move to `mixed_ua_v7` (whole pool, no score-based selection;
+> `scripts/benchmarks/build_mixed_ua_v7.py`). The text below describes the
+> intent, not what the file contains.
+
 Validate the **measuring instrument** before choosing a router architecture (tinyBenchmarks / IRT-inspired curation). Historical suites `mixed_ua_v3`–`v5` stay frozen. **Do not quote screening-pool means as thesis scores** — those items were drawn to *find* a suite, not to report quality.
 
 ## Why a smaller suite is still valid

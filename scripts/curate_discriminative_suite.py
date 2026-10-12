@@ -60,6 +60,18 @@ def proxy_stats(scores: dict[str, float]) -> tuple[float, float]:
     return (var, mean)
 
 
+def keep_high_variance(pool: list[dict], drop_frac: float) -> list[dict]:
+    """Drop the ``drop_frac`` share of items with the LOWEST between-model variance.
+
+    Until 12 Oct 2026 this step kept ``pool[drop_n:]`` of a list sorted by variance
+    descending, which dropped the highest-variance items instead. The frozen
+    ``mixed_ua_v6.jsonl`` was built that way; see docs/mixed_ua_v6.md.
+    """
+    ranked = sorted(pool, key=lambda r: (-float(r["_var"]), str(r.get("id"))))
+    drop_n = int(math.floor(len(ranked) * drop_frac))
+    return ranked[: len(ranked) - drop_n] if drop_n < len(ranked) else ranked
+
+
 def difficulty_balanced(rows: list[dict], n: int, rng: random.Random) -> list[dict]:
     if n >= len(rows):
         return rows[:]
@@ -149,9 +161,7 @@ def main() -> None:
         if not pool:
             bucket_meta[bucket] = {"selected": 0, "pool": 0, "note": "empty"}
             continue
-        pool.sort(key=lambda r: (-float(r["_var"]), str(r.get("id"))))
-        drop_n = int(math.floor(len(pool) * args.drop_frac))
-        kept = pool[drop_n:] if drop_n < len(pool) else pool[:]
+        kept = keep_high_variance(pool, args.drop_frac)
         headline = bucket in HEADLINE
         target = n_star if headline else len(kept)
         if bucket in APPENDIX and not args.keep_appendix:

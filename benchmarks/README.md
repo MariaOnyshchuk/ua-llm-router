@@ -27,7 +27,8 @@ See `corpus/README.md`.
 | `mixed_ua_v3.jsonl` | 182 | messy (tr56/al48/…) | Historical week 3–4 bake-off |
 | **`mixed_ua_v4_balanced.jsonl`** | **192** | **32×6** | Historical eval (weeks 6–10) |
 | `mixed_ua_v6_screen.jsonl` | 4237 | warehouse draw | Discriminability screening (not for claims) |
-| **`mixed_ua_v6.jsonl`** | **2414** | 683×3 + instruct 327; chat/code appendix | **Eval freeze** — [`docs/mixed_ua_v6.md`](../docs/mixed_ua_v6.md) |
+| `mixed_ua_v6.jsonl` | 2414 | 683×3 + instruct 327; chat/code appendix | Withdrawn 12 Oct 2026 (inverted selection) — [`docs/mixed_ua_v6.md`](../docs/mixed_ua_v6.md) |
+| **`mixed_ua_v7.jsonl`** | **4237** | whole screening pool; dev 1487, test 2750 (knowledge 794, translate 795, alignment 800, instruct 361) | **Claim suite.** No score-based selection; v4 items forced to dev. Build: `scripts/benchmarks/build_mixed_ua_v7.py` |
 
 ## Tiny samples (`samples/`) — legacy / hand extras only
 

@@ -1,0 +1,122 @@
+{
+ "source": "results/v6_screen/scores_screen_detail.jsonl",
+ "note": "Screening scores (not for claims). Mamay-12B screening pass is incomplete (HTTP 0), so it is not shown.",
+ "buckets": {
+  "knowledge": {
+   "kept_in_v6": {
+    "n": 683,
+    "mean_variance": 0.002,
+    "all_three_same_score": 0.991,
+    "mamay4": 0.7335,
+    "lapa": 0.7379,
+    "aya": 0.7335,
+    "route_oracle": 0.7394
+   },
+   "dropped": {
+    "n": 517,
+    "mean_variance": 0.2218,
+    "all_three_same_score": 0.002,
+    "mamay4": 0.2785,
+    "lapa": 0.7698,
+    "aya": 0.4971,
+    "route_oracle": 0.9981
+   },
+   "full_pool": {
+    "n": 1200,
+    "mean_variance": 0.0967,
+    "all_three_same_score": 0.565,
+    "mamay4": 0.5375,
+    "lapa": 0.7517,
+    "aya": 0.6317,
+    "route_oracle": 0.8508
+   }
+  },
+  "translate": {
+   "kept_in_v6": {
+    "n": 683,
+    "mean_variance": 0.002,
+    "all_three_same_score": 0.092,
+    "mamay4": 0.6345,
+    "lapa": 0.6472,
+    "aya": 0.646,
+    "route_oracle": 0.6794
+   },
+   "dropped": {
+    "n": 517,
+    "mean_variance": 0.0983,
+    "all_three_same_score": 0.002,
+    "mamay4": 0.7261,
+    "lapa": 0.1677,
+    "aya": 0.7466,
+    "route_oracle": 0.7912
+   },
+   "full_pool": {
+    "n": 1200,
+    "mean_variance": 0.0435,
+    "all_three_same_score": 0.053,
+    "mamay4": 0.6739,
+    "lapa": 0.4406,
+    "aya": 0.6893,
+    "route_oracle": 0.7276
+   }
+  },
+  "alignment": {
+   "kept_in_v6": {
+    "n": 683,
+    "mean_variance": 0.0003,
+    "all_three_same_score": 0.999,
+    "mamay4": 0.6764,
+    "lapa": 0.6764,
+    "aya": 0.675,
+    "route_oracle": 0.6764
+   },
+   "dropped": {
+    "n": 517,
+    "mean_variance": 0.138,
+    "all_three_same_score": 0.379,
+    "mamay4": 0.5242,
+    "lapa": 0.764,
+    "aya": 0.6576,
+    "route_oracle": 0.9323
+   },
+   "full_pool": {
+    "n": 1200,
+    "mean_variance": 0.0596,
+    "all_three_same_score": 0.732,
+    "mamay4": 0.6108,
+    "lapa": 0.7142,
+    "aya": 0.6675,
+    "route_oracle": 0.7867
+   }
+  },
+  "instruct": {
+   "kept_in_v6": {
+    "n": 327,
+    "mean_variance": 0.0015,
+    "all_three_same_score": 0.939,
+    "mamay4": 0.524,
+    "lapa": 0.5148,
+    "aya": 0.5148,
+    "route_oracle": 0.528
+   },
+   "dropped": {
+    "n": 246,
+    "mean_variance": 0.1415,
+    "all_three_same_score": 0.0,
+    "mamay4": 0.6335,
+    "lapa": 0.4092,
+    "aya": 0.4912,
+    "route_oracle": 0.8875
+   },
+   "full_pool": {
+    "n": 573,
+    "mean_variance": 0.0616,
+    "all_three_same_score": 0.536,
+    "mamay4": 0.571,
+    "lapa": 0.4695,
+    "aya": 0.5047,
+    "route_oracle": 0.6824
+   }
+  }
+ }
+}

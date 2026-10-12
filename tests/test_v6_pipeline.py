@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from router.intent_rules import route_intent
-from scripts.curate_discriminative_suite import difficulty_balanced, proxy_stats
+from scripts.curate_discriminative_suite import difficulty_balanced, keep_high_variance, proxy_stats
 from scripts.extract_ua_leaderboard import (
     rows_from_arc,
     rows_from_belebele,
@@ -157,6 +157,12 @@ class CuratorTests(unittest.TestCase):
         rows = [{"id": str(i), "_mean": i / 9} for i in range(9)]
         picked = difficulty_balanced(rows, 3, __import__("random").Random(0))
         self.assertEqual(len(picked), 3)
+
+    def test_low_variance_items_are_the_ones_dropped(self) -> None:
+        pool = [{"id": str(i), "_var": i / 10} for i in range(10)]
+        kept = keep_high_variance(pool, 0.4)
+        self.assertEqual(len(kept), 6)
+        self.assertEqual(min(r["_var"] for r in kept), 0.4)
 
 
 class LearnedRouterTests(unittest.TestCase):
