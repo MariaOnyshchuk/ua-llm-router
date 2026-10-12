@@ -1,0 +1,218 @@
+{
+  "overall": {
+    "n": 400,
+    "split": {
+      "k": 273,
+      "rate": 0.6825,
+      "ci_low": 0.6353,
+      "ci_high": 0.7262
+    },
+    "fallback": {
+      "k": 100,
+      "rate": 0.25,
+      "ci_low": 0.2101,
+      "ci_high": 0.2947
+    },
+    "correct": {
+      "k": 25,
+      "rate": 0.0625,
+      "ci_low": 0.0427,
+      "ci_high": 0.0906
+    },
+    "repaired": {
+      "k": 102,
+      "rate": 0.255,
+      "ci_low": 0.2148,
+      "ci_high": 0.2999
+    },
+    "truncated": {
+      "k": 103,
+      "rate": 0.2575,
+      "ci_low": 0.2171,
+      "ci_high": 0.3025
+    },
+    "steps": {
+      "1": 127,
+      "2": 220,
+      "3": 52,
+      "4": 1
+    },
+    "latency_p50_ms": 7756.2
+  },
+  "by_bucket": {
+    "knowledge": {
+      "n": 100,
+      "split": {
+        "k": 44,
+        "rate": 0.44,
+        "ci_low": 0.3467,
+        "ci_high": 0.5377
+      },
+      "fallback": {
+        "k": 56,
+        "rate": 0.56,
+        "ci_low": 0.4623,
+        "ci_high": 0.6533
+      },
+      "correct": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "repaired": {
+        "k": 57,
+        "rate": 0.57,
+        "ci_low": 0.4722,
+        "ci_high": 0.6627
+      },
+      "truncated": {
+        "k": 58,
+        "rate": 0.58,
+        "ci_low": 0.4821,
+        "ci_high": 0.672
+      },
+      "steps": {
+        "1": 56,
+        "2": 8,
+        "3": 35,
+        "4": 1
+      },
+      "latency_p50_ms": 23451.7
+    },
+    "translate": {
+      "n": 100,
+      "split": {
+        "k": 99,
+        "rate": 0.99,
+        "ci_low": 0.9455,
+        "ci_high": 0.9982
+      },
+      "fallback": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "correct": {
+        "k": 1,
+        "rate": 0.01,
+        "ci_low": 0.0018,
+        "ci_high": 0.0545
+      },
+      "repaired": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "truncated": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "steps": {
+        "1": 1,
+        "2": 98,
+        "3": 1
+      },
+      "latency_p50_ms": 6642.1
+    },
+    "alignment": {
+      "n": 100,
+      "split": {
+        "k": 75,
+        "rate": 0.75,
+        "ci_low": 0.657,
+        "ci_high": 0.8245
+      },
+      "fallback": {
+        "k": 1,
+        "rate": 0.01,
+        "ci_low": 0.0018,
+        "ci_high": 0.0545
+      },
+      "correct": {
+        "k": 24,
+        "rate": 0.24,
+        "ci_low": 0.1669,
+        "ci_high": 0.3323
+      },
+      "repaired": {
+        "k": 1,
+        "rate": 0.01,
+        "ci_low": 0.0018,
+        "ci_high": 0.0545
+      },
+      "truncated": {
+        "k": 1,
+        "rate": 0.01,
+        "ci_low": 0.0018,
+        "ci_high": 0.0545
+      },
+      "steps": {
+        "1": 25,
+        "2": 71,
+        "3": 4
+      },
+      "latency_p50_ms": 6916.3
+    },
+    "instruct": {
+      "n": 100,
+      "split": {
+        "k": 55,
+        "rate": 0.55,
+        "ci_low": 0.4524,
+        "ci_high": 0.6439
+      },
+      "fallback": {
+        "k": 43,
+        "rate": 0.43,
+        "ci_low": 0.3373,
+        "ci_high": 0.5278
+      },
+      "correct": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "repaired": {
+        "k": 44,
+        "rate": 0.44,
+        "ci_low": 0.3467,
+        "ci_high": 0.5377
+      },
+      "truncated": {
+        "k": 44,
+        "rate": 0.44,
+        "ci_low": 0.3467,
+        "ci_high": 0.5377
+      },
+      "steps": {
+        "1": 45,
+        "2": 43,
+        "3": 12
+      },
+      "latency_p50_ms": 10790.1
+    }
+  },
+  "intents_in_split_plans": {
+    "translate": 210,
+    "instruct": 126,
+    "code": 81,
+    "alignment": 74,
+    "knowledge": 70,
+    "chat": 39
+  },
+  "settings": {
+    "profile": "hybrid",
+    "planner": "mamay4",
+    "n_per_bucket": 100,
+    "seed": 42,
+    "max_tokens": 256,
+    "bench": "logs/mixed_ua_v7_dev.jsonl",
+    "temperature": 0.0
+  }
+}

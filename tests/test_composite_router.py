@@ -18,7 +18,13 @@ from router.orchestrator import (
     render_prompt,
     validate_plan,
 )
-from router.planner import enforce_final_constraint, generate_plan, SYSTEM_INSTRUCTION_V3_MINIMAL
+from router.planner import (
+    SYSTEM_INSTRUCTION_V3_MINIMAL,
+    THINK_SUFFIX,
+    enforce_final_constraint,
+    generate_plan,
+    is_word_problem,
+)
 from router.workflows import select_plan, select_template
 from scripts.build_agentcoma_benchmark import wrap_row
 from scripts.build_composite_benchmark import (
@@ -92,6 +98,18 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(wrapped["oracle_plan"]["steps"][1]["intent"], "instruct")
         self.assertEqual(wrapped["prompt"], "Скільки предметів підуть у шафу?")
         self.assertNotIn("5", wrapped["prompt"])
+        # Both oracle steps must see the task; the filter step once did not.
+        for step in wrapped["oracle_plan"]["steps"]:
+            self.assertIn("Скільки предметів підуть у шафу?", step["prompt"])
+        with_sub = wrap_row(
+            {
+                "id": "x",
+                "question_composition_uk": "Скільки предметів підуть у шафу?",
+                "question_commonsense_uk": "Які предмети підуть у шафу?",
+                "answer_composition": 5,
+            }
+        )
+        self.assertIn("Які предмети підуть у шафу?", with_sub["oracle_plan"]["steps"][0]["prompt"])
         self.assertNotIn("5", wrapped["oracle_plan"]["steps"][0]["prompt"])
         self.assertEqual(wrapped["split"], "dev")
 
@@ -535,6 +553,78 @@ class ScoringAndExecutionTests(unittest.TestCase):
         self.assertTrue(body["complete"])
         self.assertEqual(body["calls"], 3)
         self.assertEqual([step["alias"] for step in body["steps"]], ["aya", "mamay4"])
+
+
+
+class GatedPlannerTests(unittest.TestCase):
+    def _run(self, prompt: str, reply: str):
+        calls: list[str] = []
+
+        async def caller(alias: str, text: str) -> dict:
+            calls.append(alias)
+            return {"ok": True, "content": reply}
+
+        plan, meta = asyncio.run(generate_plan(prompt, caller, profile="hybrid_gated"))
+        return plan, meta, calls
+
+    def test_word_problem_rule(self) -> None:
+        self.assertTrue(is_word_problem("У кімнаті 3 столи і 4 стільці на кожен. Скільки всього стільців?"))
+        self.assertFalse(is_word_problem("Який фільм 2020 року порадиш подивитись?"))
+        self.assertFalse(is_word_problem("Що подарувати татові на 60-річчя? Він любить риболовлю."))
+        self.assertFalse(is_word_problem("Скільки буде 2+2? Відповідай лише цифрою (A, B, C)?"))
+
+    def test_word_problem_skips_the_planner(self) -> None:
+        prompt = "У кімнаті 3 столи і 4 стільці на кожен. Скільки всього стільців?"
+        plan, meta, calls = self._run(prompt, "unused")
+        self.assertEqual(calls, [])
+        self.assertEqual(len(plan.steps), 1)
+        self.assertEqual(plan.steps[0].prompt, prompt + THINK_SUFFIX)
+        self.assertEqual(meta["gate"], "single_word_problem")
+
+    def test_single_task_keeps_the_users_words(self) -> None:
+        prompt = "Що подарувати татові на 60-річчя? Він любить риболовлю."
+        plan, meta, calls = self._run(prompt, '{"steps":[]}')
+        self.assertEqual(len(calls), 1)
+        self.assertEqual([s.prompt for s in plan.steps], [prompt])
+        self.assertEqual(meta["gate"], "single")
+
+    def test_multi_step_plan_carries_the_request(self) -> None:
+        prompt = "Переклади українською 'early bird' і поясни значення."
+        reply = (
+            '{"steps":[{"id":"step1","intent":"translate","depends_on":[],"prompt":"Переклади early bird"},'
+            '{"id":"step2","intent":"instruct","depends_on":["step1"],"prompt":"Поясни {{step1.content}}"}]}'
+        )
+        plan, meta, _ = self._run(prompt, reply)
+        self.assertEqual(len(plan.steps), 2)
+        # Only the last step sees the whole request; an earlier step that saw it did the whole task.
+        self.assertNotIn(prompt, plan.steps[0].prompt)
+        self.assertIn(prompt, plan.steps[-1].prompt)
+        self.assertNotIn("gate", meta)
+        # The executor returns the last step only, so it must see every earlier result.
+        self.assertEqual(plan.steps[-1].depends_on, ("step1",))
+        self.assertIn("{{step1.content}}", plan.steps[-1].prompt)
+        self.assertIn("лише цю одну дію", plan.steps[0].prompt)
+
+    def test_near_miss_intent_labels_do_not_kill_the_plan(self) -> None:
+        reply = (
+            '{"steps":[{"id":"step1","intent":"knowledge","depends_on":[],"prompt":"Витягни тему"},'
+            '{"id":"step2","intent":"classification","depends_on":["step1"],"prompt":"Класифікуй {{step1.content}}"},'
+            '{"id":"step3","intent":"instruction","depends_on":["step2"],"prompt":"Поверни JSON {{step2.content}}"}]}'
+        )
+        plan, meta, calls = self._run("Витягни тему, класифікуй і поверни JSON.", reply)
+        self.assertEqual([s.intent for s in plan.steps], ["knowledge", "knowledge", "instruct"])
+        self.assertEqual(len(calls), 1)
+        self.assertFalse(meta["fallback"])
+
+    def test_last_step_gets_results_it_did_not_reference(self) -> None:
+        reply = (
+            '{"steps":[{"id":"a","intent":"code","depends_on":[],"prompt":"Напиши функцію"},'
+            '{"id":"b","intent":"translate","depends_on":[],"prompt":"Переклади назву"},'
+            '{"id":"c","intent":"instruct","depends_on":["a"],"prompt":"Поясни {{a.content}}"}]}'
+        )
+        plan, _, _ = self._run("Напиши функцію, переклади назву і поясни.", reply)
+        self.assertEqual(plan.steps[-1].depends_on, ("a", "b"))
+        self.assertIn("{{b.content}}", plan.steps[-1].prompt)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,32 @@
+{
+ "bench": "mixed_ua_composite_v2 dev (60)",
+ "hybrid_gated": 0.675,
+ "router_direct": 0.6183,
+ "diff": 0.0567,
+ "ci95": [
+  -0.005,
+  0.115
+ ],
+ "by_family": {
+  "translate_code": {
+   "hybrid_gated": 0.9583,
+   "router_direct": 0.9792
+  },
+  "knowledge_explain": {
+   "hybrid_gated": 0.8542,
+   "router_direct": 0.875
+  },
+  "translate_knowledge_write": {
+   "hybrid_gated": 0.7083,
+   "router_direct": 0.3542
+  },
+  "extract_classify_write": {
+   "hybrid_gated": 0.5,
+   "router_direct": 0.6333
+  },
+  "translate_summarize_format": {
+   "hybrid_gated": 0.3542,
+   "router_direct": 0.25
+  }
+ }
+}

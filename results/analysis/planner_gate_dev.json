@@ -1,0 +1,85 @@
+{
+ "date": "2026-10-12",
+ "profile": "hybrid_gated",
+ "planner_model": "mamay4",
+ "false_split_on_single_skill": {
+  "bench": "mixed_ua_v7 dev, 100 per claim bucket, seed 42",
+  "hybrid_gated": {
+   "k": 14,
+   "rate": 0.035,
+   "ci_low": 0.021,
+   "ci_high": 0.0579
+  },
+  "hybrid_old": {
+   "k": 273,
+   "rate": 0.6825,
+   "ci_low": 0.6353,
+   "ci_high": 0.7262
+  },
+  "files": [
+   "planner_split_v7dev_hybrid_gated.json",
+   "planner_split_v7dev_hybrid.json"
+  ]
+ },
+ "plans_built_on_composite": {
+  "bench": "mixed_ua_composite_v2 dev (60)",
+  "planned": 60,
+  "exact_intent_sequence": 46,
+  "same_model_sequence": 57,
+  "by_family": {
+   "translate_code": {
+    "planned": 12,
+    "exact": 2,
+    "fallback": 0
+   },
+   "knowledge_explain": {
+    "planned": 12,
+    "exact": 12,
+    "fallback": 0
+   },
+   "translate_knowledge_write": {
+    "planned": 12,
+    "exact": 12,
+    "fallback": 0
+   },
+   "extract_classify_write": {
+    "planned": 12,
+    "exact": 8,
+    "fallback": 0
+   },
+   "translate_summarize_format": {
+    "planned": 12,
+    "exact": 12,
+    "fallback": 0
+   }
+  },
+  "note": "instruct and code both route to Mamay-4B, so translate > instruct instead of translate > code runs the same models."
+ },
+ "history": [
+  {
+   "prompt": "gate only, no intent definitions",
+   "false_split": 0.09,
+   "planned": 52,
+   "exact": 10
+  },
+  {
+   "prompt": "+ intent definitions",
+   "false_split": 0.21,
+   "planned": 56,
+   "exact": 46
+  },
+  {
+   "prompt": "+ single-symbol rule, \"one text with format rules is one task\"",
+   "false_split": 0.03,
+   "planned": 46,
+   "exact": 33
+  },
+  {
+   "prompt": "+ intent label normalisation (final)",
+   "false_split": 0.035,
+   "planned": 60,
+   "exact": 46
+  }
+ ],
+ "caveat": "Prompt and rules were tuned on these same dev sets. composite v2 test (60) and AgentCoMa test (150) are untouched."
+}

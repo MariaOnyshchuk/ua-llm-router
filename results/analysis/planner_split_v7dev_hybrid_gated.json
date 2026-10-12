@@ -1,0 +1,206 @@
+{
+  "overall": {
+    "n": 400,
+    "split": {
+      "k": 14,
+      "rate": 0.035,
+      "ci_low": 0.021,
+      "ci_high": 0.0579
+    },
+    "fallback": {
+      "k": 23,
+      "rate": 0.0575,
+      "ci_low": 0.0386,
+      "ci_high": 0.0848
+    },
+    "correct": {
+      "k": 326,
+      "rate": 0.815,
+      "ci_low": 0.774,
+      "ci_high": 0.85
+    },
+    "repaired": {
+      "k": 23,
+      "rate": 0.0575,
+      "ci_low": 0.0386,
+      "ci_high": 0.0848
+    },
+    "truncated": {
+      "k": 22,
+      "rate": 0.055,
+      "ci_low": 0.0366,
+      "ci_high": 0.0819
+    },
+    "steps": {
+      "1": 386,
+      "2": 14
+    },
+    "latency_p50_ms": 948.1
+  },
+  "by_bucket": {
+    "knowledge": {
+      "n": 100,
+      "split": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "fallback": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "correct": {
+        "k": 99,
+        "rate": 0.99,
+        "ci_low": 0.9455,
+        "ci_high": 0.9982
+      },
+      "repaired": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "truncated": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "steps": {
+        "1": 100
+      },
+      "latency_p50_ms": 0
+    },
+    "translate": {
+      "n": 100,
+      "split": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "fallback": {
+        "k": 1,
+        "rate": 0.01,
+        "ci_low": 0.0018,
+        "ci_high": 0.0545
+      },
+      "correct": {
+        "k": 99,
+        "rate": 0.99,
+        "ci_low": 0.9455,
+        "ci_high": 0.9982
+      },
+      "repaired": {
+        "k": 1,
+        "rate": 0.01,
+        "ci_low": 0.0018,
+        "ci_high": 0.0545
+      },
+      "truncated": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "steps": {
+        "1": 100
+      },
+      "latency_p50_ms": 4009.6
+    },
+    "alignment": {
+      "n": 100,
+      "split": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "fallback": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "correct": {
+        "k": 100,
+        "rate": 1.0,
+        "ci_low": 0.963,
+        "ci_high": 1.0
+      },
+      "repaired": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "truncated": {
+        "k": 0,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.037
+      },
+      "steps": {
+        "1": 100
+      },
+      "latency_p50_ms": 0
+    },
+    "instruct": {
+      "n": 100,
+      "split": {
+        "k": 14,
+        "rate": 0.14,
+        "ci_low": 0.0853,
+        "ci_high": 0.2214
+      },
+      "fallback": {
+        "k": 22,
+        "rate": 0.22,
+        "ci_low": 0.15,
+        "ci_high": 0.3107
+      },
+      "correct": {
+        "k": 28,
+        "rate": 0.28,
+        "ci_low": 0.2014,
+        "ci_high": 0.3749
+      },
+      "repaired": {
+        "k": 22,
+        "rate": 0.22,
+        "ci_low": 0.15,
+        "ci_high": 0.3107
+      },
+      "truncated": {
+        "k": 22,
+        "rate": 0.22,
+        "ci_low": 0.15,
+        "ci_high": 0.3107
+      },
+      "steps": {
+        "1": 86,
+        "2": 14
+      },
+      "latency_p50_ms": 5641.2
+    }
+  },
+  "intents_in_split_plans": {
+    "instruct": 20,
+    "knowledge": 6,
+    "alignment": 1,
+    "translate": 1
+  },
+  "settings": {
+    "profile": "hybrid_gated",
+    "planner": "mamay4",
+    "n_per_bucket": 100,
+    "seed": 42,
+    "max_tokens": 256,
+    "bench": "logs/mixed_ua_v7_dev.jsonl",
+    "temperature": 0.0
+  }
+}
