@@ -172,7 +172,10 @@ class LearnedRouterTests(unittest.TestCase):
         self.assertEqual(d.intent, "translate")
 
     def test_knn_profile_with_hash_artifacts(self) -> None:
-        from sklearn.neighbors import KNeighborsClassifier
+        try:
+            from sklearn.neighbors import KNeighborsClassifier
+        except ModuleNotFoundError:
+            self.skipTest("scikit-learn is not installed in this environment")
 
         from router import learned as learned_mod
         from router.learned import HashEncoder
