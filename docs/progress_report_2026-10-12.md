@@ -374,6 +374,28 @@ the numbers are tuned-on. The one-symbol rule matches the benchmark wording
 splits are all in instruct (14 of 100). Composite v2 test (60) and AgentCoMa
 test (150) are untouched.
 
+### Instruct routing profile `v3_instruct` (13 Oct, offline)
+
+`results/analysis/v7_dev_instruct_profile.json`. New rules profile: rules v2
+plus one rule that sends an unmatched "write a …" request to Mamay-4B as
+instruct instead of to Aya as chat. Rules v2 is unchanged. Estimated from the
+stored baseline-prompt specialist scores, **dev rows only**; a simulation, not
+a live run (the live rules v2 router scored 0.553 on dev instruct).
+
+| Bucket (dev n) | Rules v2 | `v3_instruct` | Difference | 95% interval | Items rerouted |
+|---|---:|---:|---:|---|---:|
+| instruct (212) | 0.557 | 0.563 | +0.006 | [−0.030, +0.041] | 80 |
+| chat (32, appendix) | 0.875 | 0.922 | +0.047 | [0.000, +0.109] | 18 |
+| knowledge, translate, alignment, code | same | same | 0 | — | 0 |
+| macro of four | 0.672 | 0.673 | +0.001 | [−0.008, +0.010] | |
+
+Not distinguishable from rules v2 on instruct and on the macro. The profile is
+**not recommended**: it moves 80 instruct items to the specialist that is
+better on the bucket average and gains nothing measurable, and it also moves
+18 of 32 chat items. The instruct gap to Mamay-12B (−0.120) is not a routing
+problem among these three models. The profile stays in the code as a recorded
+negative result.
+
 ## Files
 
 - Figures: `docs/figures/*.png`, built by `scripts/analysis/plot_progress_report.py`.

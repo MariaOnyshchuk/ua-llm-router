@@ -157,6 +157,16 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "default": "aya",
         "blurb": "code → Mamay-4B · chat → Aya",
     },
+    # v2 plus one extra rule: an unmatched request that asks to write a text goes to
+    # Mamay-4B as instruct instead of to Aya as chat. Estimated on v7 dev only
+    # (results/analysis/v7_dev_instruct_profile.json). v2 itself is unchanged.
+    "v3_instruct": {
+        "label": "Rules v2 + writing tasks",
+        "remap": {},
+        "default": "aya",
+        "blurb": "v2, but 'write a …' requests → Mamay-4B",
+        "writing_to": "mamay4",
+    },
     "knn": {
         "label": "Learned kNN",
         "remap": {},
@@ -172,6 +182,17 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "learned": "clf",
     },
 }
+
+
+# A request to produce a text: "Напиши…", "Створіть…", "Write a…". Used by v3_instruct only.
+_WRITING_TASK = re.compile(
+    r"(?i)(^|[\s\"«“(])("
+    r"напиш(и|іть)|створ(и|іть)|склад(и|іть)|придума(й|йте)|розгорн(и|іть)|сформулю(й|йте)|"
+    r"перепиш(и|іть)|опиш(и|іть)|підготу(й|йте)|запропону(й|йте)|"
+    r"write|compose|create|draft|rewrite"
+    r")\b",
+    re.U,
+)
 
 
 def route_intent(
@@ -213,6 +234,11 @@ def route_intent(
                     reason = f"{intent} → {target} (profile {profile})"
                 decision = RouteDecision(target, intent, reason)
                 break
+        writing_to = spec.get("writing_to")
+        if decision is None and isinstance(writing_to, str) and _WRITING_TASK.search(text):
+            decision = RouteDecision(
+                writing_to, "instruct", f"writing task → {writing_to} (profile {profile})"
+            )
         if decision is None:
             chat_reason = (
                 "default UA chat → Mamay-4B"

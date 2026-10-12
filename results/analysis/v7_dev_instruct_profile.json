@@ -1,0 +1,104 @@
+{
+ "suite": "mixed_ua_v7",
+ "split": "dev",
+ "profile": "v3_instruct",
+ "against": "v2",
+ "note": "Simulation from stored baseline-prompt specialist scores (runs of 4 Sep, rescored 12 Oct), dev rows only. Not a live run. For reference the live rules v2 router scored 0.553 on dev instruct.",
+ "buckets": {
+  "knowledge": {
+   "n": 406,
+   "v2": 0.7389,
+   "v3_instruct": 0.7389,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "items_rerouted": 0,
+   "verdict": "not distinguishable"
+  },
+  "translate": {
+   "n": 405,
+   "v2": 0.6872,
+   "v3_instruct": 0.6872,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "items_rerouted": 0,
+   "verdict": "not distinguishable"
+  },
+  "alignment": {
+   "n": 400,
+   "v2": 0.7025,
+   "v3_instruct": 0.7025,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "items_rerouted": 0,
+   "verdict": "not distinguishable"
+  },
+  "instruct": {
+   "n": 212,
+   "v2": 0.5574,
+   "v3_instruct": 0.5629,
+   "diff": 0.0055,
+   "ci95": [
+    -0.0299,
+    0.0409
+   ],
+   "items_rerouted": 80,
+   "verdict": "not distinguishable"
+  },
+  "chat": {
+   "n": 32,
+   "v2": 0.875,
+   "v3_instruct": 0.9219,
+   "diff": 0.0469,
+   "ci95": [
+    0.0,
+    0.1094
+   ],
+   "items_rerouted": 18,
+   "verdict": "not distinguishable"
+  },
+  "code": {
+   "n": 32,
+   "v2": 0.9844,
+   "v3_instruct": 0.9844,
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "items_rerouted": 0,
+   "verdict": "not distinguishable"
+  }
+ },
+ "macro4": {
+  "v2": 0.6715,
+  "v3_instruct": 0.6729,
+  "diff": 0.0014,
+  "ci95": [
+   -0.0079,
+   0.0102
+  ],
+  "verdict": "not distinguishable"
+ },
+ "instruct_routes": {
+  "v2": {
+   "mamay4": 79,
+   "aya": 123,
+   "lapa": 10
+  },
+  "v3_instruct": {
+   "mamay4": 159,
+   "aya": 43,
+   "lapa": 10
+  }
+ },
+ "recommendation": "do not adopt"
+}

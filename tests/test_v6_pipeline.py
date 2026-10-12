@@ -171,6 +171,16 @@ class LearnedRouterTests(unittest.TestCase):
         self.assertEqual(d.model, "aya")
         self.assertEqual(d.intent, "translate")
 
+    def test_v3_instruct_only_moves_unmatched_writing_tasks(self) -> None:
+        text = "Напишіть пісню про інновації для підлітків."
+        self.assertEqual(route_intent(text, profile="v2").model, "aya")
+        d = route_intent(text, profile="v3_instruct")
+        self.assertEqual((d.model, d.intent), ("mamay4", "instruct"))
+        hello = "Привіт! Як справи?"
+        self.assertEqual(route_intent(hello, profile="v3_instruct").model, "aya")
+        translate = "Переклади з англійської: write a poem"
+        self.assertEqual(route_intent(translate, profile="v3_instruct").model, "aya")
+
     def test_knn_profile_with_hash_artifacts(self) -> None:
         try:
             from sklearn.neighbors import KNeighborsClassifier

@@ -27,7 +27,9 @@ every step is ticked or blocked.
   plan carries the original request. That is intended (an earlier step that saw
   the whole request did the whole task), and a test asserts it.
 
-- [ ] **3. Try the instruct routing fix, offline, on v7 dev only.**
+- [x] **3. Try the instruct routing fix, offline, on v7 dev only.**
+  Done 13 Oct: profile `v3_instruct` added; instruct +0.006 [−0.030, +0.041], macro +0.001 [−0.008, +0.010]:
+  not distinguishable, not recommended. `results/analysis/v7_dev_instruct_profile.json`.
   On v7 dev, 122 of 212 instruct items are detected as chat and go to Aya
   (0.539) while Mamay-4B scores 0.583. Add a new rules profile (rules v2 stays
   as it is) that keeps these on Mamay-4B. Estimate it from the stored scores
