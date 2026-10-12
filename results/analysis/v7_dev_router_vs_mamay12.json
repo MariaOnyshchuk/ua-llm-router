@@ -1,0 +1,170 @@
+{
+ "suite": "mixed_ua_v7",
+ "split": "dev",
+ "note": "Live runs of 12 Oct 2026, one pass, T=0, seed 42, max_tokens 1024. Router = rules v2 with the alignment few-shot prompt. Mamay-12B row uses the same alignment few-shot prompt (baseline-prompt alignment score given separately). Latency is not comparable: the lab was shared with other jobs during these runs. Test split not scored.",
+ "rows": {
+  "knowledge": {
+   "n": 406,
+   "router": 0.7365,
+   "mamay12": 0.7315,
+   "router_minus_mamay12": {
+    "diff": 0.0049,
+    "ci95": [
+     -0.032,
+     0.0419
+    ],
+    "verdict": "not distinguishable"
+   },
+   "best_single_specialist": "lapa",
+   "router_minus_best_specialist": {
+    "diff": -0.0123,
+    "ci95": [
+     -0.0271,
+     0.0
+    ]
+   },
+   "bucket_fewshot_minus_router": {
+    "diff": -0.032,
+    "ci95": [
+     -0.064,
+     -0.0025
+    ]
+   }
+  },
+  "translate": {
+   "n": 405,
+   "router": 0.6863,
+   "mamay12": 0.6975,
+   "router_minus_mamay12": {
+    "diff": -0.0112,
+    "ci95": [
+     -0.0219,
+     -0.0008
+    ],
+    "verdict": "router lower"
+   },
+   "best_single_specialist": "aya",
+   "router_minus_best_specialist": {
+    "diff": -0.0008,
+    "ci95": [
+     -0.0025,
+     0.0002
+    ]
+   },
+   "bucket_fewshot_minus_router": {
+    "diff": -0.0103,
+    "ci95": [
+     -0.0187,
+     -0.0028
+    ]
+   }
+  },
+  "alignment": {
+   "n": 400,
+   "router": 0.745,
+   "mamay12": 0.7375,
+   "router_minus_mamay12": {
+    "diff": 0.0075,
+    "ci95": [
+     -0.025,
+     0.04
+    ],
+    "verdict": "not distinguishable"
+   },
+   "best_single_specialist": "lapa",
+   "router_minus_best_specialist": {
+    "diff": 0.0425,
+    "ci95": [
+     -0.0125,
+     0.0975
+    ]
+   },
+   "bucket_fewshot_minus_router": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "instruct": {
+   "n": 212,
+   "router": 0.5527,
+   "mamay12": 0.673,
+   "router_minus_mamay12": {
+    "diff": -0.1203,
+    "ci95": [
+     -0.1745,
+     -0.0668
+    ],
+    "verdict": "router lower"
+   },
+   "best_single_specialist": "mamay4",
+   "router_minus_best_specialist": {
+    "diff": -0.0307,
+    "ci95": [
+     -0.0747,
+     0.0134
+    ]
+   },
+   "bucket_fewshot_minus_router": {
+    "diff": -0.0134,
+    "ci95": [
+     -0.0542,
+     0.0267
+    ]
+   }
+  },
+  "macro4": {
+   "n": 1423,
+   "router": 0.6801,
+   "mamay12": 0.7099,
+   "router_minus_mamay12": {
+    "diff": -0.0298,
+    "ci95": [
+     -0.0478,
+     -0.0119
+    ],
+    "verdict": "router lower"
+   },
+   "best_single_specialist": "aya",
+   "router_minus_best_specialist": {
+    "diff": 0.0465,
+    "ci95": [
+     0.0254,
+     0.0687
+    ]
+   },
+   "bucket_fewshot_minus_router": {
+    "diff": -0.0139,
+    "ci95": [
+     -0.0267,
+     -0.001
+    ]
+   }
+  }
+ },
+ "mamay12_alignment_baseline_prompt": 0.73,
+ "latency_avg_ms": {
+  "router": 2168.0,
+  "mamay12": 3999.8
+ },
+ "routed_to": {
+  "knowledge": {
+   "lapa": 396,
+   "mamay4": 6,
+   "aya": 4
+  },
+  "translate": {
+   "aya": 405
+  },
+  "alignment": {
+   "lapa": 400
+  },
+  "instruct": {
+   "mamay4": 79,
+   "aya": 123,
+   "lapa": 10
+  }
+ }
+}

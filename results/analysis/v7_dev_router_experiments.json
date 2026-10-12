@@ -1,0 +1,87 @@
+{
+ "suite": "mixed_ua_v7",
+ "split": "dev",
+ "date": "2026-10-12",
+ "note": "Offline experiments on stored dev answers plus short live calls. One run each. Not claims.",
+ "per_stratum_route_table": {
+  "finding": "Rules v2 already send each source stratum to its best specialist, except instruct/ifeval (Mamay-4B 0.548 vs routed 0.518) and translate/wmt22 en-uk (Lapa 0.558 vs Aya 0.522). Expected macro gain from a per-stratum table: about 0.01."
+ },
+ "first_token_confidence": {
+  "source": "results/v7_confidence/dev_first_token.jsonl",
+  "n": {
+   "knowledge": 406,
+   "alignment": 400
+  },
+  "calibration": "Lapa puts >=0.99 on its first token for 374 of 385 knowledge items and 384 of 400 alignment items while being right on 0.76 and 0.70 of them. Mamay-12B is calibrated (knowledge accuracy 0.29 below 0.5 confidence, 0.98 at >=0.99).",
+  "two_fold_selection": {
+   "calibrated_choice_among_3_specialists_minus_lapa": {
+    "knowledge": [
+     -0.015,
+     -0.032,
+     0.002
+    ],
+    "alignment": [
+     -0.033,
+     -0.058,
+     -0.007
+    ]
+   },
+   "calibrated_choice_with_mamay12_minus_mamay12": {
+    "knowledge": [
+     -0.002,
+     -0.032,
+     0.027
+    ],
+    "alignment": [
+     -0.043,
+     -0.072,
+     -0.015
+    ]
+   },
+   "mamay12_if_confident_else_lapa_minus_mamay12": {
+    "knowledge": [
+     -0.022,
+     -0.054,
+     0.007
+    ],
+    "alignment": [
+     0.0,
+     -0.007,
+     0.007
+    ]
+   }
+  },
+  "caveat": "Answers are the first-token symbol; items whose first token is not an answer symbol count as wrong (Lapa 5% of knowledge items).",
+  "first_token_accuracy_on_parsed_items": {
+   "knowledge": {
+    "lapa": 0.751,
+    "mamay12": 0.742
+   },
+   "alignment": {
+    "lapa": 0.7,
+    "mamay12": 0.728
+   }
+  }
+ },
+ "instruct_second_pass": {
+  "n": 212,
+  "draft": "mamay4 0.583",
+  "mamay4_refines_itself": [
+   -0.005,
+   -0.031,
+   0.022
+  ],
+  "aya_refines_mamay4": [
+   -0.063,
+   -0.111,
+   -0.015
+  ],
+  "format": "[difference, ci_low, ci_high] against the Mamay-4B draft",
+  "lapa_refines_mamay4": [
+   -0.019,
+   -0.05,
+   0.012
+  ]
+ },
+ "verdict": "No gain from confidence-based selection or from a verify-and-fix second pass. Both are dropped."
+}

@@ -1,0 +1,146 @@
+{
+ "suite": "mixed_ua_v7",
+ "split": "dev",
+ "suite_sha1_12": "9f7145b626b2",
+ "note": "Specialists: screening runs of 4 Sep 2026 rescored on 12 Oct 2026 with the current scorer and references. The router row is simulated: the rules v2 route applied to the specialists' baseline-prompt scores (no alignment few-shot, no live router run). Dev only; test scores are not computed before freeze.",
+ "buckets": {
+  "knowledge": {
+   "n": 406,
+   "mamay4": 0.5591,
+   "lapa": 0.7488,
+   "aya": 0.6305,
+   "router_rules_v2_sim": 0.7389,
+   "route_oracle": 0.8325,
+   "routed_to": {
+    "lapa": 396,
+    "mamay4": 6,
+    "aya": 4
+   },
+   "detected_intent": {
+    "knowledge": 392,
+    "code": 3,
+    "instruct": 3,
+    "translate": 4,
+    "alignment": 4
+   },
+   "sim_minus_best_single": {
+    "best": "lapa",
+    "diff": -0.0099,
+    "ci95": [
+     -0.0222,
+     0.0
+    ]
+   }
+  },
+  "translate": {
+   "n": 405,
+   "mamay4": 0.6737,
+   "lapa": 0.4404,
+   "aya": 0.6872,
+   "router_rules_v2_sim": 0.6872,
+   "route_oracle": 0.7246,
+   "routed_to": {
+    "aya": 405
+   },
+   "detected_intent": {
+    "translate": 405
+   },
+   "sim_minus_best_single": {
+    "best": "aya",
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "alignment": {
+   "n": 400,
+   "mamay4": 0.62,
+   "lapa": 0.7025,
+   "aya": 0.6775,
+   "router_rules_v2_sim": 0.7025,
+   "route_oracle": 0.7875,
+   "routed_to": {
+    "lapa": 400
+   },
+   "detected_intent": {
+    "alignment": 400
+   },
+   "sim_minus_best_single": {
+    "best": "lapa",
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "instruct": {
+   "n": 212,
+   "mamay4": 0.5833,
+   "lapa": 0.4788,
+   "aya": 0.5393,
+   "router_rules_v2_sim": 0.5574,
+   "route_oracle": 0.6887,
+   "routed_to": {
+    "mamay4": 79,
+    "aya": 123,
+    "lapa": 10
+   },
+   "detected_intent": {
+    "instruct": 77,
+    "chat": 122,
+    "knowledge": 10,
+    "code": 2,
+    "translate": 1
+   },
+   "sim_minus_best_single": {
+    "best": "mamay4",
+    "diff": -0.0259,
+    "ci95": [
+     -0.0708,
+     0.0165
+    ]
+   }
+  }
+ },
+ "macro4": {
+  "n": 1423,
+  "mamay4": 0.609,
+  "lapa": 0.5926,
+  "aya": 0.6336,
+  "router_rules_v2_sim": 0.6715,
+  "route_oracle": 0.7583,
+  "sim_minus_each_single": {
+   "mamay4": {
+    "diff": 0.0624,
+    "ci95": [
+     0.0432,
+     0.0827
+    ]
+   },
+   "lapa": {
+    "diff": 0.0789,
+    "ci95": [
+     0.0621,
+     0.0965
+    ]
+   },
+   "aya": {
+    "diff": 0.0379,
+    "ci95": [
+     0.0203,
+     0.0557
+    ]
+   }
+  },
+  "oracle_minus_sim": {
+   "diff": 0.0868,
+   "ci95": [
+    0.0723,
+    0.101
+   ]
+  }
+ }
+}
