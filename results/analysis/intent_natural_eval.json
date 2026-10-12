@@ -1,0 +1,2497 @@
+{
+ "classifier": "mamay4",
+ "sets": {
+  "natural": {
+   "n": 72,
+   "methods": {
+    "rules_v2": {
+     "intent_accuracy": 0.361,
+     "intent_ci95": [
+      0.26,
+      0.476
+     ],
+     "model_accuracy": 0.528,
+     "model_ci95": [
+      0.414,
+      0.639
+     ],
+     "by_intent": {
+      "alignment": "1/12",
+      "chat": "12/12",
+      "code": "4/12",
+      "instruct": "2/12",
+      "knowledge": "7/12",
+      "translate": "0/12"
+     }
+    },
+    "llm": {
+     "intent_accuracy": 0.819,
+     "intent_ci95": [
+      0.715,
+      0.891
+     ],
+     "model_accuracy": 0.875,
+     "model_ci95": [
+      0.779,
+      0.933
+     ],
+     "by_intent": {
+      "alignment": "12/12",
+      "chat": "11/12",
+      "code": "12/12",
+      "instruct": "4/12",
+      "knowledge": "12/12",
+      "translate": "8/12"
+     }
+    },
+    "hybrid": {
+     "intent_accuracy": 0.847,
+     "intent_ci95": [
+      0.747,
+      0.912
+     ],
+     "model_accuracy": 0.903,
+     "model_ci95": [
+      0.813,
+      0.952
+     ],
+     "by_intent": {
+      "alignment": "12/12",
+      "chat": "11/12",
+      "code": "12/12",
+      "instruct": "6/12",
+      "knowledge": "12/12",
+      "translate": "8/12"
+     }
+    }
+   },
+   "llm_unusable_replies": 0,
+   "llm_latency_p50_ms": 275.6,
+   "hybrid_share_of_requests_sent_to_llm": 0.806,
+   "items": [
+    {
+     "id": "nat-translate-01",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-02",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-03",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-translate-04",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-05",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-06",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-07",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-translate-08",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-09",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-translate-10",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-11",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "nat-translate-12",
+     "gold": "translate",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-01",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-02",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-03",
+     "gold": "knowledge",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-04",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-05",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-06",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-07",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-08",
+     "gold": "knowledge",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-09",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-10",
+     "gold": "knowledge",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-11",
+     "gold": "knowledge",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-knowledge-12",
+     "gold": "knowledge",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-alignment-01",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-02",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-03",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-04",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-05",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-06",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-07",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-08",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-09",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-10",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-11",
+     "gold": "alignment",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-alignment-12",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "nat-instruct-01",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-instruct-02",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-instruct-03",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "nat-instruct-04",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "nat-instruct-05",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "nat-instruct-06",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-instruct-07",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-instruct-08",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "nat-instruct-09",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "nat-instruct-10",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-instruct-11",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-instruct-12",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "nat-code-01",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-02",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-03",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-04",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-05",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-06",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-07",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-08",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-09",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-10",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-11",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-code-12",
+     "gold": "code",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "nat-chat-01",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-02",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "nat-chat-03",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-04",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-05",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-06",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-07",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-08",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-09",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-10",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-11",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "nat-chat-12",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    }
+   ]
+  },
+  "v7_dev_sample": {
+   "n": 264,
+   "methods": {
+    "rules_v2": {
+     "intent_accuracy": 0.867,
+     "intent_ci95": [
+      0.821,
+      0.903
+     ],
+     "model_accuracy": 0.867,
+     "model_ci95": [
+      0.821,
+      0.903
+     ],
+     "by_intent": {
+      "alignment": "50/50",
+      "chat": "31/32",
+      "code": "32/32",
+      "instruct": "16/50",
+      "knowledge": "50/50",
+      "translate": "50/50"
+     }
+    },
+    "llm": {
+     "intent_accuracy": 0.814,
+     "intent_ci95": [
+      0.763,
+      0.857
+     ],
+     "model_accuracy": 0.83,
+     "model_ci95": [
+      0.78,
+      0.87
+     ],
+     "by_intent": {
+      "alignment": "50/50",
+      "chat": "30/32",
+      "code": "32/32",
+      "instruct": "7/50",
+      "knowledge": "46/50",
+      "translate": "50/50"
+     }
+    },
+    "hybrid": {
+     "intent_accuracy": 0.879,
+     "intent_ci95": [
+      0.834,
+      0.913
+     ],
+     "model_accuracy": 0.883,
+     "model_ci95": [
+      0.838,
+      0.916
+     ],
+     "by_intent": {
+      "alignment": "50/50",
+      "chat": "29/32",
+      "code": "32/32",
+      "instruct": "21/50",
+      "knowledge": "50/50",
+      "translate": "50/50"
+     }
+    }
+   },
+   "llm_unusable_replies": 1,
+   "llm_latency_p50_ms": 273.7,
+   "hybrid_share_of_requests_sent_to_llm": 0.246,
+   "items": [
+    {
+     "id": "zno-his-20-20-2915",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_7196263",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-MCAS_2004_8_3",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "code",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-14-14-724",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikinews.org-wiki-Icelandic_Hekla_volcano_shows_signs_of_activity",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "chat",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-Wikijunior:United_States_Charters_of_Freedom-Decla",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-Wikijunior:Ancient_Civilizations-Babylonians",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_7274348",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-12-12-636",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_7179358",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-his-47-47-3747",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "mmlu-us_foreign_policy-13635",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_7085820",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-geo-29-29-4706",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "mmlu-formal_logic-14600",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-MCAS_2013_5_29411",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-MCAS_2010_5_11998",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_7116253",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-Modern_Photography-Format",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-Wikijunior:Biology-Kingdoms-Plants",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "mmlu-medical_genetics-7350",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-his-03-3-2252",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-MCAS_2005_8_2",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-geo-08-8-4135",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-American_Revolution-The_Battles_of_Trenton_and_Pri",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-07-7-374",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-his-26-26-3132",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-03-3-167",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "mmlu-electrical_engineering-1924",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "code",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-Philippine_History-The_Philippine-American_War",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "mmlu-high_school_government_and_politics-3798",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-geo-28-28-4691",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikinews.org-wiki-Judge_orders_Baltimore_City_prison_to_produce_plan_",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-ACTAAP_2014_7_3",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-23-23-1169",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_SC_407302",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-01-1-89",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikivoyage.org-wiki-New_Mexico_Pueblos",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "chat",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_SC_405928",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikibooks.org-wiki-Introduction_to_Sociology-Society",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-28-28-1381",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikivoyage.org-wiki-Moldova",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "mmlu-astronomy-253",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_7138390",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "know-001",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikivoyage.org-wiki-South_Pole",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-his-04-4-2274",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "belebele-https:--en.wikinews.org-wiki-Former_Yugoslavian_footballer_Stjepan_Bobek_dies_ag",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "arc-Mercury_176855",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "zno-ukr-11-11-559",
+     "gold": "knowledge",
+     "rules_v2": "knowledge",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "wmt22-en-uk-test-145",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-384",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-devtest-323",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-842",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-dev-858",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-537",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-947",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1191",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1120",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-667",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-793",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-devtest-926",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1922",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-dev-798",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-dev-609",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1491",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-401",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-85",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-859",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-444",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-devtest-131",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-873",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-830",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-1382",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1274",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-718",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-devtest-682",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-795",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-596",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-206",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1630",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-750",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1902",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-172",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1400",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-dev-802",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-991",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-en-uk-devtest-734",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-36",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-497",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-556",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-1452",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-772",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1310",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1766",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-en-uk-test-588",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-dev-302",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-1733",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "flores-uk-en-devtest-235",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "wmt22-uk-en-test-823",
+     "gold": "translate",
+     "rules_v2": "translate",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "ualign-social-3634",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0419",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1592",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0239",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0382",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1077",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0099",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0507",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1465",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2313",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-3247",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2902",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1881",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1039",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2796",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1588",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1168",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0086",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1165",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1694",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-3358",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2279",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2166",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0080",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-3371",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2371",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1408",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2359",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1073",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0775",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1531",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1164",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1939",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1864",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0758",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-3449",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0347",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0956",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1190",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2627",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-1211",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-3033",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1333",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2414",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-ethics-0489",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0948",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0906",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-1622",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-2055",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ualign-social-0022",
+     "gold": "alignment",
+     "rules_v2": "alignment",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ifeval-2765",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "if-003",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "knowledge",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3281",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3415",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "if-030",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3754",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "alignment",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-2691",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-3513",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-1746",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3565",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-3089",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-2010",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "if-029",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "code",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-1886",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-2305",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-1128",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "alignment",
+     "hybrid": "alignment"
+    },
+    {
+     "id": "ifeval-2359",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "if-001",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "code",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3749",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "ifeval-3536",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-1739",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "ifeval-2517",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-1237",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-2585",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "if-028",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-2985",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "ifeval-1893",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-3025",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "knowledge",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3453",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "ifeval-2905",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-1305",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-1127",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-2143",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-1162",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-2739",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "translate",
+     "hybrid": "translate"
+    },
+    {
+     "id": "ifeval-2662",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-3549",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-286",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "ifeval-1964",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-2465",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "if-005",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3653",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "ifeval-2078",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-1922",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "ifeval-1659",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "if-015",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "ifeval-3150",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "knowledge",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "ifeval-281",
+     "gold": "instruct",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "if-021",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "code",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "if-022",
+     "gold": "instruct",
+     "rules_v2": "instruct",
+     "llm": "chat",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "chat-032",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-027",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-003",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-025",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-018",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "chat-029",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-005",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-026",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-022",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-016",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-028",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-006",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-009",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-017",
+     "gold": "chat",
+     "rules_v2": "knowledge",
+     "llm": "chat",
+     "hybrid": "knowledge"
+    },
+    {
+     "id": "chat-014",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-007",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-019",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-012",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-031",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-023",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-011",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-015",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "instruct",
+     "hybrid": "instruct"
+    },
+    {
+     "id": "chat-021",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-008",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-020",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-001",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-002",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-010",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-013",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-024",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-004",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "chat-030",
+     "gold": "chat",
+     "rules_v2": "chat",
+     "llm": "chat",
+     "hybrid": "chat"
+    },
+    {
+     "id": "code-015",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-001",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-003",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-023",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-021",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-002",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-008",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-030",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-027",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-011",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-025",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-017",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-026",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-009",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-016",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-007",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-005",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-012",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-010",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-014",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-020",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-004",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-032",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-028",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-029",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-031",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-019",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-013",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-022",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-024",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-018",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-006",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    }
+   ]
+  }
+ }
+}

@@ -500,6 +500,34 @@ request and writes bullet lists correctly more often than the specialists.
 Fixing the scorer is required before the test runs, and by the rule in
 `AGENTS.md` every cited run must then be rescored. It was not changed tonight.
 
+## Routing on everyday wording: a small model as classifier (13 Oct, live)
+
+`results/analysis/intent_natural_eval.json`, script
+`scripts/analysis/intent_natural_eval.py`. Two sets: 72 hand-written requests
+in everyday Ukrainian (`benchmarks/intent_natural_v1.jsonl`, 12 per intent,
+written in one sitting, routing diagnostics only) and 264 v7 dev items in
+benchmark wording. "Right model" counts an intent error that still lands on
+the right specialist as correct.
+
+| Method | Everyday: right intent | Everyday: right model | Benchmark wording: right intent | Benchmark wording: right model |
+|---|---:|---:|---:|---:|
+| Rules v2 | 0.36 [0.26, 0.48] | 0.53 [0.41, 0.64] | 0.87 [0.82, 0.90] | 0.87 [0.82, 0.90] |
+| Mamay-4B names the intent | 0.82 [0.72, 0.89] | 0.88 [0.78, 0.93] | 0.81 [0.76, 0.86] | 0.83 [0.78, 0.87] |
+| Hybrid: rules, then Mamay-4B if no rule matched | 0.85 [0.75, 0.91] | 0.90 [0.81, 0.95] | 0.88 [0.83, 0.91] | 0.88 [0.84, 0.92] |
+
+- The rules fit benchmark templates. On everyday wording they name 0 of 12
+  translation requests and 1 of 12 ethical questions; the model names 8 and 12.
+- The model alone is below the rules on benchmark wording, so it does not
+  replace them. The hybrid is at least as good as either on both sets.
+- Cost of the hybrid: one call of about 275 ms (p50) on the requests no rule
+  matched: 25% of the benchmark-wording sample, 81% of the everyday set.
+- Instruct stays weak for every method (6 of 12 everyday, 21 of 50 benchmark):
+  a request to write a text with form rules is often called chat.
+- Limits: the everyday set is small and written by one person; intervals are
+  wide. Answer quality under the hybrid route was not measured, only the route.
+
+The hybrid is available as rules profile `v2_llm` (rules v2 unchanged).
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.

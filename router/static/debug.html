@@ -346,7 +346,10 @@ function showWhy(trace, live) {
   if (!trace) { $("why").replaceChildren(h("span", { class: "muted" }, "Start typing: the route is decided by rules before any model is called.")); renderStrip(null); return; }
   renderStrip(trace.model);
   put($("why"), h("span", { class: "tag" }, trace.intent), h("span", {}, "→ ", h("b", {}, nice(trace.model))),
-    h("span", { class: "muted", title: trace.reason || "" }, trace.learned ? "chosen by the learned router" : (WHY[trace.intent] || trace.reason || "")),
+    h("span", { class: "muted", title: trace.reason || "" }, trace.learned ? "chosen by the learned router"
+      : /^no rule matched/.test(trace.reason || "") ? "no rule matched, so Mamay-4B named the type"
+      : /^default/.test(trace.reason || "") ? "no rule matched: default route"
+      : (WHY[trace.intent] || trace.reason || "")),
     live ? null : h("span", { class: "tag plain" }, "preview"));
 }
 let previewTimer = null;

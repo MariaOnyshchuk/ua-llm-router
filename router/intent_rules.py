@@ -167,6 +167,16 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "blurb": "v2, but 'write a …' requests → Mamay-4B",
         "writing_to": "mamay4",
     },
+    # v2 rules first; when no rule matches, a small model names the intent in one word
+    # (router/llm_intent.py). Measured on everyday requests in
+    # results/analysis/intent_natural_eval.json. v2 itself is unchanged.
+    "v2_llm": {
+        "label": "Rules v2 + model for unmatched",
+        "remap": {},
+        "default": "aya",
+        "blurb": "v2 rules; unmatched requests are classified by Mamay-4B",
+        "llm_fallback": "mamay4",
+    },
     "knn": {
         "label": "Learned kNN",
         "remap": {},
@@ -193,6 +203,23 @@ _WRITING_TASK = re.compile(
     r")\b",
     re.U,
 )
+
+
+def _llm_decision(text: str, alias: str, fallback: str) -> RouteDecision | None:
+    """Ask a small model for the intent of a request no rule matched. None if the call fails."""
+    try:
+        import httpx
+
+        from router.llm_intent import INTENT_MODEL, classify
+
+        with httpx.Client(timeout=15.0) as client:
+            intent = classify(client, text, alias)["intent"]
+    except Exception:  # noqa: BLE001 - routing must not fail because the classifier is down
+        return None
+    if intent is None:
+        return None
+    model = fallback if intent == "chat" else INTENT_MODEL[intent]
+    return RouteDecision(model, intent, f"no rule matched; {alias} classified the request as {intent} → {model}")
 
 
 def route_intent(
@@ -239,6 +266,9 @@ def route_intent(
             decision = RouteDecision(
                 writing_to, "instruct", f"writing task → {writing_to} (profile {profile})"
             )
+        llm_alias = spec.get("llm_fallback")
+        if decision is None and isinstance(llm_alias, str):
+            decision = _llm_decision(text, llm_alias, fallback)
         if decision is None:
             chat_reason = (
                 "default UA chat → Mamay-4B"

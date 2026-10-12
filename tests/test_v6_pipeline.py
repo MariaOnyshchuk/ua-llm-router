@@ -181,6 +181,24 @@ class LearnedRouterTests(unittest.TestCase):
         translate = "Переклади з англійської: write a poem"
         self.assertEqual(route_intent(translate, profile="v3_instruct").model, "aya")
 
+    def test_v2_llm_asks_the_model_only_when_no_rule_matched(self) -> None:
+        from router import intent_rules
+
+        asked: list[str] = []
+
+        def fake(text: str, alias: str, fallback: str):
+            asked.append(text)
+            return intent_rules.RouteDecision("lapa", "alignment", "stub")
+
+        with patch.object(intent_rules, "_llm_decision", fake):
+            matched = route_intent("Переклади з англійської: hello", profile="v2_llm")
+            unmatched = route_intent("Чи чесно списувати на іспиті?", profile="v2_llm")
+            plain_v2 = route_intent("Чи чесно списувати на іспиті?", profile="v2")
+        self.assertEqual(matched.intent, "translate")
+        self.assertEqual((unmatched.model, unmatched.intent), ("lapa", "alignment"))
+        self.assertEqual(plain_v2.intent, "chat")
+        self.assertEqual(asked, ["Чи чесно списувати на іспиті?"])
+
     def test_knn_profile_with_hash_artifacts(self) -> None:
         try:
             from sklearn.neighbors import KNeighborsClassifier
