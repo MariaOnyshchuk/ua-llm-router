@@ -331,7 +331,12 @@ async function loadHealth() {
   fill($("model"), aliases.map((a) => ({ value: a, label: nice(a) + (d.backends[a].up ? "" : " (offline)") })), true);
   const up = (a) => d.backends[a] && d.backends[a].up;
   $("model").value = ["mamay12", "aya", "lapa", "mamay4"].find(up) || aliases[0];
-  fill($("profile"), d.profiles, true); $("profile").value = "v2";
+  fill($("profile"), d.profiles, true);
+  /* ?profile=v2_llm (and optionally &mode=compare) in the address opens the page with that setting */
+  const params = new URLSearchParams(location.search), wanted = params.get("profile");
+  $("profile").value = d.profiles.includes(wanted) ? wanted : "v2";
+  if (d.profiles.includes(wanted)) document.querySelector("details.settings").open = true;
+  state.startMode = ["router", "compare", "composite", "model"].includes(params.get("mode")) ? params.get("mode") : "router";
   fill($("planner"), d.planners, true);
   $("planner").value = d.planners.includes("hybrid_gated") ? "hybrid_gated" : "hybrid";
   renderStrip(null);
@@ -624,7 +629,7 @@ $("next").onclick = () => { state.offset += LIMIT; loadList(); };
 
 (async () => {
   await loadHealth().catch((e) => $("why").replaceChildren(h("span", { class: "err" }, String(e))));
-  setMode("router");
+  setMode(state.startMode || "router");
   let tools = false; try { tools = localStorage.getItem("router-debug-tools") === "1"; } catch (e) { /* storage is optional */ }
   setTools(tools);
 })();
