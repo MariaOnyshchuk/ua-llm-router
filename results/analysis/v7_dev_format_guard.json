@@ -1,0 +1,361 @@
+{
+ "suite": "mixed_ua_v7",
+ "split": "dev",
+ "bucket": "instruct",
+ "n": 212,
+ "note": "Offline: the guard is applied to stored dev answers, which are then rescored. Constraints are detected from the request text only. The patterns were written against these same dev items.",
+ "detection_vs_ifeval_labels": {
+  "no_comma": {
+   "labelled": 19,
+   "found": 19,
+   "missed": 0,
+   "unlabelled_hits": 0
+  },
+  "quotes": {
+   "labelled": 16,
+   "found": 16,
+   "missed": 0,
+   "unlabelled_hits": 0
+  },
+  "lower": {
+   "labelled": 10,
+   "found": 10,
+   "missed": 0,
+   "unlabelled_hits": 0
+  },
+  "upper": {
+   "labelled": 7,
+   "found": 7,
+   "missed": 0,
+   "unlabelled_hits": 2
+  }
+ },
+ "guard_hits_in_other_dev_buckets": {},
+ "per_system": {
+  "router": {
+   "a": 0.6478,
+   "b": 0.5527,
+   "diff": 0.0951,
+   "ci95": [
+    0.0629,
+    0.1305
+   ],
+   "verdict": "A higher",
+   "answers_changed": 30
+  },
+  "mamay4": {
+   "a": 0.6439,
+   "b": 0.5833,
+   "diff": 0.0605,
+   "ci95": [
+    0.0354,
+    0.0896
+   ],
+   "verdict": "A higher",
+   "answers_changed": 21
+  },
+  "aya": {
+   "a": 0.6439,
+   "b": 0.5393,
+   "diff": 0.1046,
+   "ci95": [
+    0.0708,
+    0.1423
+   ],
+   "verdict": "A higher",
+   "answers_changed": 34
+  },
+  "lapa": {
+   "a": 0.5873,
+   "b": 0.4788,
+   "diff": 0.1085,
+   "ci95": [
+    0.0747,
+    0.1462
+   ],
+   "verdict": "A higher",
+   "answers_changed": 41
+  },
+  "mamay12": {
+   "a": 0.6942,
+   "b": 0.673,
+   "diff": 0.0212,
+   "ci95": [
+    0.0086,
+    0.0377
+   ],
+   "verdict": "A higher",
+   "answers_changed": 11
+  }
+ },
+ "comparisons": {
+  "router raw vs Mamay-12B raw": {
+   "a": 0.5527,
+   "b": 0.673,
+   "diff": -0.1203,
+   "ci95": [
+    -0.1745,
+    -0.0684
+   ],
+   "verdict": "A lower"
+  },
+  "router + guard vs Mamay-12B raw": {
+   "a": 0.6478,
+   "b": 0.673,
+   "diff": -0.0252,
+   "ci95": [
+    -0.0723,
+    0.0197
+   ],
+   "verdict": "not distinguishable"
+  },
+  "router + guard vs Mamay-12B + guard": {
+   "a": 0.6478,
+   "b": 0.6942,
+   "diff": -0.0464,
+   "ci95": [
+    -0.0912,
+    -0.0024
+   ],
+   "verdict": "A lower"
+  }
+ },
+ "repaired_checks_what_if": {
+  "per_system": {
+   "router": {
+    "raw": 0.6447,
+    "guard": 0.7398
+   },
+   "mamay4": {
+    "raw": 0.6989,
+    "guard": 0.7547
+   },
+   "aya": {
+    "raw": 0.6305,
+    "guard": 0.7351
+   },
+   "lapa": {
+    "raw": 0.5613,
+    "guard": 0.6675
+   },
+   "mamay12": {
+    "raw": 0.7995,
+    "guard": 0.8184
+   }
+  },
+  "router raw vs Mamay-12B raw": {
+   "a": 0.6447,
+   "b": 0.7995,
+   "diff": -0.1549,
+   "ci95": [
+    -0.2146,
+    -0.0983
+   ],
+   "verdict": "A lower"
+  },
+  "router + guard vs Mamay-12B + guard": {
+   "a": 0.7398,
+   "b": 0.8184,
+   "diff": -0.0786,
+   "ci95": [
+    -0.1281,
+    -0.0307
+   ],
+   "verdict": "A lower"
+  }
+ },
+ "macro_of_four_buckets": {
+  "router vs Mamay-12B": {
+   "instruct": {
+    "n": 212,
+    "a": 0.5527,
+    "b": 0.673,
+    "diff": -0.1203,
+    "ci95": [
+     -0.1753,
+     -0.0645
+    ],
+    "verdict": "A lower"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.6801,
+    "b": 0.7099,
+    "diff": -0.0298,
+    "ci95": [
+     -0.048,
+     -0.0112
+    ],
+    "verdict": "A lower"
+   }
+  },
+  "router + guard vs Mamay-12B": {
+   "instruct": {
+    "n": 212,
+    "a": 0.6478,
+    "b": 0.673,
+    "diff": -0.0252,
+    "ci95": [
+     -0.0715,
+     0.022
+    ],
+    "verdict": "not distinguishable"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7039,
+    "b": 0.7099,
+    "diff": -0.006,
+    "ci95": [
+     -0.0233,
+     0.011
+    ],
+    "verdict": "not distinguishable"
+   }
+  },
+  "router + guard vs Mamay-12B + guard": {
+   "instruct": {
+    "n": 212,
+    "a": 0.6478,
+    "b": 0.6942,
+    "diff": -0.0464,
+    "ci95": [
+     -0.0904,
+     -0.0008
+    ],
+    "verdict": "A lower"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7039,
+    "b": 0.7152,
+    "diff": -0.0113,
+    "ci95": [
+     -0.0278,
+     0.0054
+    ],
+    "verdict": "not distinguishable"
+   }
+  },
+  "router + guard vs router": {
+   "instruct": {
+    "n": 212,
+    "a": 0.6478,
+    "b": 0.5527,
+    "diff": 0.0951,
+    "ci95": [
+     0.0629,
+     0.1305
+    ],
+    "verdict": "A higher"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7039,
+    "b": 0.6801,
+    "diff": 0.0238,
+    "ci95": [
+     0.0155,
+     0.0328
+    ],
+    "verdict": "A higher"
+   }
+  },
+  "router + guard vs Aya (best single)": {
+   "instruct": {
+    "n": 212,
+    "a": 0.6478,
+    "b": 0.5393,
+    "diff": 0.1085,
+    "ci95": [
+     0.0582,
+     0.1596
+    ],
+    "verdict": "A higher"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7039,
+    "b": 0.6336,
+    "diff": 0.0703,
+    "ci95": [
+     0.0467,
+     0.0938
+    ],
+    "verdict": "A higher"
+   }
+  },
+  "repaired checks: router vs Mamay-12B": {
+   "instruct": {
+    "n": 212,
+    "a": 0.6447,
+    "b": 0.7995,
+    "diff": -0.1549,
+    "ci95": [
+     -0.2115,
+     -0.0959
+    ],
+    "verdict": "A lower"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7031,
+    "b": 0.7415,
+    "diff": -0.0384,
+    "ci95": [
+     -0.0576,
+     -0.0196
+    ],
+    "verdict": "A lower"
+   }
+  },
+  "repaired checks: router + guard vs Mamay-12B": {
+   "instruct": {
+    "n": 212,
+    "a": 0.7398,
+    "b": 0.7995,
+    "diff": -0.0597,
+    "ci95": [
+     -0.1085,
+     -0.0079
+    ],
+    "verdict": "A lower"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7269,
+    "b": 0.7415,
+    "diff": -0.0146,
+    "ci95": [
+     -0.0328,
+     0.0033
+    ],
+    "verdict": "not distinguishable"
+   }
+  },
+  "repaired checks: router + guard vs Mamay-12B + guard": {
+   "instruct": {
+    "n": 212,
+    "a": 0.7398,
+    "b": 0.8184,
+    "diff": -0.0786,
+    "ci95": [
+     -0.1258,
+     -0.0275
+    ],
+    "verdict": "A lower"
+   },
+   "macro4": {
+    "n": 1423,
+    "a": 0.7269,
+    "b": 0.7462,
+    "diff": -0.0193,
+    "ci95": [
+     -0.0372,
+     -0.002
+    ],
+    "verdict": "A lower"
+   }
+  }
+ }
+}

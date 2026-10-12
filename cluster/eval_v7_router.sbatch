@@ -14,6 +14,7 @@
 #
 #   sbatch cluster/eval_v7_router.sbatch                 # dev
 #   SPLIT=test sbatch cluster/eval_v7_router.sbatch
+#   FORMAT_GUARD=1 sbatch cluster/eval_v7_router.sbatch      # with the format guard
 #
 # Needs benchmarks/mixed_ua_v7.jsonl, router/intent_rules.py and the current
 # scripts/run_small_router_cluster.py on the lab (scp + checksum). Writes
@@ -25,6 +26,15 @@ SPLIT="${SPLIT:-dev}"
 MAX_TOKENS="${MAX_TOKENS:-1024}"
 BENCH="${BENCH:-benchmarks/mixed_ua_v7.jsonl}"
 SYSTEM="router_matrix_v2_fewshot"
+# FORMAT_GUARD=1 adds router/format_guard.py (system name gets the suffix _fg).
+FORMAT_GUARD="${FORMAT_GUARD:-0}"
+GUARD_ARGS=()
+SCORES="scores_router.json"
+if [[ "${FORMAT_GUARD}" == "1" ]]; then
+  GUARD_ARGS=(--format-guard)
+  SYSTEM="${SYSTEM}_fg"
+  SCORES="scores_router_fg.json"
+fi
 ROOT="${HOME}/Diploma"
 # shellcheck disable=SC1091
 source "${ROOT}/.venv/bin/activate"
@@ -82,8 +92,9 @@ done
 
 # Rules v2 with the alignment few-shot prompt: the frozen one-hop router.
 python scripts/run_small_router_cluster.py --mode router_matrix --align-prompt fewshot \
-  --bench "${BENCH}" --split "${SPLIT}" --repeats 1 --max-tokens "${MAX_TOKENS}" --out-dir "${OUT_DIR}"
+  --bench "${BENCH}" --split "${SPLIT}" --repeats 1 --max-tokens "${MAX_TOKENS}" --out-dir "${OUT_DIR}" \
+  "${GUARD_ARGS[@]}"
 python scripts/score_results.py "${OUT_DIR}/${SYSTEM}"_mixed_ua_v7_"${SPLIT}"_*.jsonl \
-  --out "${OUT_DIR}/scores_router.json"
+  --out "${OUT_DIR}/${SCORES}"
 
 echo "[v7-router] finished ${SPLIT}"

@@ -1,0 +1,286 @@
+{
+ "by_family": {
+  "combination": {
+   "router": 0.125,
+   "mamay4": 0.2917,
+   "aya": 0,
+   "lapa": 0.2083,
+   "mamay12": 0.4167,
+   "n": 24
+  },
+  "detectable_format": {
+   "router": 0.6491,
+   "mamay4": 0.6316,
+   "aya": 0.6491,
+   "lapa": 0.5965,
+   "mamay12": 0.6842,
+   "n": 57
+  },
+  "change_case": {
+   "router": 0.5,
+   "mamay4": 0.6667,
+   "aya": 0.4167,
+   "lapa": 0.2083,
+   "mamay12": 0.9167,
+   "n": 24
+  },
+  "length_constraints": {
+   "router": 0.4894,
+   "mamay4": 0.5106,
+   "aya": 0.4255,
+   "lapa": 0.5106,
+   "mamay12": 0.4894,
+   "n": 47
+  },
+  "keywords": {
+   "router": 0.68,
+   "mamay4": 0.6,
+   "aya": 0.7,
+   "lapa": 0.48,
+   "mamay12": 0.6,
+   "n": 50
+  },
+  "startend": {
+   "router": 0.6667,
+   "mamay4": 0.8095,
+   "aya": 0.6667,
+   "lapa": 0.6667,
+   "mamay12": 0.9524,
+   "n": 21
+  },
+  "punctuation": {
+   "router": 0.1579,
+   "mamay4": 0.2105,
+   "aya": 0.1053,
+   "lapa": 0,
+   "mamay12": 0.5263,
+   "n": 19
+  },
+  "detectable_content": {
+   "router": 0.3125,
+   "mamay4": 0.3125,
+   "aya": 0.25,
+   "lapa": 0.3125,
+   "mamay12": 0.25,
+   "n": 16
+  },
+  "language": {
+   "router": 1,
+   "mamay4": 1,
+   "aya": 1,
+   "lapa": 1,
+   "mamay12": 1,
+   "n": 7
+  }
+ },
+ "by_instruction": {
+  "combination:repeat_prompt": {
+   "router": 0,
+   "mamay4": 0.0625,
+   "aya": 0,
+   "lapa": 0.1875,
+   "mamay12": 0.125,
+   "n": 16
+  },
+  "detectable_format:title": {
+   "router": 0.8571,
+   "mamay4": 0.9286,
+   "aya": 0.8571,
+   "lapa": 0.9286,
+   "mamay12": 1,
+   "n": 14
+  },
+  "change_case:english_lowercase": {
+   "router": 0.5,
+   "mamay4": 0.7,
+   "aya": 0.6,
+   "lapa": 0.2,
+   "mamay12": 1,
+   "n": 10
+  },
+  "length_constraints:number_words": {
+   "router": 0.3333,
+   "mamay4": 0.4667,
+   "aya": 0.3333,
+   "lapa": 0.5333,
+   "mamay12": 0.5333,
+   "n": 15
+  },
+  "detectable_format:json_format": {
+   "router": 0.75,
+   "mamay4": 0.75,
+   "aya": 0.75,
+   "lapa": 0.75,
+   "mamay12": 0.75,
+   "n": 4
+  },
+  "combination:two_responses": {
+   "router": 0.375,
+   "mamay4": 0.75,
+   "aya": 0,
+   "lapa": 0.25,
+   "mamay12": 1,
+   "n": 8
+  },
+  "keywords:letter_frequency": {
+   "router": 0.7273,
+   "mamay4": 0.7273,
+   "aya": 0.7273,
+   "lapa": 0.7273,
+   "mamay12": 0.7273,
+   "n": 11
+  },
+  "detectable_format:multiple_sections": {
+   "router": 1,
+   "mamay4": 1,
+   "aya": 1,
+   "lapa": 1,
+   "mamay12": 1,
+   "n": 4
+  },
+  "startend:end_checker": {
+   "router": 0.8,
+   "mamay4": 0.6,
+   "aya": 0.8,
+   "lapa": 0.6,
+   "mamay12": 0.8,
+   "n": 5
+  },
+  "punctuation:no_comma": {
+   "router": 0.1579,
+   "mamay4": 0.2105,
+   "aya": 0.1053,
+   "lapa": 0,
+   "mamay12": 0.5263,
+   "n": 19
+  },
+  "keywords:frequency": {
+   "router": 0.6429,
+   "mamay4": 0.3571,
+   "aya": 0.7143,
+   "lapa": 0.2143,
+   "mamay12": 0.4286,
+   "n": 14
+  },
+  "detectable_format:number_highlighted_sections": {
+   "router": 1,
+   "mamay4": 0.8889,
+   "aya": 1,
+   "lapa": 0.7778,
+   "mamay12": 1,
+   "n": 18
+  },
+  "keywords:existence": {
+   "router": 0.6667,
+   "mamay4": 0.5556,
+   "aya": 0.5556,
+   "lapa": 0.5556,
+   "mamay12": 0.4444,
+   "n": 9
+  },
+  "detectable_content:postscript": {
+   "router": 1,
+   "mamay4": 1,
+   "aya": 0.8,
+   "lapa": 1,
+   "mamay12": 0.8,
+   "n": 5
+  },
+  "length_constraints:number_sentences": {
+   "router": 0.6667,
+   "mamay4": 0.625,
+   "aya": 0.5417,
+   "lapa": 0.5417,
+   "mamay12": 0.5,
+   "n": 24
+  },
+  "detectable_format:number_bullet_lists": {
+   "router": 0,
+   "mamay4": 0,
+   "aya": 0,
+   "lapa": 0,
+   "mamay12": 0,
+   "n": 13
+  },
+  "detectable_content:number_placeholders": {
+   "router": 0,
+   "mamay4": 0,
+   "aya": 0,
+   "lapa": 0,
+   "mamay12": 0,
+   "n": 11
+  },
+  "startend:quotation": {
+   "router": 0.625,
+   "mamay4": 0.875,
+   "aya": 0.625,
+   "lapa": 0.6875,
+   "mamay12": 1,
+   "n": 16
+  },
+  "keywords:forbidden_words": {
+   "router": 0.6875,
+   "mamay4": 0.75,
+   "aya": 0.75,
+   "lapa": 0.5,
+   "mamay12": 0.75,
+   "n": 16
+  },
+  "change_case:english_capital": {
+   "router": 0.5714,
+   "mamay4": 0.8571,
+   "aya": 0,
+   "lapa": 0.1429,
+   "mamay12": 0.8571,
+   "n": 7
+  },
+  "language:response_language": {
+   "router": 1,
+   "mamay4": 1,
+   "aya": 1,
+   "lapa": 1,
+   "mamay12": 1,
+   "n": 7
+  },
+  "change_case:capital_word_frequency": {
+   "router": 0.4286,
+   "mamay4": 0.4286,
+   "aya": 0.5714,
+   "lapa": 0.2857,
+   "mamay12": 0.8571,
+   "n": 7
+  },
+  "length_constraints:number_paragraphs": {
+   "router": 0,
+   "mamay4": 0,
+   "aya": 0,
+   "lapa": 0.2,
+   "mamay12": 0,
+   "n": 5
+  },
+  "length_constraints:nth_paragraph_first_word": {
+   "router": 0.6667,
+   "mamay4": 0.6667,
+   "aya": 0.6667,
+   "lapa": 0.6667,
+   "mamay12": 1,
+   "n": 3
+  },
+  "detectable_format:constrained_response": {
+   "router": 0,
+   "mamay4": 0,
+   "aya": 0,
+   "lapa": 0,
+   "mamay12": 0,
+   "n": 4
+  }
+ },
+ "all": {
+  "router": 0.5208,
+  "mamay4": 0.5509,
+  "aya": 0.4868,
+  "lapa": 0.4453,
+  "mamay12": 0.6226
+ },
+ "note": "mixed_ua_v7 dev instruct (IFEval-UA items only), share of single instructions satisfied. Specialists: 4 Sep runs; Mamay-12B: 12 Oct pool run, dev rows; router: live rules v2 dev run."
+}

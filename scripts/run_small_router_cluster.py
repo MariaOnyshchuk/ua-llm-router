@@ -38,6 +38,7 @@ from router.ensemble import (  # noqa: E402
 )
 from router.intent_rules import BEST_BY_BUCKET, ROUTER_MODELS, route_intent  # noqa: E402
 from scripts.alignment_prompt_variants import apply_alignment_variant  # noqa: E402
+from router.format_guard import apply as apply_format_guard  # noqa: E402
 from scripts.bucket_prompt_variants import apply_bucket_fewshot, parse_buckets  # noqa: E402
 
 # Pinned decoding — do not change between systems without bumping run tags.
@@ -209,8 +210,12 @@ def run_system(
     ensemble: bool = False,
     align_prompt: str = "baseline",
     bucket_fewshot: frozenset[str] = frozenset(),
+    format_guard: bool = False,
     out_dir: Path | None = None,
 ) -> Path:
+    if format_guard:
+        # the guard changes answers, so it is a different system in file names and scores
+        name = f"{name}_fg"
     if bucket_fewshot:
         # keep runs with different prompts apart in file names and in the system column
         name = f"{name}_bfs-{'-'.join(sorted(bucket_fewshot))}"
@@ -367,6 +372,12 @@ def run_system(
                 "ensemble": ensemble_meta,
                 **result,
             }
+            if format_guard:
+                # constraints are read from the item's own request, not from the few-shot wrapper
+                guarded, repairs = apply_format_guard(str(item.get("prompt") or ""), row.get("content") or "")
+                row["content_raw"] = row.get("content") or ""
+                row["content"] = guarded
+                row["format_guard"] = repairs
             fout.write(json.dumps(row, ensure_ascii=False) + "\n")
             fout.flush()
             preview = (result.get("content") or "")[:70].replace("\n", " ")
@@ -508,6 +519,12 @@ def main() -> None:
         "--id-prefix",
         default="",
         help="Optional id prefix filter, e.g. zno- for ZNO-only",
+    )
+    p.add_argument(
+        "--format-guard",
+        action="store_true",
+        help="Repair explicit surface constraints of the request in each answer (router/format_guard.py). "
+        "The system name gets the suffix _fg; the model's own text is kept in content_raw.",
     )
     p.add_argument(
         "--split",
@@ -688,6 +705,7 @@ def main() -> None:
             "vram_interval_s": args.vram_interval,
             "align_prompt": args.align_prompt,
             "bucket_fewshot": parse_buckets(args.bucket_fewshot),
+            "format_guard": args.format_guard,
         }
         if args.out_dir:
             kw["out_dir"] = Path(args.out_dir)

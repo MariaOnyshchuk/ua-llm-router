@@ -405,6 +405,101 @@ negative result.
 - Code change: `router/planner.py` (profile `hybrid_gated`), not committed.
 - Raw rows stay in `logs/` (local, not in git).
 
+## Instruct: what the specialists fail, and a format guard (13 Oct, offline)
+
+All of this is computed from stored dev answers; no model was called.
+Files: `results/analysis/v7_dev_instruct_by_constraint.json`,
+`results/analysis/v7_dev_format_guard.json`; scripts
+`scripts/analysis/format_guard_dev.py`, `router/format_guard.py`.
+
+### Where the instruct gap is
+
+Share of single IFEval constraints satisfied on v7 dev instruct (265
+constraints in 180 items):
+
+| Constraint family | n | Router | Mamay-4B | Aya | Lapa | Mamay-12B |
+|---|---:|---:|---:|---:|---:|---:|
+| change case | 24 | 0.50 | 0.67 | 0.42 | 0.21 | 0.92 |
+| punctuation (no commas) | 19 | 0.16 | 0.21 | 0.11 | 0.00 | 0.53 |
+| start / end (quotes) | 21 | 0.67 | 0.81 | 0.67 | 0.67 | 0.95 |
+| combination (two answers, repeat the request) | 24 | 0.12 | 0.29 | 0.00 | 0.21 | 0.42 |
+| detectable format | 57 | 0.65 | 0.63 | 0.65 | 0.60 | 0.68 |
+| keywords | 50 | 0.68 | 0.60 | 0.70 | 0.48 | 0.60 |
+| length | 47 | 0.49 | 0.51 | 0.43 | 0.51 | 0.49 |
+| all | 265 | 0.52 | 0.55 | 0.49 | 0.45 | 0.62 |
+
+Mamay-12B is ahead only on surface rules: letter case, "no commas", "wrap the
+answer in quotes", "give two answers". On format, keywords and length the
+systems are level.
+
+### Format guard
+
+`router/format_guard.py` reads four rules from the request text (no commas;
+whole answer in double quotes; all lowercase; all capitals) and repairs the
+answer with string operations. No model call, no benchmark metadata. It is off
+by default; `run_small_router_cluster.py --format-guard` and
+`FORMAT_GUARD=1 sbatch cluster/eval_v7_router.sbatch` turn it on.
+
+| System, dev instruct (n=212) | Raw | With guard | Difference | 95% interval | Answers changed |
+|---|---:|---:|---:|---|---:|
+| Router rules v2 | 0.553 | 0.648 | +0.095 | [+0.063, +0.131] | 30 |
+| Mamay-4B | 0.583 | 0.644 | +0.060 | [+0.035, +0.090] | 21 |
+| Aya | 0.539 | 0.644 | +0.105 | [+0.071, +0.142] | 34 |
+| Lapa | 0.479 | 0.587 | +0.108 | [+0.075, +0.146] | 41 |
+| Mamay-12B | 0.673 | 0.694 | +0.021 | [+0.009, +0.038] | 11 |
+
+Macro of the four buckets, v7 dev:
+
+| Comparison | A | B | Difference | 95% interval | Verdict |
+|---|---:|---:|---:|---|---|
+| router − Mamay-12B (before) | 0.680 | 0.710 | −0.030 | [−0.048, −0.011] | router lower |
+| router + guard − router | 0.704 | 0.680 | +0.024 | [+0.015, +0.033] | higher |
+| router + guard − Mamay-12B | 0.704 | 0.710 | −0.006 | [−0.023, +0.011] | not distinguishable |
+| router + guard − Mamay-12B + guard | 0.704 | 0.715 | −0.011 | [−0.028, +0.005] | not distinguishable |
+| router + guard − Aya (best single specialist) | 0.704 | 0.634 | +0.070 | [+0.047, +0.094] | higher |
+
+The guard fires on no dev item outside instruct.
+
+Supervisor notes:
+
+- The four patterns were written and corrected against these same dev items;
+  detection is 52 of 52 labelled constraints on dev, which will not hold on
+  test. The effect on test will be smaller. This is an offline estimate: a live
+  dev run with `FORMAT_GUARD=1` must reproduce it before the freeze.
+- The guard is a post-processor, not routing. Mamay-12B gains from it too
+  (+0.021). The fair comparison is "router + guard" against "Mamay-12B +
+  guard"; both rows are given.
+- Lowercasing or removing commas can damage an answer that also has to quote
+  something exactly. No such case was seen on dev; it was not searched for
+  outside dev.
+
+### Three wrong checks in `scripts/ifeval_check.py`
+
+| Check | Problem | Effect on dev |
+|---|---|---|
+| `detectable_format:number_bullet_lists` | registered as `detectable_content:number_bullet_lists`, so the id from the data is unknown and never passes | 0 of 13 for every system |
+| `detectable_content:number_placeholders` | the pattern accepts Latin capitals only, so `[місто]` is not counted | 0 of 11 for every system |
+| `combination:repeat_prompt` | compares the answer with the whole request instead of `prompt_to_repeat` | 0.00–0.19 for every system |
+
+40 of the 265 dev constraints are scored wrongly. With these three checks
+repaired **for this analysis only** (the scorer is unchanged):
+
+| Dev instruct | Router | Router + guard | Mamay-12B | Mamay-12B + guard |
+|---|---:|---:|---:|---:|
+| current scorer | 0.553 | 0.648 | 0.673 | 0.694 |
+| repaired checks | 0.645 | 0.740 | 0.799 | 0.818 |
+
+| Macro of four, repaired checks | Difference | 95% interval | Verdict |
+|---|---:|---|---|
+| router − Mamay-12B | −0.038 | [−0.058, −0.020] | router lower |
+| router + guard − Mamay-12B | −0.015 | [−0.033, +0.003] | not distinguishable |
+| router + guard − Mamay-12B + guard | −0.019 | [−0.037, −0.002] | router lower |
+
+The current scorer hides part of Mamay-12B's lead on instruct: it repeats the
+request and writes bullet lists correctly more often than the specialists.
+Fixing the scorer is required before the test runs, and by the rule in
+`AGENTS.md` every cited run must then be rescored. It was not changed tonight.
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.
@@ -416,6 +511,8 @@ Nothing in this section has been run. The test splits are untouched.
 | Routing | rules profile `v2` | `router/intent_rules.py` | `5bf829b` (added `v3_instruct` beside it; `v2` rules unchanged since before v7) |
 | Alignment prompt | `--align-prompt fewshot` | `scripts/alignment_prompt_variants.py` | `11a1d0d` |
 | Bucket few-shot | none (it made dev worse) | — | — |
+| Format guard | proposed, pending a live dev run | `router/format_guard.py` | this branch |
+| Scorer | `scripts/ifeval_check.py` has three wrong checks; fix and rescore before the test runs | — | — |
 | Planner | `hybrid_gated` | `router/planner.py` | `9dbb1b7` |
 | Decoding | T=0, seed 42, max_tokens 1024, one pass on v7; 3 repeats on AgentCoMa | — | — |
 | Specialists | Mamay-4B, Lapa-12B, Aya-8B, bf16, `gpu_memory_utilization` 0.90, one model per card | `cluster/serve_*.sbatch` | — |
@@ -430,6 +527,8 @@ test runs.
 |---|---|
 | Use the `v3_instruct` profile | Not recommended: not distinguishable from `v2` on dev (+0.006 [−0.030, +0.041] on instruct). |
 | Escalate word problems to Mamay-12B | Decided on 12 Oct: no. Mamay-12B is a reference baseline only. |
+| Fix the three IFEval checks and rescore the cited runs | Open, and it comes first: it changes every instruct number. |
+| Include the format guard in the frozen router | Open. Offline dev estimate: instruct +0.095 [+0.063, +0.131]; needs a live dev run. |
 | Run the planner (`hybrid_gated`) on v7 test, or only one-hop rules v2 | Open. v7 items are single-skill, so the planner can only cost calls there; the dev false-split rate is 0.035. One-hop rules v2 is the comparable row to the solo models. |
 
 ### Jobs for the test runs
@@ -451,6 +550,7 @@ Step 1, dev check (safe to repeat; compare with the dev table above):
 
 ```bash
 sbatch cluster/eval_v7_router.sbatch
+FORMAT_GUARD=1 sbatch cluster/eval_v7_router.sbatch
 sbatch --job-name=v7-mamay12 --export=ALL,ALIAS=mamay12 cluster/eval_v7_solo.sbatch
 ```
 
@@ -485,7 +585,8 @@ checksums before any run:
 |---|---|
 | `router/planner.py` | `hybrid_gated` profile |
 | `router/intent_rules.py` | `v3_instruct` added; `v2` unchanged |
-| `scripts/run_small_router_cluster.py` | new `--split` option |
+| `scripts/run_small_router_cluster.py` | new `--split` and `--format-guard` options |
+| `router/format_guard.py` | the format guard |
 | `cluster/eval_v7_solo.sbatch`, `cluster/eval_v7_router.sbatch`, `cluster/eval_agentcoma_200.sbatch`, `cluster/eval_agentcoma_solo.sbatch` | new and changed jobs |
 | `benchmarks/mixed_ua_v7.jsonl` | claim suite (only the dev file is on the lab) |
 | `benchmarks/agentcoma_uk_200_composite.jsonl` | rebuilt with the fixed oracle plan; local only, never in git |

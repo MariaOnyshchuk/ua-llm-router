@@ -38,3 +38,15 @@ other option was.
   test split, and a new job for a one-shot test run should be tried on dev with
   Maria present. Other option: write `cluster/eval_v7.sbatch` unattended and
   untested.
+- **After step 8. Work continued past the list** because Maria said the session
+  should not stop. The `TASK.md` limits were kept: no cluster, no model calls,
+  no test split, no scorer edit, existing profiles unchanged.
+- **Extra step 9. New cluster jobs were written although step 7 had decided not
+  to**, for the same reason. They are syntax-checked only and default to the dev
+  split, so the first submission cannot touch test by accident.
+- **Extra step 12. The format guard is a new, opt-in module**, not a change to
+  rules v2 or to any planner profile. Other option: put it inside the router
+  path by default.
+- **Extra step 13. The IFEval scorer was not fixed**, only measured: `AGENTS.md`
+  requires rescoring every cited run after a scorer change, and week 5-7 raw
+  files are not on this laptop. Other option: fix it and rescore what is local.

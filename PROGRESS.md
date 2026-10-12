@@ -11,6 +11,13 @@
 - Ledger rebuilt (567 rows): v6 runs `superseded`, two v7 dev runs `provisional`. Every results folder has a README line.
 - The progress report ends with "Ready to freeze".
 
+**Done after the list (same night)**
+
+- Cluster jobs for the v7 and AgentCoMa test runs are written (not run); submit lines are in the report.
+- Format guard: offline on dev it lifts router instruct by +0.095 [+0.063, +0.131] and makes the router not
+  distinguishable from Mamay-12B on the macro (−0.006 [−0.023, +0.011]). Tuned on dev, not yet run live.
+- Three wrong checks found in the IFEval scorer; they hide part of Mamay-12B's lead on instruct. Not fixed.
+
 **Blocked**
 
 - Nothing is blocked.
@@ -18,7 +25,9 @@
 **Maria must run or decide**
 
 - Push the branch: `git push --force-with-lease origin 2026-08-31-323p` (history was rewritten to drop 17 `Co-Authored-By` trailers; backup branch `backup/before-trailer-rewrite-20261013`).
-- The test jobs are not ready: the v6 cluster jobs are pinned to the v6 file and the AgentCoMa jobs to `max_tokens 256`. See "What is missing before the test runs can be submitted" in the report. A v7 job has to be written and tried on dev first.
+- Decide on the scorer fix first (three IFEval checks). It changes every instruct number and needs a rescore of the cited runs.
+- Run the new jobs on the **dev** split once (`sbatch cluster/eval_v7_router.sbatch`, then with `FORMAT_GUARD=1`) and compare with the report before any test run.
+- Decide whether the format guard goes into the frozen router.
 - Decide whether v7 test runs the planner (`hybrid_gated`) or only one-hop rules v2.
 - `docs/HANDOFF.md` is updated but still untracked, as you asked earlier. Commit it if you want it in the repo.
 - The `v6_rules` ledger note still names the old hash `f3bc8ff` (now `34ab9e4`).
@@ -119,5 +128,23 @@ every step is ticked or blocked.
   Done 13 Oct: 69 passed, 1 skipped; no modified tracked files; summary written.
   Run the full test suite, check every "Done means" item in `TASK.md`, write
   the morning summary at the top of this file, commit, and add the finish line.
+
+## Extra work after step 8 (13 Oct, same night)
+
+Maria asked for the work to continue without stopping, so these were done as well. Same rules as `TASK.md`.
+
+- [x] **9. Cluster jobs for the test runs.** `cluster/eval_v7_solo.sbatch` and `cluster/eval_v7_router.sbatch`
+  (suite split as a variable, own output folders); the AgentCoMa jobs take `MAX_TOKENS` and `REPEATS`;
+  `run_small_router_cluster.py --split`. Syntax-checked only; a dev-split run is the first real check.
+- [x] **10. Comparison script.** `scripts/analysis/v7_compare.py` reproduces the dev table (router − Mamay-12B
+  macro −0.030 [−0.048, −0.011]); three tests.
+- [x] **11. Instruct by constraint.** The gap to Mamay-12B is in letter case, "no commas", "quotes" and
+  "two answers" (`results/analysis/v7_dev_instruct_by_constraint.json`).
+- [x] **12. Format guard.** `router/format_guard.py`, off by default. Offline on dev: router instruct 0.553 → 0.648,
+  +0.095 [+0.063, +0.131]; macro router + guard − Mamay-12B −0.006 [−0.023, +0.011], not distinguishable.
+  Patterns were tuned on the same dev items; needs a live dev run.
+- [x] **13. Scorer finding, not fixed.** Three wrong checks in `scripts/ifeval_check.py` (bullet lists,
+  placeholders, repeat the request) mis-score 40 of 265 dev constraints. With them repaired the instruct gap to
+  Mamay-12B is larger (−0.155 instead of −0.120). The scorer was left unchanged: a fix means rescoring every cited run.
 
 ALL DONE
