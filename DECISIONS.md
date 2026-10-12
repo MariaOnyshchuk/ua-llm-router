@@ -19,3 +19,9 @@ other option was.
   `d3b5fe0`; backup branch `backup/before-trailer-rewrite-20261013`; hash map in
   `logs/hash_map_trailer_rewrite_20261013.txt`. The branch needs a
   `git push --force-with-lease` by Maria.
+- **Step 4. Statements that the router "wins knowledge" over Mamay-12B on v4 were removed.**
+  Rescored Mamay-12B knowledge is 0.750, equal to the router's 0.750, and the
+  router run is not rescored. Other option: keep the claim with a caveat.
+- **Step 4. "The FP8 pack loses knowledge (0.750 → 0.688)" was removed** from
+  the same docs: the rescored pack knowledge is 0.750, so the drop was the
+  scorer bug.

@@ -1,5 +1,15 @@
 # Thesis Scope — A Composite Ukrainian Assistant from Open Specialists
 
+> **Scorer note (13 Oct 2026).** On 29 Sep a scorer bug was fixed (numeric
+> answers such as 1991 were read as multiple-choice indexes). Rescored runs:
+> week 9 (Mamay-12B on v4: 0.874 → **0.884**) and week 11 (FP8 pack: 0.842 →
+> **0.852**); in both, the whole change is in knowledge (0.688 → 0.750). The
+> week 5–7 runs (rules v1 and v2 at 0.842 and 0.848, the three specialists,
+> micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
+> are only on the lab. Those numbers are from before the fix and are probably
+> about 0.01 low, so do not subtract one of them from a rescored number. All
+> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+
 *Reframed 31 Aug 2026. Supersedes the original "less VRAM than one big model" framing, which our own week-8 measurements do not support.*
 
 ## 1. Problem
@@ -36,7 +46,7 @@ Complementary specialists behind a deterministic router approximate a single str
 |----|--------|--------|
 | S0 | Each specialist alone (Mamay-4B, Lapa-12B, Aya-8B) | **Done** — `week_6_v4_solos`, `week_5_aya_qwen7` |
 | S1 | **Rules router v2 + few-shot** (the product) | **Done** — 0.848 / p50 633 ms |
-| S2 | One larger open model — Mamay-12B | **Done** — 0.874 / p50 1352 ms (`week_9_baselines`) |
+| S2 | One larger open model — Mamay-12B | **Done** — 0.884 (rescored 29 Sep; was 0.874) / p50 1352 ms (`week_9_baselines`) |
 | S3 | Hosted frontier API | **Missing** — the sovereignty-constrained alternative |
 | S4 | Cascade / ensemble / 4-bit variants | **Done** — none beat S1 |
 | S5 | Oracle composite pipeline | **Done** — 0.882, diagnostic ceiling on composite v1 |
@@ -59,9 +69,9 @@ Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Co
 
 ## 6. What we claim about resources — and what we do not
 
-**Claim:** the router lowers **per-query latency** (p50 633 ms vs 867–1681 ms for singles) and costs roughly **1.5 GPU-seconds per prompt**, with routing overhead itself immeasurable (−3.2 ms). One FP8 colocation of the same three specialists fits on **one** RTX 6000 Ada (45 668 / 49 140 MiB after load) and scores **0.842** / p50 723 ms. That is a packing result, not a replacement for the bf16 0.848 / 633 ms product number.
+**Claim:** the router lowers **per-query latency** (p50 633 ms vs 867–1681 ms for singles) and costs roughly **1.5 GPU-seconds per prompt**, with routing overhead itself immeasurable (−3.2 ms). One FP8 colocation of the same three specialists fits on **one** RTX 6000 Ada (45 668 / 49 140 MiB after load) and scores **0.852** (rescored; was 0.842) / p50 723 ms. That is a packing result, not a replacement for the bf16 product number (0.848 / 633 ms, before the scorer fix, not rescored).
 
-**Do not claim** that the bf16 product uses less resident VRAM. At `gpu_memory_utilization=0.90` each specialist still reserves ~44 GB, and week-8 bitsandbytes did not change that. S2 (Mamay-12B alone) is one card at the same 0.90 reservation and scores **0.874** / p50 1352 ms against the router's 0.848 / 633 ms. A separate FP8 colocation (`results/week_11_pack_fp8/`) does put Mamay-4B + Lapa + Aya on one card: 45 668 MiB, rules v2 **0.842** / p50 723 ms, with the drop concentrated in knowledge (0.750 → 0.688).
+**Do not claim** that the bf16 product uses less resident VRAM. At `gpu_memory_utilization=0.90` each specialist still reserves ~44 GB, and week-8 bitsandbytes did not change that. S2 (Mamay-12B alone) is one card at the same 0.90 reservation and scores **0.884** (rescored) / p50 1352 ms against the router's 0.848 / 633 ms (before the scorer fix, not rescored). A separate FP8 colocation (`results/week_11_pack_fp8/`) does put Mamay-4B + Lapa + Aya on one card: 45 668 MiB, rules v2 **0.852** (rescored) / p50 723 ms. The knowledge drop reported earlier (0.750 → 0.688) was the scorer bug; rescored knowledge is 0.750.
 
 ## 7. Out of scope
 

@@ -44,7 +44,9 @@ every step is ticked or blocked.
   progress report. If the interval contains 0, say "not distinguishable" and do
   not recommend the new profile.
 
-- [ ] **4. Fix the old v4 numbers in the docs.**
+- [x] **4. Fix the old v4 numbers in the docs.**
+  Done 13 Oct: Mamay-12B 0.874 → 0.884 and FP8 pack 0.842 → 0.852 (both rescored, change is all in knowledge);
+  a scorer note at the top of the four docs marks week 5–7 numbers as not rescored; "router wins knowledge" removed.
   `docs/key_takeaways.md`, `docs/thesis_scope.md`,
   `docs/weeks_7_10_takeaways.md` and `docs/conclusion.md` still show scores
   from before the 29 Sep scorer fix (the values 0.874 and 0.842 appear among

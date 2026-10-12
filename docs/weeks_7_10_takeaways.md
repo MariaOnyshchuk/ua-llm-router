@@ -1,5 +1,15 @@
 # Weeks 7–10 takeaways
 
+> **Scorer note (13 Oct 2026).** On 29 Sep a scorer bug was fixed (numeric
+> answers such as 1991 were read as multiple-choice indexes). Rescored runs:
+> week 9 (Mamay-12B on v4: 0.874 → **0.884**) and week 11 (FP8 pack: 0.842 →
+> **0.852**); in both, the whole change is in knowledge (0.688 → 0.750). The
+> week 5–7 runs (rules v1 and v2 at 0.842 and 0.848, the three specialists,
+> micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
+> are only on the lab. Those numbers are from before the fix and are probably
+> about 0.01 low, so do not subtract one of them from a rescored number. All
+> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+
 *Written 1 Sep 2026. Authoritative single-skill numbers are on* `mixed_ua_v4_balanced` *unless a table names another suite. Decode protocol:* `T=0`*,* `seed=42`*,* `max_tokens=256`*,* `--align-prompt fewshot`*, 3 repeats when marked* `×3`*.*
 
 This note is the glossary + metrics pack for the second half of the experiments. The live product claim is still: **rules v2 + few-shot = 0.848 / p50 633 ms**, matching the gold-bucket oracle. Extra hops and 4-bit do not beat it. Week 9 numbers are **not scored yet**. Week 10 has plumbing and a 6-item smoke; **do not cite smoke as quality**.
@@ -197,7 +207,7 @@ Intent of each **step** still maps through the same rules-v2 specialist table. T
 | Aya-8B alone                         | 0.785     | 867     | **1.000** | 0.953     | **0.821** | 0.781    | 0.562     | 0.594     | 1 GPU                         |
 | Mamay-4B alone                       | 0.762     | 1125    | 0.984     | **0.984** | 0.758     | 0.781    | 0.469     | 0.594     | 1 GPU                         |
 | Lapa-12B alone                       | 0.732     | 1681    | 0.984     | 0.938     | 0.436     | 0.688    | **0.750** | 0.594     | 1 GPU                         |
-| Mamay-12B on **v4**                  | **0.874** | 1352    | 1.000     | 0.969     | 0.805     | **0.938** | 0.688     | **0.844** | **week 9, 192×3**             |
+| Mamay-12B on **v4**                  | **0.884** | 1352    | 1.000     | 0.969     | 0.805     | **0.938** | 0.750     | **0.844** | **week 9, 192×3, rescored**   |
 | Hosted frontier API                  | —         | —       |           |           |           |          |           |           | **week 9, not run**           |
 
 
@@ -255,7 +265,7 @@ Same product router, same v4 192, 1 repeat. Serve flags: `--quantization bitsand
 | 4-bit bnb (`1×`)     | 0.830     | 1115    | 473   | 0.719     | 0.719     | 0.795     |
 
 
-Latency got **worse**: bitsandbytes on vLLM 0.25.1 / Ada is a slower matmul than fused bf16. nvidia-smi still ~44 GB/GPU because KV cache fills the reservation. **This is not a packing / “fits on one GPU” result.** Keep bf16 for the product number. A later one-GPU FP8 colocation is a different run: **0.842** / p50 723 ms, 45 668 MiB, knowledge 0.688. See [`week_8_quant.md`](week_8_quant.md).
+Latency got **worse**: bitsandbytes on vLLM 0.25.1 / Ada is a slower matmul than fused bf16. nvidia-smi still ~44 GB/GPU because KV cache fills the reservation. **This is not a packing / “fits on one GPU” result.** Keep bf16 for the product number. A later one-GPU FP8 colocation is a different run: **0.852** (rescored; was 0.842) / p50 723 ms, 45 668 MiB, knowledge 0.750 (rescored; 0.688 before). See [`week_8_quant.md`](week_8_quant.md).
 
 ---
 
@@ -268,7 +278,7 @@ Everything above compares the router to models **inside its pool**. A reviewer c
 
 | Slot | System                                                        | Question                                                         | Status                                                      |
 | ---- | ------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------- |
-| S2   | Mamay-12B on v4, 1 GPU, same util 0.90                        | Does composition beat **scaling** one open model?                | **No on overall:** 0.874 / p50 1352 ms vs router 0.848 / 633 ms. Router still wins knowledge, code, translate. |
+| S2   | Mamay-12B on v4, 1 GPU, same util 0.90                        | Does composition beat **scaling** one open model?                | **No on overall:** 0.884 (rescored) / p50 1352 ms vs router 0.848 (not rescored) / 633 ms. Router is ahead on code and translate; knowledge is 0.750 for both (12B rescored, router not). |
 | S3   | Hosted frontier API (e.g. gpt-4o), sequential, USD/1k queries | How far from the option a **data-residency** constraint forbids? | `scripts/archive/run_api_baseline.py` ready; **not run**            |
 
 
@@ -278,7 +288,7 @@ S2 landed above the router. The three pre-registered readings were:
 - **≈ 0.848** — claim latency and per-bucket robustness, not headline quality.
 - **> 0.848** — report it; fallback is “three small specialists approach a 12B, cheaper per query.”
 
-The measured case is the third: **0.874 > 0.848**, with the router still cheaper per query (p50 633 vs 1352 ms). The 12B's gains are instruct and alignment; the router still wins knowledge, code, and translate.
+The measured case is the third: **0.884 > 0.848** (12B rescored, router not rescored), with the router still cheaper per query (p50 633 vs 1352 ms). The 12B's gains are instruct and alignment; the router is ahead on code and translate; knowledge cannot be ranked until the router run is rescored.
 
 S3 is expected to win quality. Keep it **out of GPU columns**; cite USD and “data leaves perimeter = yes.” The thesis question is how much the on-prem composite gives up, not whether GPT is better in the abstract.
 
@@ -289,7 +299,7 @@ Draft table (S3 still empty):
 | ------------------- | --------------- | --------- | ------- | --------------------- |
 | Frontier API        | hosted          | —         | —       | **yes** (not run)     |
 | Rules v2 + few-shot | 3 GPUs resident | **0.848** | 633 ms  | no                    |
-| Mamay-12B           | 1 GPU           | **0.874** | 1352 ms | no                    |
+| Mamay-12B           | 1 GPU           | **0.884** | 1352 ms | no                    |
 | Aya-8B              | 1 GPU           | 0.785     | 867 ms  | no                    |
 | Mamay-4B            | 1 GPU           | 0.762     | 1125 ms | no                    |
 | Lapa-12B            | 1 GPU           | 0.732     | 1681 ms | no                    |
@@ -326,14 +336,14 @@ Metrics to report after the full run: final score / exact success; all-stages-pa
 | Leakage                    | Fixed in regex; leftover `chat-017` → knowledge         |
 | Rules v2                   | Matches gold-bucket oracle on v4                        |
 | Cascade / ensemble / 4-bit | None beat 0.848; skip product                           |
-| One-GPU packing            | **Done** — FP8, one card, 45 668 MiB, rules v2 **0.842** / p50 723 ms |
-| Mamay-12B on v4 (S2)       | **Done** — 0.874 / p50 1352 ms; beats the router on overall, loses on p50 |
+| One-GPU packing            | **Done** — FP8, one card, 45 668 MiB, rules v2 **0.852** (rescored) / p50 723 ms |
+| Mamay-12B on v4 (S2)       | **Done** — 0.884 (rescored) / p50 1352 ms; beats the router on overall, loses on p50 |
 | Frontier API on v4 (S3)    | **Next**                                                |
 | Composite 36×3 (S5/S6)     | Code done; **GPU eval next**                            |
 
 
-**Honest resource line:** the bf16 product cuts **median latency** and **active GPU-seconds** (~1.5 GPU-s / single-skill prompt) and still occupies three cards at util 0.90. Online FP8 puts the same three specialists on one card (45 668 MiB) at 0.842 / p50 723 ms.
+**Honest resource line:** the bf16 product cuts **median latency** and **active GPU-seconds** (~1.5 GPU-s / single-skill prompt) and still occupies three cards at util 0.90. Online FP8 puts the same three specialists on one card (45 668 MiB) at 0.852 (rescored) / p50 723 ms.
 
-**Product stop (single-skill):** rules v2 + few-shot, bf16, one hop, three specialists. That system matches the pool oracle. It does not match Mamay-12B on overall quality (0.848 vs 0.874); it is the faster on-prem system (p50 633 vs 1352 ms).
+**Product stop (single-skill):** rules v2 + few-shot, bf16, one hop, three specialists. That system matches the pool oracle. It does not match Mamay-12B on overall quality (0.848, not rescored, vs 0.884, rescored); it is the faster on-prem system (p50 633 vs 1352 ms).
 
 **Composite v2 (week 12):** larger split suite + constrained `template` planner — planning exact match **1.000** on held-out test; distillation not warranted. See [`week_12_composite_v2.md`](week_12_composite_v2.md). Do not mix with v1 0.812 / 0.882 cells.

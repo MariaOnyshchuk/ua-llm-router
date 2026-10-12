@@ -1,5 +1,15 @@
 # Key takeaways — Ukrainian LLM router (diploma)
 
+> **Scorer note (13 Oct 2026).** On 29 Sep a scorer bug was fixed (numeric
+> answers such as 1991 were read as multiple-choice indexes). Rescored runs:
+> week 9 (Mamay-12B on v4: 0.874 → **0.884**) and week 11 (FP8 pack: 0.842 →
+> **0.852**); in both, the whole change is in knowledge (0.688 → 0.750). The
+> week 5–7 runs (rules v1 and v2 at 0.842 and 0.848, the three specialists,
+> micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
+> are only on the lab. Those numbers are from before the fix and are probably
+> about 0.01 low, so do not subtract one of them from a rescored number. All
+> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+
 *Last updated: 2026-09-28. Weeks 7–10 pack (glossary, router diagrams, v4/v5/composite tables): [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md). Composite v2: [`docs/week_12_composite_v2.md`](week_12_composite_v2.md).*
 
 ## One-sentence claim
@@ -228,9 +238,9 @@ See **§E**. Baseline Lapa (and Mamay-4B) map social “1 — очікувано
 | 3 | **Selective cascade** (social 2 → Mamay-4B retry, no Mamay-12) | **Done** — 1.56% escalate, Δquality ≈ 0 |
 | 4 | **Ensemble / multi-agent** on discrete labels | **Done** — 0.843 vs 0.848; 3 flips net −1; skip product |
 | 5 | **Quantize** Mamay-4B / Lapa / Aya (bitsandbytes 4-bit) | **Done** — 0.830 / slower; keep bf16 |
-| 5b | Pack specialists on **one GPU** | **Done** — online FP8, utils 0.42/0.28/0.18, one card at 45 668 MiB. Rules v2 **0.842** / p50 723 ms vs bf16 0.848 / 633 ms. Knowledge 0.750 → 0.688. `results/week_11_pack_fp8/` |
+| 5b | Pack specialists on **one GPU** | **Done** — online FP8, utils 0.42/0.28/0.18, one card at 45 668 MiB. Rules v2 **0.852** (rescored; was 0.842) / p50 723 ms vs bf16 0.848 / 633 ms (not rescored). The knowledge drop 0.750 → 0.688 was the scorer bug; rescored knowledge is 0.750. `results/week_11_pack_fp8/` |
 | — | Full Mamay-4B / Lapa solo on v4 192×3 | **Done** (`week_6_v4_solos`) |
-| **6** | **S2: Mamay-12B on v4** — does composition beat scaling? | **Done** — **0.874** / p50 1352 ms vs router 0.848 / 633 ms. Headline quality goes to the 12B; the router stays faster and wins knowledge, code, translate. [`docs/week_9_baselines.md`](week_9_baselines.md) |
+| **6** | **S2: Mamay-12B on v4** — does composition beat scaling? | **Done** — **0.884** (rescored; was 0.874) / p50 1352 ms vs router 0.848 / 633 ms (not rescored). Headline quality goes to the 12B; the router stays faster and is ahead on code and translate. [`docs/week_9_baselines.md`](week_9_baselines.md) |
 | **7** | **S3: hosted frontier API on v4** — how far is the unavailable option? | **Not run** — spend not approved |
 | **8** | Composite benchmark + hybrid orchestrator | **Done** — oracle 0.882, one-hop 0.812, hybrid 0.768; use fixed workflows, not general planner |
 | **8b** | Composite v2 + constrained templates | **Planning done** — 200-item split suite; template exact=1.0 on test; distill **no**; live GPU bake-off ready (`eval_composite_v2_bakeoff.sbatch`) |
