@@ -1,5 +1,15 @@
 # Week 7 — S3 discrete ensemble (majority vote)
 
+> **Scorer note (13 Oct 2026).** On 29 Sep a scorer bug was fixed (numeric
+> answers such as 1991 were read as multiple-choice indexes). Rescored runs:
+> week 9 (Mamay-12B on v4: 0.874 → **0.884**) and week 11 (FP8 pack: 0.842 →
+> **0.852**); in both, the whole change is in knowledge (0.688 → 0.750). The
+> week 5–8 runs in this file (rules v1 and v2, the three specialists,
+> micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
+> are only on the lab. Those numbers are from before the fix and are probably
+> about 0.01 low. All of these are v4 development numbers; claims come from
+> `mixed_ua_v7` test.
+
 *31 Aug 2026. Suite: `mixed_ua_v4_balanced.jsonl` (192), T=0, seed=42, **1 repeat**, max_tokens=256, few-shot alignment.*
 
 Rules v2 first hop, then **majority vote only** on votable discrete labels: all **alignment** (32) + **ZNO** (`id` starts with `zno-`, 24). Voters: Lapa, Mamay-4B, Aya. Tie-break = first hop. Open knowledge / chat / code / translate stay single-call.

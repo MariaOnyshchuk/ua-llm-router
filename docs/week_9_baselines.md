@@ -1,5 +1,15 @@
 # Week 9 — the two missing reference points
 
+> **Scorer note (13 Oct 2026).** On 29 Sep a scorer bug was fixed (numeric
+> answers such as 1991 were read as multiple-choice indexes). Rescored runs:
+> week 9 (Mamay-12B on v4: 0.874 → **0.884**) and week 11 (FP8 pack: 0.842 →
+> **0.852**); in both, the whole change is in knowledge (0.688 → 0.750). The
+> week 5–8 runs in this file (rules v1 and v2, the three specialists,
+> micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
+> are only on the lab. Those numbers are from before the fix and are probably
+> about 0.01 low. All of these are v4 development numbers; claims come from
+> `mixed_ua_v7` test.
+
 *S2 scored 26 Sep 2026. S3 not run (API spend not approved).*
 
 Everything so far compares the router against models **inside its own pool**, which a reviewer can call circular. These two runs give the comparisons a decision-maker actually weighs: *scale up one open model* or *call a hosted frontier model*.
@@ -17,12 +27,12 @@ Served on one RTX 6000 Ada, bf16, `gpu_memory_utilization=0.90`, `:8002`. HTTP *
 
 | System | Overall | p50 | chat | code | translate | instruct | knowledge | alignment | GPU-s / prompt |
 |--------|--------:|----:|-----:|-----:|----------:|---------:|----------:|----------:|---------------:|
-| **Mamay-12B** | **0.874** | 1352 | 1.000 | 0.969 | 0.805 | **0.938** | 0.688 | **0.844** | 2.49 |
+| **Mamay-12B** (rescored 29 Sep; overall was 0.874, knowledge 0.688) | **0.884** | 1352 | 1.000 | 0.969 | 0.805 | **0.938** | 0.750 | **0.844** | 2.49 |
 | Rules v2 + few-shot | 0.848 | **633** | 1.000 | **0.984** | **0.820** | 0.781 | **0.750** | 0.750 | ~1.5 |
 
 Repeat overalls: 0.875, 0.873, 0.873 (sd 0.001). p50 repeat values 1354, 1353, 1348 ms.
 
-**Mamay-12B > 0.848.** Composition does not beat scaling on headline quality. The router is still the faster system (p50 633 vs 1352 ms, about 1.5 vs 2.49 GPU-seconds per prompt) and still wins knowledge, code, and translate. The 12B wins instruct (+0.157) and alignment (+0.094). Chat is a tie at 1.000.
+**Mamay-12B > 0.848.** Composition does not beat scaling on headline quality. The router is still the faster system (p50 633 vs 1352 ms, about 1.5 vs 2.49 GPU-seconds per prompt) and is still ahead on code and translate; knowledge is 0.750 for both, with Mamay-12B rescored and the router not. The 12B wins instruct (+0.157) and alignment (+0.094). Chat is a tie at 1.000.
 
 The runner and sbatch, kept here so the run can be repeated. Serve on `:8002` at the **same** `gpu_memory_utilization=0.90` as every other single-model run, so the VRAM figure stays comparable.
 
@@ -92,7 +102,7 @@ python ../../scripts/aggregate_repeat_scores.py scores_rep*.json \
 | System | Hardware | Overall | p50 | Data leaves perimeter |
 |--------|----------|--------:|----:|-----------------------|
 | Frontier API | none (hosted) | — | — | **yes** (not run) |
-| Mamay-12B | 1 GPU | **0.874** | 1352 ms | no |
+| Mamay-12B | 1 GPU | **0.884** (rescored) | 1352 ms | no |
 | Rules v2 + few-shot | 3 GPUs resident | 0.848 | **633 ms** | no |
 | Aya-8B (best single in the pool) | 1 GPU | 0.785 | 867 ms | no |
 | Mamay-4B | 1 GPU | 0.762 | 1125 ms | no |
