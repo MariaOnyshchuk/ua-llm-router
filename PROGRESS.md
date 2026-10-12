@@ -1,5 +1,29 @@
 # Progress
 
+## Morning summary (13 Oct 2026)
+
+**Done**
+
+- All work from 10–12 Oct is committed in small commits, authored by Maria only, no trailers.
+- Tests: 69 passed, 1 skipped (the kNN test, `scikit-learn` not installed). 0 failed.
+- `v3_instruct` routing profile tried offline on v7 dev: +0.006 [−0.030, +0.041] on instruct, not distinguishable. Not recommended.
+- Docs: Mamay-12B on v4 is 0.884 and the FP8 pack 0.852 (rescored); week 5–8 numbers are marked "not rescored"; v6 is marked withdrawn everywhere and the docs point to v7.
+- Ledger rebuilt (567 rows): v6 runs `superseded`, two v7 dev runs `provisional`. Every results folder has a README line.
+- The progress report ends with "Ready to freeze".
+
+**Blocked**
+
+- Nothing is blocked.
+
+**Maria must run or decide**
+
+- Push the branch: `git push --force-with-lease origin 2026-08-31-323p` (history was rewritten to drop 17 `Co-Authored-By` trailers; backup branch `backup/before-trailer-rewrite-20261013`).
+- The test jobs are not ready: the v6 cluster jobs are pinned to the v6 file and the AgentCoMa jobs to `max_tokens 256`. See "What is missing before the test runs can be submitted" in the report. A v7 job has to be written and tried on dev first.
+- Decide whether v7 test runs the planner (`hybrid_gated`) or only one-hop rules v2.
+- `docs/HANDOFF.md` is updated but still untracked, as you asked earlier. Commit it if you want it in the repo.
+- The `v6_rules` ledger note still names the old hash `f3bc8ff` (now `34ab9e4`).
+- Read `DECISIONS.md` for the choices made without asking.
+
 Rules are in `TASK.md`. Take the first step that is not ticked and not
 `BLOCKED`. One line of notes under each step when it is finished. The finish
 line described in `TASK.md` goes at the very end of this file, and only when
@@ -91,6 +115,7 @@ every step is ticked or blocked.
   `cluster/*.sbatch` file exists and accepts the v7 test split; if one does
   not, say what is missing instead of inventing a command. Run nothing.
 
-- [ ] **8. Close.**
+- [x] **8. Close.**
+  Done 13 Oct: 69 passed, 1 skipped; no modified tracked files; summary written.
   Run the full test suite, check every "Done means" item in `TASK.md`, write
   the morning summary at the top of this file, commit, and add the finish line.
