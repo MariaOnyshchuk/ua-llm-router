@@ -75,7 +75,9 @@ every step is ticked or blocked.
   `docs/hf_dataset_card.md` to the current state; do not upload. Rewrite the
   STATE and NEXT lines of `docs/HANDOFF.md` so they match 12 Oct.
 
-- [ ] **7. Write the "Ready to freeze" section.**
+- [x] **7. Write the "Ready to freeze" section.**
+  Done 13 Oct, with one finding: the v6 jobs are pinned to the v6 file and the AgentCoMa jobs to `max_tokens 256`,
+  so no ready `sbatch` line exists for v7 test. The section lists what is missing instead of inventing commands.
   At the end of `docs/progress_report_2026-10-12.md` list: the routing profile,
   planner profile, prompts and few-shot files proposed for freezing, with the
   commit hash from this branch; the open decisions for Maria (use the step 3

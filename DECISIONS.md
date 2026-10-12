@@ -34,3 +34,7 @@ other option was.
 - **Step 6. The note of the `v6_rules` ledger entry still names the old commit
   hash `f3bc8ff`** (now `34ab9e4` after the trailer rewrite). Left unchanged: a
   permission check blocked inspecting it, and the run is withdrawn anyway.
+- **Step 7. No new cluster job was written.** The v6 jobs cannot take the v7
+  test split, and a new job for a one-shot test run should be tried on dev with
+  Maria present. Other option: write `cluster/eval_v7.sbatch` unattended and
+  untested.

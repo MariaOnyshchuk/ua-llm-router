@@ -404,3 +404,87 @@ negative result.
   `results/analysis/v7_dev_preliminary.json`, `results/v7_pool/`.
 - Code change: `router/planner.py` (profile `hybrid_gated`), not committed.
 - Raw rows stay in `logs/` (local, not in git).
+
+## Ready to freeze (13 Oct)
+
+Nothing in this section has been run. The test splits are untouched.
+
+### Proposed frozen configuration
+
+| Part | Choice | File | Last commit that changed it |
+|---|---|---|---|
+| Routing | rules profile `v2` | `router/intent_rules.py` | `5bf829b` (added `v3_instruct` beside it; `v2` rules unchanged since before v7) |
+| Alignment prompt | `--align-prompt fewshot` | `scripts/alignment_prompt_variants.py` | `11a1d0d` |
+| Bucket few-shot | none (it made dev worse) | — | — |
+| Planner | `hybrid_gated` | `router/planner.py` | `9dbb1b7` |
+| Decoding | T=0, seed 42, max_tokens 1024, one pass on v7; 3 repeats on AgentCoMa | — | — |
+| Specialists | Mamay-4B, Lapa-12B, Aya-8B, bf16, `gpu_memory_utilization` 0.90, one model per card | `cluster/serve_*.sbatch` | — |
+
+To freeze: review this branch, then record the commit hash of its tip in the
+ledger note of the test runs. No file may change between that hash and the
+test runs.
+
+### Decisions still open
+
+| Decision | State |
+|---|---|
+| Use the `v3_instruct` profile | Not recommended: not distinguishable from `v2` on dev (+0.006 [−0.030, +0.041] on instruct). |
+| Escalate word problems to Mamay-12B | Decided on 12 Oct: no. Mamay-12B is a reference baseline only. |
+| Run the planner (`hybrid_gated`) on v7 test, or only one-hop rules v2 | Open. v7 items are single-skill, so the planner can only cost calls there; the dev false-split rate is 0.035. One-hop rules v2 is the comparable row to the solo models. |
+
+### What is missing before the test runs can be submitted
+
+The existing jobs cannot run v7 test as they are. Commands are therefore not
+given for those; writing them here would be inventing them.
+
+| Run | Job file | Exists | What is missing |
+|---|---|---|---|
+| v7 test, three specialists and Mamay-12B alone | `cluster/eval_v6_solo.sbatch` | yes | It calls `scripts/week_v6_eval_pipeline.sh`, which pins `V6="benchmarks/mixed_ua_v6.jsonl"` and writes to `results/v6_solos`. It takes no suite or split argument, and `scripts/run_small_router_cluster.py` has no `--split`. Running it would score v6 again and overwrite `results/v6_solos/scores.json`. |
+| v7 test, rules v2 router | `cluster/eval_v6_router.sbatch` | yes | Same pipeline, same pin; writes to `results/v6_rules`. |
+| Mamay-27B FP8 on v7 test | `cluster/eval_v6_solo.sbatch` with `ALIAS=mamay27` | yes | Same pin. |
+| AgentCoMa-UK test, router systems | `cluster/eval_agentcoma_200.sbatch` | yes | Accepts `SPLIT`, `SYSTEMS` and `REPEATS`, but `--max-tokens 256` is hard-coded (line 114). Dev tuning used 1024, and at 256 the reasoning answers are cut off. |
+| AgentCoMa-UK test, one model alone | `cluster/eval_agentcoma_solo.sbatch` | yes | Accepts `SPLIT` and `ALIAS`, but `--max-tokens 256` and `--repeats 1` are hard-coded. |
+
+Smallest change that closes the gap (to do with Maria, then try once on the
+**dev** split before any test run):
+
+1. A test-only suite file on the lab, made from `benchmarks/mixed_ua_v7.jsonl`
+   by keeping the rows with `"split": "test"` (the dev file
+   `benchmarks/mixed_ua_v7_dev.jsonl` is already there).
+2. A job `cluster/eval_v7.sbatch` copied from the two v6 jobs, with the suite
+   path and the output folder as variables (`results/v7_test_solos`,
+   `results/v7_test_router`), calling `run_small_router_cluster.py` directly.
+3. `MAX_TOKENS` and `REPEATS` as variables in the two AgentCoMa jobs.
+
+Once the two AgentCoMa jobs take `MAX_TOKENS`, their submit lines would be
+(`SPLIT`, `SYSTEMS`, `REPEATS`, `ALIAS` are already supported):
+
+```bash
+SPLIT=test SYSTEMS=router_direct,hybrid_gated,oracle REPEATS=3 MAX_TOKENS=1024 sbatch cluster/eval_agentcoma_200.sbatch
+sbatch --job-name=ac-mamay12 --export=ALL,ALIAS=mamay12,SPLIT=test,REPEATS=3,MAX_TOKENS=1024 cluster/eval_agentcoma_solo.sbatch
+```
+
+### Files to copy to the lab first
+
+The lab `~/Diploma` is not a git checkout. Copy with `scp` and compare
+checksums before any run:
+
+| File | Why |
+|---|---|
+| `router/planner.py` | `hybrid_gated` profile |
+| `router/intent_rules.py` | `v3_instruct` added; `v2` unchanged |
+| `benchmarks/mixed_ua_v7.jsonl` | claim suite (only the dev file is on the lab) |
+| `benchmarks/agentcoma_uk_200_composite.jsonl` | rebuilt with the fixed oracle plan; local only, never in git |
+| `scripts/build_progress_ledger.py`, `tests/` | not needed for the runs |
+
+Before submitting: `squeue -u $USER` and `nvidia-smi`. On 10–12 Oct card 0 was
+partly used by another user, so a job that Slurm placed there failed at 0.90
+utilisation.
+
+### After the test runs
+
+Score each repeat separately, add the runs to the ledger registry with the
+frozen commit hash, rebuild the ledger, and compute every claimed difference
+with a paired bootstrap interval. Then update `key_takeaways.md`,
+`thesis_scope.md` and `conclusion.md` from those tables only.
+
