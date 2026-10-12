@@ -8,7 +8,7 @@ Find out how good the router (Mamay-4B, Lapa-12B, Aya-8B behind rules) is compar
 
 ## Ground rules
 
-- Use only existing benchmarks. Do not create synthetic benchmarks. Single skills: `benchmarks/mixed_ua_v6.jsonl` (2414). Composite tasks: AgentCoMa-UK, `benchmarks/agentcoma_uk_200_*.jsonl` (50 dev + 150 test, local only, never commit or publish prompts). `mixed_ua_v4_balanced` (192) is for wiring checks only.
+- Use only existing benchmarks. Do not create synthetic benchmarks. Single skills: `benchmarks/mixed_ua_v7.jsonl` (4237: dev 1487 for tuning, test 2750 for claims, run once after the router is frozen). `mixed_ua_v6` (2414) is withdrawn since 12 Oct 2026: its item selection was inverted, see `docs/mixed_ua_v6.md`; do not cite v6 numbers. Composite tasks: AgentCoMa-UK, `benchmarks/agentcoma_uk_200_*.jsonl` (50 dev + 150 test, local only, never commit or publish prompts). `mixed_ua_v4_balanced` (192) is for wiring checks only.
 - One run per experiment is fine (T=0, seed=42). Every claimed difference has a paired bootstrap 95% interval (`scripts/analysis/bootstrap_compare.py`). If the interval contains 0, write "not distinguishable".
 - Tune on dev only. Freeze the routing table, prompts and few-shot examples, write the commit hash in the ledger, then run test once.
 - Metrics always go in tables. Plain direct language. Answer the user in Ukrainian or English, never Russian.
@@ -19,7 +19,7 @@ Find out how good the router (Mamay-4B, Lapa-12B, Aya-8B behind rules) is compar
 ## Phase 0: clean base (before any new run)
 
 1. Confirm the scorer fix in `scripts/score_results.py` is committed and tests pass (`pytest -q`).
-2. List which cited runs still have old scores (week_6, week_7, week_9, week_11, v6 solos) and give the user the rescoring commands. Do not proceed to comparisons until they are rescored.
+2. List which cited runs still have old scores (week_6, week_7, week_9, week_11; v6 solos were rescored but v6 is withdrawn) and give the user the rescoring commands. Do not proceed to comparisons until they are rescored.
 3. Rebuild `results/progress_ledger.csv`; check that the FP8 pack run has its own label.
 
 Done when: one table of run, scorer version, rescored yes/no.
@@ -30,7 +30,7 @@ Systems: mamay4, lapa, aya, mamay12, mamay27 (FP8), router rules v2. On AgentCoM
 
 | Benchmark | Split | Systems | Runner |
 |---|---|---|---|
-| v6 | all 2414 | all six | `cluster/eval_v6_solo.sbatch`, `cluster/eval_v6_router.sbatch` |
+| v7 | dev 1487 for tuning; test 2750 once, after freeze | all six | `cluster/eval_v6_solo.sbatch`, `cluster/eval_v6_router.sbatch` with the v7 file (the job names still say v6) |
 | AgentCoMa-UK | dev 50 first, test 150 once | all six plus oracle and template | `cluster/eval_agentcoma_200.sbatch` (add the solo systems; they are missing) |
 
 Also run the AgentCoMa step questions alone (`question_commonsense_uk`, `question_math_uk` in `agentcoma_uk_200_merged.jsonl`) for every model, so the compositional gap can be computed: share of tasks where both steps are right alone minus share of composite answers that are right.
@@ -43,7 +43,7 @@ The final score is not enough. Produce these tables from the existing per-item f
 
 | Analysis | Question it answers | Source |
 |---|---|---|
-| Per-bucket gap to the big model, with intervals | where does the router lose | v6 scored details |
+| Per-bucket gap to the big model, with intervals | where does the router lose | v7 scored details (dev: `results/analysis/v7_dev_router_vs_mamay12.json`) |
 | Routing accuracy: share of items sent to the best solo model per bucket, and the score if every item went to its best model (route oracle) | is the loss from routing or from the specialists | router route field + solo scores |
 | Parse and format failures vs wrong answers | is the loss real quality or scorer/format | `method` fields in scorer details |
 | Latency and GPU cost per point of score | is the router worth it | ledger, `plot_tradeoff.py` |

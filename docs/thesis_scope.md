@@ -57,7 +57,7 @@ S2 and S3 are the two reference points that turn "router beats its own pool" (ne
 
 ## 5. Evaluation
 
-**Single-skill next suite:** `benchmarks/mixed_ua_v6.jsonl` is frozen (2414 items; headline 683 knowledge / 683 translate / 683 alignment / 327 instruct; chat+code appendix). Methods: [`docs/mixed_ua_v6.md`](mixed_ua_v6.md). Published claims stay on `mixed_ua_v4_balanced.jsonl` (192×3) until the 3× v6 bake-off is scored — **do not quote screening means**. Decoding for v6: `T=0`, `seed=42`, `max_tokens=1024`.
+**Single-skill claim suite:** `benchmarks/mixed_ua_v7.jsonl` (4237 items, no score-based selection; dev 1487 for tuning, test 2750 for claims: knowledge 794, translate 795, alignment 800, instruct 361). `mixed_ua_v6` (2414) is withdrawn 12 Oct 2026, see [`docs/mixed_ua_v6.md`](mixed_ua_v6.md): its selection kept the items where the three specialists score the same, so no v6 number is cited. State on v7 **dev** (12 Oct, not a claim): router 0.680 vs Mamay-12B 0.710 on the macro of four buckets, difference −0.030 [−0.048, −0.012], all of it in instruct; router vs the best single specialist +0.046 [+0.025, +0.069]. Details: [`docs/progress_report_2026-10-12.md`](progress_report_2026-10-12.md). Decoding for v7: `T=0`, `seed=42`, `max_tokens=1024`, one pass.
 
 Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Code + HumanEval (code). Chat and instruct are hand-written — open UA data barely exists for them, and that is a stated limitation.
 

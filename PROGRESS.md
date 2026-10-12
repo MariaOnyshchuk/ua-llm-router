@@ -55,7 +55,9 @@ every step is ticked or blocked.
   scored summaries, not from memory. Week 6 and week 7 runs were not rescored:
   keep their numbers and mark them "before the scorer fix, not rescored".
 
-- [ ] **5. Remove v6 as evidence from the docs.**
+- [x] **5. Remove v6 as evidence from the docs.**
+  Done 13 Oct: `CLAUDE_CODE_PLAN.md`, `thesis_scope.md`, `benchmarks.md`, `hf_dataset_card.md`, `results/README.md`
+  now name v7 and mark v6 withdrawn; `README.md` had no v6 number; `HANDOFF.md` is handled in step 6.
   Search all of `docs/`, `README.md`, `results/README.md` and
   `docs/CLAUDE_CODE_PLAN.md` for v6 numbers and statements ("not
   distinguishable from the specialists", route oracle 0.660, −0.027). Mark each

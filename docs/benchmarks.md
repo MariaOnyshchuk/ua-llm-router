@@ -33,7 +33,8 @@ benchmarks/
   mixed_ua_v3.jsonl          # v2 ∪ 22 hand-written code items (182; code=30) — unbalanced
   mixed_ua_v4_balanced.jsonl # **32 per bucket × 6 = 192** (historical claims)
   mixed_ua_v6_screen.jsonl   # warehouse screening draw
-  mixed_ua_v6.jsonl          # IRT-curated eval (frozen; v4/v5 untouched)
+  mixed_ua_v6.jsonl          # withdrawn 12 Oct 2026: selection was inverted (docs/mixed_ua_v6.md)
+  mixed_ua_v7.jsonl          # claim suite: whole pool, dev 1487 / test 2750
   mixed_ua_composite_v1.jsonl  # 36 dependent workflows (historical)
   mixed_ua_composite_v2.jsonl  # 200 items, 5 families, train/dev/test
   agentcoma_uk_50*.jsonl       # AgentCoMa-UK 50 (source dev split) — local only, gitignored
