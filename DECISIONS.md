@@ -50,3 +50,7 @@ other option was.
 - **Extra step 13. The IFEval scorer was not fixed**, only measured: `AGENTS.md`
   requires rescoring every cited run after a scorer change, and week 5-7 raw
   files are not on this laptop. Other option: fix it and rescore what is local.
+- **00:45, 13 Oct. Maria allowed a second block**: fix the IFEval checks and
+  rescore local runs, and run the new router job on the dev split on the lab
+  (plain and with the format guard). Written into `TASK.md`. Test split, push
+  and uploads stay forbidden.

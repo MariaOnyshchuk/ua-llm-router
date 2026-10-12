@@ -102,3 +102,29 @@ submit the test runs herself.
 When every step is ticked or `BLOCKED`, put a short "Morning summary" at the
 top of `PROGRESS.md` (what was done, what is blocked, what Maria must run or
 decide, each in one line), commit, and add `ALL DONE` as the last line.
+
+## Second night block (allowed by Maria on 13 Oct, 00:45)
+
+These two things are now allowed, in addition to the rules above. Everything
+else above still holds.
+
+1. **Fix the three wrong checks in `scripts/ifeval_check.py`** (bullet lists
+   registered under the wrong family, placeholders matched in Latin capitals
+   only, `repeat_prompt` compared with the whole request). Then rescore every
+   run whose raw answers are on the laptop, rebuild the derived tables, the
+   ledger and the report. Runs whose raw files are only on the lab (weeks 5-7,
+   week 9, week 11) stay as they are and are marked "not rescored after the
+   IFEval fix". `scripts/score_results.py` itself stays untouched unless the
+   fix cannot be made otherwise.
+2. **Dev-split runs on the lab**: `ssh`, `scp`, `rsync`, `sbatch`, `squeue`,
+   `scancel` to `ucu-lab-2240` are allowed for this purpose only. Run
+   `cluster/eval_v7_router.sbatch` on **dev**, plain and with `FORMAT_GUARD=1`.
+   Before submitting: copy the changed files with `scp` and compare checksums;
+   check `squeue -u $USER` and `nvidia-smi`; do not start on a card that
+   already holds memory. Cancel every job you started when it is no longer
+   needed. Pull back scores and item scores with `rsync`.
+
+Still forbidden: the **test** split of v7 and AgentCoMa (never pass
+`SPLIT=test`), `git push`, Hugging Face upload, paid APIs, deleting results.
+If the lab is unreachable or the cards are busy, do part 1 only and say so.
+
