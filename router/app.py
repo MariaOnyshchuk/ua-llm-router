@@ -17,7 +17,7 @@ from typing import Any
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from router.backends import BACKENDS, MODEL_META, PLAYGROUND_MODELS
@@ -58,11 +58,9 @@ def _pool_from_body(body: dict[str, Any]) -> frozenset[str] | None:
 
 
 @app.get("/")
-def playground() -> FileResponse:
-    index = STATIC_DIR / "index.html"
-    if not index.is_file():
-        raise HTTPException(status_code=404, detail="playground UI missing")
-    return FileResponse(index)
+def playground() -> RedirectResponse:
+    """There is one page: the demo and debug view at /debug."""
+    return RedirectResponse("/debug")
 
 
 @app.get("/healthz")

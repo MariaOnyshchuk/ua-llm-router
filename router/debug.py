@@ -453,7 +453,7 @@ async def composite(body: dict[str, Any]) -> StreamingResponse:
                         plan = Plan.from_dict(item["oracle_plan"], source="oracle")
                         planning: dict[str, Any] = {"valid": True, "attempts": [], "mode": "oracle"}
                     else:
-                        plan, planning = await generate_plan(prompt, caller, profile=planner)
+                        plan, planning = await generate_plan(prompt, caller, profile=planner, router_profile=params.profile)
                     await queue.put({"type": "plan", "plan": plan.to_dict(), "planning": planning})
                     execution = await execute_plan(plan, caller, profile=params.profile)
                     final: dict[str, Any] = {"type": "final", "execution": execution}

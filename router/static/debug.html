@@ -69,6 +69,12 @@
   details.settings summary, details.more summary { cursor: pointer; color: var(--muted); font-size: 14px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 14px; margin-top: 10px; }
   .grid label, aside label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .grid.wide { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .grid small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.35; }
+  .modehint { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+  .about { margin: 0 0 16px; font-size: 15px; }
+  .about summary { cursor: pointer; color: var(--muted); }
+  .about ol { margin: 10px 0 0; padding-left: 1.3em; } .about li { margin-bottom: 4px; }
   .grid select, .grid input:not([type=checkbox]), aside select, aside input { width: 100%; background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
   aside label { margin-top: 10px; }
 
@@ -169,6 +175,16 @@
   </aside>
 
   <main>
+    <details class="card about">
+      <summary>What am I looking at?</summary>
+      <ol>
+        <li>You type a request. Three small Ukrainian models are available; each is good at different things.</li>
+        <li>The <b>router</b> reads the request, decides what kind it is (translation, facts, ethics, writing with rules, code, conversation) and sends it to one model. The chosen model is highlighted in yellow, with the reason.</li>
+        <li>Most requests need one model call. If a request clearly contains several tasks that depend on each other ("translate this, then explain it"), the mode <b>Plan steps if needed</b> splits it into steps and shows each step.</li>
+        <li><b>Compare with one model</b> sends the same request to the router and to one model you pick, side by side.</li>
+      </ol>
+    </details>
+
     <section class="card" id="itemcard" hidden></section>
 
     <section class="card">
@@ -176,29 +192,39 @@
       <div class="examples" id="examples"></div>
       <div class="bar">
         <div class="seg" id="mode" role="group" aria-label="Mode">
-          <button data-m="router" aria-pressed="true">Router</button>
-          <button data-m="compare" aria-pressed="false">Router vs one model</button>
-          <button data-m="composite" aria-pressed="false">Multi-step</button>
-          <button data-m="model" aria-pressed="false">One model</button>
+          <button data-m="router" aria-pressed="true">Ask the router</button>
+          <button data-m="compare" aria-pressed="false">Compare with one model</button>
+          <button data-m="composite" aria-pressed="false">Plan steps if needed</button>
+          <button data-m="model" aria-pressed="false">Ask one model</button>
         </div>
         <span class="inline" id="modelbox" hidden><span id="modellabel">Model</span><select id="model" aria-label="Model"></select></span>
         <span class="spacer"></span>
         <button id="stop" disabled>Stop</button>
         <button class="primary" id="run">Run</button>
       </div>
+      <p class="modehint" id="modehint"></p>
       <details class="settings">
         <summary>Settings</summary>
-        <div class="grid">
-          <div id="profilebox"><label for="profile">Router table</label><select id="profile"></select></div>
-          <div id="alignbox"><label for="align">Alignment prompt</label>
-            <select id="align"><option value="fewshot">fewshot</option><option value="baseline">baseline</option></select></div>
-          <div id="plannerbox"><label for="planner">Planner</label><select id="planner"></select></div>
+        <div class="grid wide">
+          <div id="profilebox"><label for="profile">How the specialist is chosen</label><select id="profile"></select>
+            <small>The router reads the request and picks one of the three models.</small></div>
+          <div id="plannerbox"><label for="planner">How steps are planned</label><select id="planner"></select>
+            <small>Only used in "Plan steps if needed".</small></div>
+          <div id="alignbox"><label for="align">Questions that ask for a 0/1/2 rating</label>
+            <select id="align"><option value="fewshot">Explain the scale with examples (recommended)</option><option value="baseline">Send the request as it is</option></select>
+            <small>Affects only benchmark items that rate an action on a number scale.</small></div>
           <div id="oraclebox"><label for="oracle">Benchmark item plan</label>
-            <label style="display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="oracle"> use the gold (oracle) plan</label></div>
-          <div><label for="temp">Temperature</label><input id="temp" type="number" step="0.1" value="0"></div>
-          <div><label for="maxtok">max_tokens</label><input id="maxtok" type="number" value="1024"></div>
-          <div><label for="seed">seed</label><input id="seed" type="number" value="42"></div>
+            <label style="display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="oracle"> use the correct plan stored with the item</label>
+            <small>Shows how far a perfect plan would get. Needs an item from Benchmark tools.</small></div>
         </div>
+        <details class="more">
+          <summary>For experiments</summary>
+          <div class="grid">
+            <div><label for="temp">Randomness (temperature)</label><input id="temp" type="number" step="0.1" value="0"><small>0 = the same answer every time.</small></div>
+            <div><label for="maxtok">Longest answer (tokens)</label><input id="maxtok" type="number" value="1024"><small>A longer answer is cut off.</small></div>
+            <div><label for="seed">Seed</label><input id="seed" type="number" value="42"><small>Fixes the randomness so a run can be repeated.</small></div>
+          </div>
+        </details>
       </details>
     </section>
 
@@ -232,6 +258,29 @@ const POOL = [
   { alias: "lapa", role: "knowledge · ethics" },
   { alias: "mamay4", role: "instructions · code · planning" },
 ];
+const KIND = { translate: "translation", knowledge: "facts", alignment: "ethics", instruct: "writing with rules",
+  code: "code", chat: "conversation", explicit: "your choice", fixed: "your choice", default: "conversation" };
+const kind = (i) => KIND[i] || i;
+const PROFILE_LABEL = {
+  v2_llm: "Keyword rules, then a small model if no rule fits (best for everyday wording)",
+  v2: "Keyword rules only (the version measured on the benchmark)",
+  v3_instruct: "Keyword rules + \"write a …\" requests to Mamay-4B (experiment, no gain)",
+  v1: "Old keyword rules from August",
+};
+const PLANNER_LABEL = {
+  hybrid_gated: "Plan only when the request has several tasks (recommended)",
+  template: "Fixed step templates, no model (benchmark task types only)",
+  hybrid: "Old planner: always splits into 2–4 steps (for comparison)",
+  hybrid_fewshot: "Old planner with examples (for comparison)",
+  hybrid_minimal: "Old planner, short instruction (for comparison)",
+  hybrid_mamay12: "Old planner run by Mamay-12B (that model must be online)",
+};
+const MODE_HINT = {
+  router: "One model call. The router picks the specialist for this request.",
+  compare: "The same request goes to the router and to one model you choose, side by side.",
+  composite: "First decides whether the request is one task or several. One task: one call. Several: a short plan, one specialist per step.",
+  model: "No routing: the request goes straight to the model you choose.",
+};
 const INTENT_MODEL = { translate: "aya", chat: "aya", knowledge: "lapa", alignment: "lapa", instruct: "mamay4", code: "mamay4" };
 const EXAMPLES = [
   { label: "Translation", text: "Переклади англійською: Я запізнюсь на 10 хвилин." },
@@ -331,13 +380,16 @@ async function loadHealth() {
   fill($("model"), aliases.map((a) => ({ value: a, label: nice(a) + (d.backends[a].up ? "" : " (offline)") })), true);
   const up = (a) => d.backends[a] && d.backends[a].up;
   $("model").value = ["mamay12", "aya", "lapa", "mamay4"].find(up) || aliases[0];
-  fill($("profile"), d.profiles, true);
+  /* learned profiles (knn, clf) need a library that is not installed here, so they are not offered */
+  const offered = Object.keys(PROFILE_LABEL).filter((x) => d.profiles.includes(x));
+  fill($("profile"), offered.map((x) => ({ value: x, label: PROFILE_LABEL[x] })), true);
   /* ?profile=v2_llm (and optionally &mode=compare) in the address opens the page with that setting */
   const params = new URLSearchParams(location.search), wanted = params.get("profile");
-  $("profile").value = d.profiles.includes(wanted) ? wanted : "v2";
-  if (d.profiles.includes(wanted)) document.querySelector("details.settings").open = true;
+  $("profile").value = offered.includes(wanted) ? wanted : (offered.includes("v2_llm") ? "v2_llm" : "v2");
+  if (offered.includes(wanted)) document.querySelector("details.settings").open = true;
   state.startMode = ["router", "compare", "composite", "model"].includes(params.get("mode")) ? params.get("mode") : "router";
-  fill($("planner"), d.planners, true);
+  const planners = Object.keys(PLANNER_LABEL).filter((x) => d.planners.includes(x));
+  fill($("planner"), planners.map((x) => ({ value: x, label: PLANNER_LABEL[x] })), true);
   $("planner").value = d.planners.includes("hybrid_gated") ? "hybrid_gated" : "hybrid";
   renderStrip(null);
 }
@@ -350,7 +402,7 @@ function renderStrip(pick) {
 function showWhy(trace, live) {
   if (!trace) { $("why").replaceChildren(h("span", { class: "muted" }, "Start typing: the route is decided by rules before any model is called.")); renderStrip(null); return; }
   renderStrip(trace.model);
-  put($("why"), h("span", { class: "tag" }, trace.intent), h("span", {}, "→ ", h("b", {}, nice(trace.model))),
+  put($("why"), h("span", { class: "tag", title: "internal name: " + trace.intent }, kind(trace.intent)), h("span", {}, "→ ", h("b", {}, nice(trace.model))),
     h("span", { class: "muted", title: trace.reason || "" }, trace.learned ? "chosen by the learned router"
       : /^no rule matched/.test(trace.reason || "") ? "no rule matched, so Mamay-4B named the type"
       : /^default/.test(trace.reason || "") ? "no rule matched: default route"
@@ -427,12 +479,13 @@ function setMode(m) {
   document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m));
   $("modelbox").hidden = m === "router" || m === "composite";
   $("modellabel").textContent = m === "compare" ? "against" : "Model";
+  $("modehint").textContent = MODE_HINT[m] || "";
   $("profilebox").hidden = m === "model";
   $("alignbox").hidden = m === "composite";
   $("plannerbox").hidden = $("oraclebox").hidden = m !== "composite";
   $("routecard").hidden = m === "model";
-  $("routetitle").textContent = m === "composite" ? "The specialists a plan can use" : "Where this request goes";
-  if (m === "composite") showWhy(null), $("why").replaceChildren(h("span", { class: "muted" }, "A gate decides first whether this is one task or several. Most requests are one task."));
+  $("routetitle").textContent = m === "composite" ? "The three specialists" : "Where this request goes";
+  if (m === "composite") showWhy(null), $("why").replaceChildren(h("span", { class: "muted" }, "The models used for this request light up as the steps run."));
   else preview();
 }
 
@@ -448,14 +501,14 @@ function newLane(title, sub) {
 function ruleTable(t) {
   if (!t.rules || !t.rules.length) return null;
   const first = t.rules.findIndex((r) => r.matched);
-  return h("details", { class: "more" }, h("summary", {}, "Rule table (" + t.rules.filter((r) => r.matched).length + " matched, the first match wins)"),
+  return h("details", { class: "more" }, h("summary", {}, "Keyword rules checked (" + t.rules.filter((r) => r.matched).length + " matched; the first match wins)"),
     ...t.rules.map((r, i) => h("div", { class: "rule" + (i === first ? " fired" : "") },
-      h("span", {}, r.matched ? "●" : "○"), r.intent + " → " + r.model, r.matched ? h("span", {}, "“" + r.match_text + "”") : null)));
+      h("span", {}, r.matched ? "●" : "○"), kind(r.intent) + " → " + nice(r.model), r.matched ? h("span", {}, "“" + r.match_text + "”") : null)));
 }
 function handleLane(lane, ev, isRouter) {
   if (ev.type === "route") {
     lane.trace = ev.trace;
-    if (isRouter) { showWhy(ev.trace, true); lane.sub.replaceChildren(h("span", { class: "tag" }, ev.trace.intent), " answered by ", h("b", {}, nice(ev.alias))); }
+    if (isRouter) { showWhy(ev.trace, true); lane.sub.replaceChildren(h("span", { class: "tag" }, kind(ev.trace.intent)), " answered by ", h("b", {}, nice(ev.alias))); }
     const rules = isRouter ? ruleTable(ev.trace) : null; if (rules) lane.more.append(rules);
   } else if (ev.type === "prompt") {
     lane.more.append(h("details", { class: "more" }, h("summary", {}, "Prompt sent to the model" + (ev.changed ? " (alignment variant applied)" : "")), h("pre", { class: "raw" }, ev.text)));
@@ -491,7 +544,7 @@ function stepCard(index, step) {
   const marker = "Твоя дія на останньому кроці:\n", at = step.prompt.indexOf(marker);
   const task = (at >= 0 ? step.prompt.slice(at + marker.length) : step.prompt).split("\n")[0].slice(0, 180);
   el.root = h("div", { class: "step" }, h("div", { class: "rail" }, el.num),
-    h("div", { class: "body" }, h("div", { class: "head" }, h("span", { class: "tag" }, step.intent), el.who, el.time, el.flags),
+    h("div", { class: "body" }, h("div", { class: "head" }, h("span", { class: "tag", title: "internal name: " + step.intent }, kind(step.intent)), el.who, el.time, el.flags),
       h("div", { class: "task" }, task), el.outp));
   return el;
 }
@@ -552,7 +605,7 @@ async function run() {
   const by = {};
   if (state.mode === "compare") {
     lanes.className = "lanes two";
-    by.a = newLane("Router"); by.b = newLane(nice(body.model_b), "one model answers everything");
+    by.a = newLane("Router"); by.b = newLane(nice(body.model_b) + " alone", "this model answers every request, no routing");
     lanes.append(by.a.root, by.b.root);
   } else if (state.mode === "composite") by.c = newComposite(lanes);
   else { by.a = newLane(state.mode === "router" ? "Answer" : nice(body.model), state.mode === "router" ? "" : "one model, no routing"); lanes.append(by.a.root); }

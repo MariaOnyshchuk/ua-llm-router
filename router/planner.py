@@ -206,9 +206,13 @@ def is_word_problem(prompt: str) -> bool:
     return bool(_WORD_PROBLEM_ASK.search(text)) and len(_NUMBER.findall(text)) >= 2
 
 
-def single_call_plan(prompt: str) -> Plan:
-    """One call on the user's own words; word problems get the reasoning suffix."""
-    decision = route_intent(prompt)
+def single_call_plan(prompt: str, router_profile: str = "v2") -> Plan:
+    """One call on the user's own words; word problems get the reasoning suffix.
+
+    The intent comes from the selected router table, so the single call goes where the
+    plain router would send the same request.
+    """
+    decision = route_intent(prompt, profile=router_profile)
     text = prompt + THINK_SUFFIX if is_word_problem(prompt) else prompt
     return Plan(
         steps=(PlanStep(id="single", intent=decision.intent, depends_on=(), prompt=text),),
@@ -347,6 +351,7 @@ async def generate_plan(
     instruction: str | None = None,
     model: str | None = None,
     profile: str | None = None,
+    router_profile: str = "v2",
 ) -> tuple[Plan, dict[str, Any]]:
     if profile == "template":
         plan, meta = select_template_plan(user_prompt)
@@ -361,13 +366,13 @@ async def generate_plan(
         planner_model = planner_model or PLANNER_MODEL
 
     if profile == "hybrid_gated" and _SINGLE_SYMBOL.search(user_prompt or ""):
-        return single_call_plan(user_prompt), {
+        return single_call_plan(user_prompt, router_profile), {
             "mode": "rule", "profile": profile, "template_id": None, "valid": True,
             "attempts": [], "repaired": False, "fallback": False, "gate": "single_symbol_answer",
         }
     if profile == "hybrid_gated" and is_word_problem(user_prompt):
         # Mamay-4B splits word problems into steps; a rule is more reliable here and saves the call.
-        return single_call_plan(user_prompt), {
+        return single_call_plan(user_prompt, router_profile), {
             "mode": "rule", "profile": profile, "template_id": None, "valid": True,
             "attempts": [], "repaired": False, "fallback": False, "gate": "single_word_problem",
         }
@@ -395,7 +400,7 @@ async def generate_plan(
             raw_steps = None
         # No steps, or one step, means "one task": answer the user's own words in one call.
         if isinstance(raw_steps, list) and len(raw_steps) <= 1:
-            return single_call_plan(user_prompt), _meta(True, repaired=False, fallback=False, gate="single")
+            return single_call_plan(user_prompt, router_profile), _meta(True, repaired=False, fallback=False, gate="single")
 
     try:
         parsed = extract_json_object(hop.get("content") or "")
@@ -432,7 +437,7 @@ async def generate_plan(
         last_error = first_error
 
     if gated:
-        return single_call_plan(user_prompt), _meta(
+        return single_call_plan(user_prompt, router_profile), _meta(
             False, repaired=repair and len(attempts) == 2, error=last_error,
             fallback=True, fallback_reason="llm_plan_invalid", gate="single",
         )
