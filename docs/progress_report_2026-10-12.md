@@ -737,6 +737,41 @@ numbers. Raw rows are local only (`logs/ac_dev_guard`, `logs/ac_dev_noguard_fp8`
 Still open: in a multi-step plan the final answer sometimes drops an earlier result (the
 translation in "translate, then write the code"; the poem in "answer, then write a poem").
 
+## Which model should write the plan (13 Oct, dev, FP8 serving)
+
+Lapa-12B, Aya-8B and Mamay-12B were put in place of Mamay-4B as the planner, with the same
+gate prompt and the same rules (profiles `hybrid_gated_lapa`, `hybrid_gated_aya`,
+`hybrid_gated_mamay12`). Composite v2 dev, 60 tasks, one run each; the first table.
+The second table is the model's own judgement on 400 single-skill v7 dev requests with the
+one-action rule switched off for this measurement only; with the rule on, the model is asked
+on 6 of the 400.
+
+| Model writing the plan | Requests that got a plan (60) | Same skills as the gold plan | Same specialists as the gold plan | Final score | Difference to Mamay-4B | Planner call, median |
+|---|---:|---:|---:|---:|---|---:|
+| Mamay-4B (current) | 60 | 48 | 59 | 0.654 | reference | 10.6 s |
+| Lapa-12B | 60 | 30 | 30 | 0.673 | +0.019 [−0.036, +0.070] | 9.8 s |
+| Aya-8B | 60 | 45 | 50 | 0.640 | −0.014 [−0.079, +0.052] | 4.5 s |
+| Mamay-12B (reference, not a router member) | 60 | 48 | 57 | 0.690 | +0.036 [−0.013, +0.091] | 10.1 s |
+
+| Model judging "one task or several" | Single-skill requests split (400) | 95% interval | Unusable planner output |
+|---|---:|---|---:|
+| Mamay-4B (current) | 22, 0.055 | [0.037, 0.082] | 26 |
+| Lapa-12B | 87, 0.217 | [0.180, 0.261] | 5 |
+| Aya-8B | 44, 0.110 | [0.083, 0.144] | 14 |
+| Mamay-12B | 16, 0.040 | [0.025, 0.064] | 3 |
+
+Reading. No planner model is distinguishable from Mamay-4B on the final score; every interval
+contains 0. The models differ in the plans themselves: Lapa names the gold skills in 30 of 60
+plans and splits 0.217 of one-task requests, Aya 0.110, Mamay-4B 0.055, Mamay-12B 0.040. Almost
+all wrong splits are in the instruct bucket (one text with format rules read as "write, then
+format"). Mamay-4B stays the planner: it is the smallest model, it is not worse on the score,
+and only Mamay-12B splits less. Aya's planner call is about twice as fast.
+
+Limits. One run per model on 60 tasks, FP8 serving on one card with the runs sharing it, so
+the planner times are not comparable with bf16 times. Mamay-4B's 0.055 here against 0.035 on
+12 Oct (bf16) is the same prompt; the difference is within the two intervals. The demo page
+now lets the user choose the model that classifies and plans (Settings).
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.
