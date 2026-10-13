@@ -193,9 +193,8 @@
       <div class="examples" id="examples"></div>
       <div class="bar">
         <div class="seg" id="mode" role="group" aria-label="Mode">
-          <button data-m="router" aria-pressed="true">Ask the router</button>
+          <button data-m="composite" aria-pressed="true">Ask the router</button>
           <button data-m="compare" aria-pressed="false">Compare with one model</button>
-          <button data-m="composite" aria-pressed="false">Plan steps if needed</button>
           <button data-m="model" aria-pressed="false">Ask one model</button>
         </div>
         <span class="inline" id="modelbox" hidden><span id="modellabel">Model</span><select id="model" aria-label="Model"></select></span>
@@ -208,7 +207,7 @@
         <summary>Settings</summary>
         <div class="grid wide">
           <div id="profilebox"><label for="profile">How the specialist is chosen</label><select id="profile"></select>
-            <small>The first option also works for requests in everyday wording. The second is the version measured on the benchmark.</small></div>
+            <small>Keyword rules only is the version measured on the benchmark. The small model (Mamay-4B) also handles everyday wording; with it alone, every request costs one extra short call.</small></div>
           <div id="oraclebox"><label for="oracle">Benchmark item plan</label>
             <label style="display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="oracle"> use the correct plan stored with the item</label>
             <small>Shows how far a perfect plan would get. Needs an item from Benchmark tools.</small></div>
@@ -260,14 +259,15 @@ const kind = (i) => KIND[i] || i;
 const PROFILE_LABEL = {
   v2_llm: "Keyword rules, then a small model if no rule fits",
   v2: "Keyword rules only",
+  llm: "Small model only, no keyword rules",
 };
 /* One planner is offered: it plans only when the request has several tasks. Older planners and
    routing variants that gave no gain are not in the page; docs/progress_report_2026-10-12.md says why. */
 const PLANNER = "hybrid_gated";
 const MODE_HINT = {
-  router: "One model call: the router picks one specialist for the whole request, even if it holds several tasks. For several tasks use Plan steps if needed.",
   compare: "The same request goes to the router and to one model you choose, side by side.",
-  composite: "First decides whether the request is one task or several. One task: one call. Several: a short plan, one specialist per step.",
+  router: "Benchmark item: one call to the specialist the router picks, scored against the stored answer.",
+  composite: "The router first decides whether the request is one task or several. One task: one call to the specialist for it. Several: a short plan, one specialist per step.",
   model: "No routing: the request goes straight to the model you choose.",
 };
 const INTENT_MODEL = { translate: "aya", chat: "aya", knowledge: "lapa", alignment: "lapa", instruct: "mamay4", code: "mamay4" };
@@ -309,9 +309,10 @@ const WHY = {
 const GATES = {
   single: "The planner judged this to be one task, so it is answered in one call.",
   single_word_problem: "Rule: a word problem with numbers. One call, with a request to reason before computing.",
+  single_one_action: "Rule: the request asks for one action, so no plan is made. One call to the specialist for it.",
   single_symbol_answer: "Rule: the answer is a single letter or digit. One call, no planning.",
 };
-const state = { mode: "router", item: null, itemPrompt: "", offset: 0, suites: [], abort: null, health: {}, files: {} };
+const state = { mode: "composite", item: null, itemPrompt: "", offset: 0, suites: [], abort: null, health: {}, files: {} };
 const LIMIT = 40;
 
 async function api(path, opts) {
@@ -393,9 +394,11 @@ function showWhy(trace, live) {
   const hit = (trace.rules || []).find((r) => r.matched);
   const reason = trace.reason || "";
   const steps = [];
-  if (hit) steps.push(["Keyword rules", h("span", {}, "matched on “", h("b", {}, hit.match_text), "”")]);
+  const noRules = /^keyword rules not used/.test(reason);
+  if (noRules) steps.push(["Keyword rules", "switched off in Settings"]);
+  else if (hit) steps.push(["Keyword rules", h("span", {}, "matched on “", h("b", {}, hit.match_text), "”")]);
   else steps.push(["Keyword rules", "no rule matched this request"]);
-  if (/^no rule matched/.test(reason)) steps.push(["Mamay-4B was asked", h("span", {}, "it called the request ", h("b", {}, kind(trace.intent)))]);
+  if (noRules || /^no rule matched/.test(reason)) steps.push(["Mamay-4B was asked", h("span", {}, "it called the request ", h("b", {}, kind(trace.intent)))]);
   else if (!hit) steps.push(["Fallback", "treated as conversation"]);
   steps.push(["Decision", h("span", {}, h("span", { class: "tag", title: "internal name: " + trace.intent }, kind(trace.intent)), " goes to ", h("b", {}, nice(trace.model)),
     live ? null : h("span", { class: "tag plain", style: "margin-left:8px" }, "preview"))]);
@@ -406,7 +409,7 @@ function preview() {
   clearTimeout(previewTimer);
   previewTimer = setTimeout(async () => {
     const text = $("prompt").value.trim();
-    if (state.mode === "model" || state.mode === "composite") return;
+    if (state.mode === "model") return;
     if (!text) return showWhy(null);
     try {
       const t = await api("/debug/api/route", { method: "POST", headers: { "Content-Type": "application/json" },
@@ -467,17 +470,18 @@ function renderItem(it) {
 
 /* ---------- mode ---------- */
 function setMode(m) {
+  /* One button for both: a typed request goes through the gate ("composite"); a single-skill
+     benchmark item keeps the plain one-call path ("router") so it is scored against its gold answer. */
+  if (m === "router" && !state.item) m = "composite";
   state.mode = m;
-  document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m));
+  document.querySelectorAll("#mode button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m || (m === "router" && b.dataset.m === "composite")));
   $("modelbox").hidden = m === "router" || m === "composite";
   $("modellabel").textContent = m === "compare" ? "against" : "Model";
   $("modehint").textContent = MODE_HINT[m] || "";
   $("profilebox").hidden = m === "model";
   $("oraclebox").hidden = m !== "composite";
   $("routecard").hidden = m === "model";
-  $("routetitle").textContent = m === "composite" ? "The three specialists" : "Where this request goes";
-  if (m === "composite") showWhy(null), $("why").replaceChildren(h("span", { class: "muted" }, "The models used for this request light up as the steps run."));
-  else preview();
+  preview();
 }
 
 /* ---------- single answers ---------- */
@@ -543,6 +547,7 @@ function handleComposite(c, ev) {
   if (ev.type === "plan") {
     const pl = ev.planning || {}, steps = ev.plan.steps, attempts = pl.attempts || [];
     c.planned = true; c.n = 0;
+    if (steps.length > 1) put($("why"), h("span", { class: "muted" }, "This request holds " + steps.length + " tasks. Each step below goes to the specialist for its skill."));
     const gate = pl.gate ? GATES[pl.gate] : null;
     const label = pl.mode === "oracle" ? "Gold plan from the benchmark" : steps.length > 1 ? steps.length + " steps planned" : "One task → one call";
     put(c.gate, h("span", { class: "big" }, label),
@@ -659,7 +664,7 @@ $("prompt").addEventListener("input", () => {
   const old = box.querySelector(".detached"); if (old) old.remove();
   if (detached) box.prepend(h("div", { class: "tag warn detached", style: "margin-bottom:8px;display:inline-block;white-space:normal" },
     "prompt edited: this is no longer the benchmark item, gold and scoring do not apply"));
-  if (state.mode !== "composite") preview();
+  preview();
 });
 $("profile").onchange = preview;
 $("run").onclick = run; $("stop").onclick = () => state.abort && state.abort.abort();

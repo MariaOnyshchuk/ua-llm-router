@@ -198,6 +198,29 @@ _SINGLE_SYMBOL = re.compile(
 )
 
 
+# A plan needs a request that states several actions itself: a sequence word ("спочатку …
+# потім") or two task verbs joined by a comma or a conjunction ("переклади … і поясни").
+# A format requirement ("поверни лише JSON") is not a second action.
+_SEQUENCE = re.compile(
+    r"(?i)\b(спочатку|спершу|потім|після\s+(цього|того)|далі|наостанок|насамкінець|фінально"
+    r"|first\b.*\bthen|and then|after that|finally)\b"
+)
+_TASK_VERB = (
+    r"(переклад\w+|поясн\w+|напиш\w+|склад\w+|підсумуй\w*|перекаж\w+|витягн\w+|класифіку\w+"
+    r"|порахуй\w*|обчисл\w+|назви|перелічи|реалізу\w+|виправ\w+|порівня\w+|опиши|визнач\w*"
+    r"|знайд\w+|розв'яж\w+|обґрунту\w+|зроби|подай|поверни|translate|explain|write|summari[sz]e|list)"
+)
+_TWO_ACTIONS = re.compile(
+    r"(?i)\b" + _TASK_VERB + r"\b[^.!?\n]{0,160}?(,|\bі\b|\bй\b|\bта\b|\bа\b)\s+(також\s+|ще\s+)?" + _TASK_VERB + r"\b"
+)
+
+
+def states_several_actions(prompt: str) -> bool:
+    """The request text itself asks for more than one action."""
+    text = prompt or ""
+    return bool(_SEQUENCE.search(text) or _TWO_ACTIONS.search(text))
+
+
 def is_word_problem(prompt: str) -> bool:
     """A question that asks for a quantity and states at least two numbers."""
     text = prompt or ""
@@ -375,6 +398,14 @@ async def generate_plan(
         return single_call_plan(user_prompt, router_profile), {
             "mode": "rule", "profile": profile, "template_id": None, "valid": True,
             "attempts": [], "repaired": False, "fallback": False, "gate": "single_word_problem",
+        }
+
+    if profile == "hybrid_gated" and not states_several_actions(user_prompt):
+        # The planner model splits some one-task requests (0.035 on v7 dev). It is asked only
+        # when the request states several actions, which also saves its call on the rest.
+        return single_call_plan(user_prompt, router_profile), {
+            "mode": "rule", "profile": profile, "template_id": None, "valid": True,
+            "attempts": [], "repaired": False, "fallback": False, "gate": "single_one_action",
         }
 
     planner_prompt = f"{system}\n\nЗАПИТ КОРИСТУВАЧА:\n{user_prompt}"

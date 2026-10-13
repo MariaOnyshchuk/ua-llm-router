@@ -167,6 +167,15 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "blurb": "v2 rules; unmatched requests are classified by Mamay-4B",
         "llm_fallback": "mamay4",
     },
+    # No keyword rules: the small model names the intent of every request. If the call
+    # fails, the v2 rules decide.
+    "llm": {
+        "label": "Model only",
+        "remap": {},
+        "default": "aya",
+        "blurb": "Mamay-4B classifies every request; rules only if the call fails",
+        "llm_only": "mamay4",
+    },
     "knn": {
         "label": "Learned kNN",
         "remap": {},
@@ -184,8 +193,8 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
 }
 
 
-def _llm_decision(text: str, alias: str, fallback: str) -> RouteDecision | None:
-    """Ask a small model for the intent of a request no rule matched. None if the call fails."""
+def _llm_decision(text: str, alias: str, fallback: str, why: str = "no rule matched") -> RouteDecision | None:
+    """Ask a small model for the intent of a request. None if the call fails."""
     try:
         import httpx
 
@@ -198,7 +207,7 @@ def _llm_decision(text: str, alias: str, fallback: str) -> RouteDecision | None:
     if intent is None:
         return None
     model = fallback if intent == "chat" else INTENT_MODEL[intent]
-    return RouteDecision(model, intent, f"no rule matched; {alias} classified the request as {intent} → {model}")
+    return RouteDecision(model, intent, f"{why}; {alias} classified the request as {intent} → {model}")
 
 
 def route_intent(
@@ -233,7 +242,10 @@ def route_intent(
         decision = RouteDecision(fallback, "default", "empty prompt")
     else:
         decision = None
-        for model, intent, pattern, reason in _RULES:
+        llm_only = spec.get("llm_only")
+        if isinstance(llm_only, str):
+            decision = _llm_decision(text, llm_only, fallback, "keyword rules not used")
+        for model, intent, pattern, reason in _RULES if decision is None else ():
             if pattern.search(text):
                 target = str(remap.get(intent, model))
                 if target != model:

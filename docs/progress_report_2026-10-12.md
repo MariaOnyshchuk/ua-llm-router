@@ -689,6 +689,54 @@ for Qwen-Coder-7B), so no route leads to Qwen and it is not a baseline either. T
 no room for it: 0.12 of the card is left, about 5.9 GB, and the 7B model needs more than
 that in FP8. Qwen has not been run on v7.
 
+## One mode in the page, a model-only routing option, and a rule before the planner (13 Oct, afternoon)
+
+Three changes after manual tests in the demo page.
+
+**One mode.** "Ask the router" and "Plan steps if needed" were two buttons, and a request with
+two tasks sent through the first one went to a single specialist. They are now one mode: a
+request with one task gets one call, a request with several gets a plan. A single-skill
+benchmark item opened from the benchmark tools keeps the plain one-call path, so it is still
+scored against its stored answer.
+
+**Routing option `llm`.** No keyword rules: Mamay-4B names the intent of every request; the v2
+rules decide only if that call fails. It joins `v2` (rules only) and `v2_llm` (rules, then the
+model). The intent accuracy of the model alone was measured earlier (everyday wording 0.83,
+benchmark wording 0.86); its effect on answer quality is not measured.
+
+**One-action rule.** Reported case: «… Мені треба порахувати лише той посуд, з якого п'ють.
+Поверни лише JSON …» was split into "count" and "format as JSON". The planner model treats a
+format requirement as a second task. Now the planner is asked only when the request text itself
+states several actions: a sequence word («спочатку», «потім», «після цього», «фінально») or two
+task verbs joined by a comma or a conjunction («переклади … і поясни»). Everything else is one
+call, and the planner call is not made (`states_several_actions` in `router/planner.py`).
+
+| Check (dev) | Gate, 12 Oct | Gate + one-action rule |
+|---|---:|---:|
+| Single-skill v7 dev requests split into steps (400) | 14, 0.035 [0.021, 0.058] | 0, 0.000 [0.000, 0.010] |
+| Planner calls made on those 400 | 204 | 6 |
+| Composite v2 dev requests that get a plan (60) | 60 | 60 |
+
+Composite v2 dev with the rule, models served in FP8 on one card: 0.654 against 0.603 for the
+one-call router, +0.051 [−0.010, +0.113], not distinguishable (12 Oct, bf16: 0.675 against
+0.618). The rule cannot change these 60 plans: every one of them states several actions.
+
+AgentCoMa dev (50). The rule changed no route: with and without it 49 tasks are one call and 1
+is the same three-step plan. The two FP8 runs still score 0.24 and 0.34: on the 44 tasks that
+took the identical path with the identical prompt, 42 answers differ in text and 7 in score.
+With the two bf16 runs of 12 Oct (0.32, 0.36) that is four runs of one planner between 0.24 and
+0.36. One run of 50 tasks does not separate differences of 0.1; the test split is 150 tasks
+and is planned with 3 repeats.
+
+Limits. The verb list and the sequence words were written with the 60 composite dev prompts in
+view, which all use such words; a request that asks for two things without any of them is
+answered in one call. Today's runs used FP8 serving, not the bf16 setup of the earlier dev
+numbers. Raw rows are local only (`logs/ac_dev_guard`, `logs/ac_dev_noguard_fp8`,
+`logs/comp_v2_dev_guard`, `logs/planner_split_v7dev_guard_*`).
+
+Still open: in a multi-step plan the final answer sometimes drops an earlier result (the
+translation in "translate, then write the code"; the poem in "answer, then write a poem").
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.

@@ -583,6 +583,20 @@ class GatedPlannerTests(unittest.TestCase):
 
     def test_single_task_keeps_the_users_words(self) -> None:
         prompt = "Що подарувати татові на 60-річчя? Він любить риболовлю."
+        plan, meta, calls = self._run(prompt, "unused")
+        self.assertEqual(calls, [])  # one action in the text: the planner model is not asked
+        self.assertEqual([s.prompt for s in plan.steps], [prompt])
+        self.assertEqual(meta["gate"], "single_one_action")
+
+    def test_format_requirement_is_not_a_second_action(self) -> None:
+        prompt = ("На полиці стоять 4 склянки, 3 чашки, 2 тарілки і 5 келихів. Мені треба порахувати лише "
+                  'той посуд, з якого п\'ють. Поверни лише JSON у форматі {"answer": число}.')
+        plan, meta, calls = self._run(prompt, "unused")
+        self.assertEqual(calls, [])
+        self.assertEqual(len(plan.steps), 1)
+
+    def test_planner_may_still_call_several_actions_one_task(self) -> None:
+        prompt = "Переклади українською 'early bird' і поясни значення."
         plan, meta, calls = self._run(prompt, '{"steps":[]}')
         self.assertEqual(len(calls), 1)
         self.assertEqual([s.prompt for s in plan.steps], [prompt])

@@ -211,6 +211,21 @@ class LearnedRouterTests(unittest.TestCase):
         self.assertEqual(plain_v2.intent, "chat")
         self.assertEqual(asked, ["Чи чесно списувати на іспиті?"])
 
+    def test_llm_profile_skips_the_rules_and_falls_back_to_them(self) -> None:
+        from router import intent_rules
+
+        def fake(text: str, alias: str, fallback: str, why: str = ""):
+            return intent_rules.RouteDecision("mamay4", "code", f"{why}; stub")
+
+        text = "Переклади з англійської: hello"
+        with patch.object(intent_rules, "_llm_decision", fake):
+            by_model = route_intent(text, profile="llm")
+        with patch.object(intent_rules, "_llm_decision", lambda *a, **k: None):
+            model_down = route_intent(text, profile="llm")
+        self.assertEqual((by_model.model, by_model.intent), ("mamay4", "code"))
+        self.assertTrue(by_model.reason.startswith("keyword rules not used"))
+        self.assertEqual((model_down.model, model_down.intent), ("aya", "translate"))
+
     def test_knn_profile_with_hash_artifacts(self) -> None:
         try:
             from sklearn.neighbors import KNeighborsClassifier
