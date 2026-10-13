@@ -208,6 +208,8 @@
         <div class="grid wide">
           <div id="profilebox"><label for="profile">How the specialist is chosen</label><select id="profile"></select>
             <small>Keyword rules only is the version measured on the benchmark. The small model (Mamay-4B) also handles everyday wording; with it alone, every request costs one extra short call.</small></div>
+          <div id="deciderbox"><label for="decider">Model that routes and plans</label><select id="decider"></select>
+            <small>This model names the type of a request when it is asked to, and writes the plan for a request with several tasks. Mamay-4B is the measured setting.</small></div>
           <div id="oraclebox"><label for="oracle">Benchmark item plan</label>
             <label style="display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="oracle"> use the correct plan stored with the item</label>
             <small>Shows how far a perfect plan would get. Needs an item from Benchmark tools.</small></div>
@@ -263,7 +265,11 @@ const PROFILE_LABEL = {
 };
 /* One planner is offered: it plans only when the request has several tasks. Older planners and
    routing variants that gave no gain are not in the page; docs/progress_report_2026-10-12.md says why. */
-const PLANNER = "hybrid_gated";
+const DECIDERS = ["mamay4", "lapa", "aya", "mamay12"];
+const decider = () => $("decider").value || "mamay4";
+const plannerProfile = () => decider() === "mamay4" ? "hybrid_gated" : "hybrid_gated_" + decider();
+/* "v2_llm@lapa": the same routing option with another model as the classifier */
+const routeProfile = () => ($("profile").value || "v2") + (decider() === "mamay4" || $("profile").value === "v2" ? "" : "@" + decider());
 const MODE_HINT = {
   compare: "The same request goes to the router (one call or a plan, as it decides) and to one model you choose, side by side.",
   router: "Benchmark item: one call to the specialist the router picks, scored against the stored answer.",
@@ -370,6 +376,9 @@ async function loadHealth() {
   /* only models that are running can be asked */
   const online = aliases.filter((a) => d.backends[a].up);
   fill($("model"), (online.length ? online : aliases).map((a) => ({ value: a, label: nice(a) })), true);
+  const keep = $("decider").value;
+  fill($("decider"), DECIDERS.filter((a) => a === "mamay4" || online.includes(a)).map((a) => ({ value: a, label: nice(a) })), true);
+  $("decider").value = keep || "mamay4";
   const up = (a) => d.backends[a] && d.backends[a].up;
   $("model").value = ["mamay12", "aya", "lapa", "mamay4"].find(up) || aliases[0];
   /* learned profiles (knn, clf) need a library that is not installed here, so they are not offered */
@@ -398,7 +407,7 @@ function showWhy(trace, live) {
   if (noRules) steps.push(["Keyword rules", "switched off in Settings"]);
   else if (hit) steps.push(["Keyword rules", h("span", {}, "matched on “", h("b", {}, hit.match_text), "”")]);
   else steps.push(["Keyword rules", "no rule matched this request"]);
-  if (noRules || /^no rule matched/.test(reason)) steps.push(["Mamay-4B was asked", h("span", {}, "it called the request ", h("b", {}, kind(trace.intent)))]);
+  if (noRules || /^no rule matched/.test(reason)) steps.push([nice((reason.match(/; (\w+) classified/) || [])[1] || "mamay4") + " was asked", h("span", {}, "it called the request ", h("b", {}, kind(trace.intent)))]);
   else if (!hit) steps.push(["Fallback", "treated as conversation"]);
   steps.push(["Decision", h("span", {}, h("span", { class: "tag", title: "internal name: " + trace.intent }, kind(trace.intent)), " goes to ", h("b", {}, nice(trace.model)),
     live ? null : h("span", { class: "tag plain", style: "margin-left:8px" }, "preview"))]);
@@ -413,7 +422,7 @@ function preview() {
     if (!text) return showWhy(null);
     try {
       const t = await api("/debug/api/route", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text, profile: $("profile").value || "v2" }) });
+        body: JSON.stringify({ prompt: text, profile: routeProfile() }) });
       if ($("prompt").value.trim() === text && state.shown !== text) showWhy(t, false);
     } catch (e) { /* the preview is optional */ }
   }, 250);
@@ -478,7 +487,7 @@ function setMode(m) {
   $("modelbox").hidden = m === "router" || m === "composite";
   $("modellabel").textContent = m === "compare" ? "against" : "Model";
   $("modehint").textContent = MODE_HINT[m] || "";
-  $("profilebox").hidden = m === "model";
+  $("profilebox").hidden = m === "model"; $("deciderbox").hidden = m === "model";
   $("oraclebox").hidden = m !== "composite";
   $("routecard").hidden = m === "model";
   preview();
@@ -593,7 +602,7 @@ async function run() {
   const prompt = $("prompt").value.trim(); if (!prompt) return;
   const attached = state.item && prompt === state.itemPrompt;
   const body = { prompt, mode: state.mode === "model" ? "model" : "router", model: $("model").value, model_b: $("model").value,
-    profile: $("profile").value, align_prompt: "fewshot", planner_profile: PLANNER, use_oracle: $("oracle").checked,
+    profile: routeProfile(), align_prompt: "fewshot", planner_profile: plannerProfile(), use_oracle: $("oracle").checked,
     temperature: parseFloat($("temp").value || 0), max_tokens: parseInt($("maxtok").value || 1024), seed: $("seed").value === "" ? null : parseInt($("seed").value) };
   if (attached) { body.suite = state.item.suite; body.item_id = state.item.id; }
   const lanes = $("lanes"); lanes.replaceChildren(); lanes.className = "lanes";
@@ -682,6 +691,7 @@ $("prompt").addEventListener("input", () => {
   preview();
 });
 $("profile").onchange = preview;
+$("decider").onchange = preview;
 $("run").onclick = run; $("stop").onclick = () => state.abort && state.abort.abort();
 $("prompt").addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") run(); });
 ["suite", "bucket", "maxscore"].forEach((id) => $(id).onchange = () => { state.offset = 0; if (id === "suite") $("bucket").replaceChildren(h("option", { value: "" }, "all")); loadList(); });

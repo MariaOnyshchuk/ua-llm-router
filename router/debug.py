@@ -113,7 +113,7 @@ def _log(entry: dict[str, Any]) -> None:
 def route_trace(text: str, profile: str) -> dict[str, Any]:
     """The decision plus every rule that matched, so alternatives are visible."""
     decision = route_intent(text, profile=profile)
-    spec = ROUTER_PROFILES.get(profile) or ROUTER_PROFILES["v2"]
+    spec = ROUTER_PROFILES.get(profile.partition("@")[0]) or ROUTER_PROFILES["v2"]
     learned = isinstance(spec.get("learned"), str)
     rules = []
     if not learned:

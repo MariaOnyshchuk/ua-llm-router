@@ -226,6 +226,23 @@ class LearnedRouterTests(unittest.TestCase):
         self.assertTrue(by_model.reason.startswith("keyword rules not used"))
         self.assertEqual((model_down.model, model_down.intent), ("aya", "translate"))
 
+    def test_profile_suffix_changes_the_classifier_model(self) -> None:
+        from router import intent_rules
+
+        asked: list[str] = []
+
+        def fake(text: str, alias: str, fallback: str, why: str = ""):
+            asked.append(alias)
+            return intent_rules.RouteDecision("lapa", "knowledge", "stub")
+
+        with patch.object(intent_rules, "_llm_decision", fake):
+            route_intent("Хто написав «Кобзар»?", profile="llm@lapa")
+            route_intent("Чи чесно списувати на іспиті?", profile="v2_llm@aya")
+            route_intent("Чи чесно списувати на іспиті?", profile="v2_llm")
+            rules_only = route_intent("Переклади з англійської: hello", profile="v2@lapa")
+        self.assertEqual(asked, ["lapa", "aya", "mamay4"])
+        self.assertEqual(rules_only.intent, "translate")
+
     def test_knn_profile_with_hash_artifacts(self) -> None:
         try:
             from sklearn.neighbors import KNeighborsClassifier

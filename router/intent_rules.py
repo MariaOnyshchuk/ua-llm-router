@@ -218,7 +218,11 @@ def route_intent(
     pool: frozenset[str] | set[str] | None = None,
     intent_hint: str | None = None,
 ) -> RouteDecision:
+    # "v2_llm@lapa": the same profile with another model as the intent classifier.
+    profile, _, classifier = profile.partition("@")
     spec = ROUTER_PROFILES.get(profile) or ROUTER_PROFILES["v2"]
+    if classifier:
+        spec = {**spec, **{key: classifier for key in ("llm_only", "llm_fallback") if key in spec}}
     fallback = default if default is not None else str(spec["default"])
     remap = spec["remap"] if isinstance(spec["remap"], dict) else {}
     hinted = (intent_hint or "").strip().lower()
