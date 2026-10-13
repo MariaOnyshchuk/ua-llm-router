@@ -55,7 +55,8 @@ SYSTEM_INSTRUCTION_GATED = """Ти диспетчер запитів для ук
 один фрагмент коду (навіть із поясненням), одна текстова задача з числами.
 Таких запитів більшість. Це також ОДНА задача:
 - тестове питання з варіантами, де треба дати лише літеру чи цифру
-  (не розбивай на «відповісти» і «оформити»);
+  (не розбивай на «відповісти» і «оформити»); якщо ж до тесту просять ще й
+  пояснення відповіді — це вже ДВІ дії, див. Крок 2;
 - один текст із вимогами до форми: кількість слів чи речень, регістр, лапки,
   обов'язкові чи заборонені слова, мова відповіді (не розбивай на «написати»
   і «відформатувати»).
@@ -63,6 +64,7 @@ SYSTEM_INSTRUCTION_GATED = """Ти диспетчер запитів для ук
 
 Крок 2. Лише якщо користувач ЯВНО просить кілька різних дій, де результат
 однієї потрібен для наступної, поверни 2-3 кроки:
+(наприклад «дай відповідь на тест і поясни» = knowledge, потім instruct)
 {"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."},
 {"id":"step2","intent":"...","depends_on":["step1"],"prompt":"... {{step1.content}}"}]}
 
@@ -220,12 +222,12 @@ _SEQUENCE = re.compile(
 _TASK_VERB = (
     r"(переклад\w+|поясн\w+|напиш\w+|склад\w+|підсумуй\w*|перекаж\w+|витягн\w+|класифіку\w+"
     r"|порахуй\w*|обчисл\w+|назви|перелічи|реалізу\w+|виправ\w+|порівня\w+|опиши|визнач\w*"
-    r"|знайд\w+|розв'яж\w+|обґрунту\w+|зроби|подай|поверни|дай\s+відповідь|відповідай|відповіси"
+    r"|знайд\w+|розв'яж\w+|обґрунту\w+|зроби|дай\s+відповідь|відповідай|відповіси"
     r"|розкаж\w+|наведи|додай|оціни|скороти|перефразуй|перепиши|придумай|запропонуй"
     r"|translate|explain|write|summari[sz]e|list|answer)"
 )
 _TWO_ACTIONS = re.compile(
-    r"(?i)\b" + _TASK_VERB + r"\b[^.!?\n]{0,160}?(,|\bі\b|\bй\b|\bта\b|\bа\b)\s+(також\s+|ще\s+)?" + _TASK_VERB + r"\b"
+    r"(?i)\b" + _TASK_VERB + r"\b[^.!?\n]{0,160}?(,|\bі\b|\bй\b|\bта\b|\bа\b)\s+(?:[\w'’-]+\s+){0,2}?" + _TASK_VERB + r"\b"
 )
 
 
@@ -307,14 +309,22 @@ def with_user_request(plan: Plan, user_prompt: str) -> Plan:
             steps.append(PlanStep(id=step.id, intent=step.intent, depends_on=step.depends_on, prompt=prompt))
             continue
         earlier = tuple(s.id for s in plan.steps[:last])
-        missing = [sid for sid in earlier if f"{{{{{sid}.content}}}}" not in step.prompt]
-        results = "".join(f"\n\nРезультат кроку {sid}:\n{{{{{sid}.content}}}}" for sid in missing)
+        # The last step gets the request and every earlier result with a label, and a fixed
+        # instruction. The planner's own text for this step is not used: it sometimes held the
+        # planner's answer (a wrong test option), which the model then preferred to the
+        # specialist's result, and it dropped parts of the request.
+        results = "\n".join(
+            f"Крок {n} ({s.intent}): {{{{{s.id}.content}}}}" for n, s in enumerate(plan.steps[:last], start=1)
+        )
         prompt = (
-            f"Запит користувача:\n{user_prompt}{results}\n\n"
-            f"Твоя дія на останньому кроці:\n{step.prompt}\n\n"
-            "Виконай цю дію і дай остаточну відповідь на запит користувача. Якщо користувач просив і "
-            "результат попереднього кроку (наприклад сам переклад чи сам код), додай його до відповіді; "
-            "якщо попередній крок був лише підготовчим, не повторюй його. Нічого зайвого не додавай."
+            f"Запит користувача:\n{user_prompt}\n\n"
+            f"Результати попередніх кроків (їх дали спеціалісти; вважай їх правильними і не змінюй):\n{results}\n\n"
+            "Напиши остаточну відповідь на запит користувача, спираючись на ці результати. "
+            "Якщо результат кроку — це відповідь на питання чи тест (літера, число, назва), "
+            "твоя відповідь має збігатися з нею; не обирай інший варіант. "
+            "Відповідь має містити все, що просив користувач: якщо він просив переклад, код чи "
+            "відповідь на питання і ще щось до них, наведи і те, і те. Дотримайся всіх вимог "
+            "запиту до формату. Не додавай того, чого користувач не просив."
         )
         steps.append(PlanStep(id=step.id, intent=step.intent, depends_on=earlier, prompt=prompt))
     return Plan(steps=tuple(steps), source=plan.source)

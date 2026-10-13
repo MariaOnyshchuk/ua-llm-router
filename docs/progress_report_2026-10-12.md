@@ -772,6 +772,48 @@ the planner times are not comparable with bf16 times. Mamay-4B's 0.055 here agai
 12 Oct (bf16) is the same prompt; the difference is within the two intervals. The demo page
 now lets the user choose the model that classifies and plans (Settings).
 
+## Last step of a plan rewritten; explanation requests planned (13 Oct, evening)
+
+Reported case: a test question with options followed by «дай відповідь та поясни матеріал».
+The router answered with one letter, with no explanation. Four causes were found, in this order.
+
+1. The compare mode of the page always made one call. It now uses the same gate and planner.
+2. The one-action rule did not know «дай відповідь» as a task verb, and a word between the
+   conjunction and the second verb («і коротко поясни») broke the match. Both fixed. «Поверни»
+   is no longer a task verb: «напиши вірш і поверни його великими літерами» is one task.
+3. The gate prompt called every test question one task. It now says that a test question plus
+   an explicit request to explain is two actions (knowledge, then instruct).
+4. With the plan in place the final answer was still wrong. The planner wrote its own answer
+   (a wrong option) into the text of the last step, and the specialist's result arrived under
+   it as a bare letter. The last step no longer uses the planner's text. It gets the request,
+   every earlier result with its step number and skill, and a fixed instruction: answer the
+   whole request from these results, keep a result that is an answer to a question, include
+   every part the user asked for.
+
+| Check (dev, FP8 serving, one run each) | Before these changes | After |
+|---|---:|---:|
+| Single-skill v7 dev requests split (400) | 0 | 1, 0.0025 [0.000, 0.014] |
+| Composite v2 dev requests that get a plan (60) | 60 | 60 |
+| Plans with the gold skill sequence (60) | 48 | 52 |
+| Composite v2 dev final score, gate prompt change only | 0.654 | 0.671 |
+| Composite v2 dev final score, with the new last step | 0.671 | 0.647, −0.024 [−0.070, +0.023], not distinguishable |
+| New last step against the one-call router (0.603) | | +0.043 [−0.025, +0.112], not distinguishable |
+
+By family the new last step moves knowledge-explain from 0.75 to 0.85, extract-classify-write
+from 0.50 to 0.40 and translate-code from 1.00 to 0.92; 12 tasks per family, so none of these
+is a finding. The change is kept for what it fixes in manual cases: the reported request now
+returns «Д дум» with an explanation, "translate and explain" returns both parts, and "answer,
+then write a poem" returns the poem. Still wrong: "translate the description, then write the
+code" returns the code without the translated description, and the answer to the reported
+request starts with an echo of the request.
+
+A separate defect seen in the page: a step of Mamay-4B ran into a repetition loop and wrote
+until the 1024-token limit (52 s). In stored dev runs lines repeated four or more times occur
+in 27 of 4237 Mamay-4B answers, 36 of 4237 for Lapa, 2 for Aya and 9 for Mamay-12B. Not fixed.
+
+The planner budget also matters: with 256 tokens a plan for a long request is cut and the
+router falls back to one call. The page now shows that fallback instead of hiding it.
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.

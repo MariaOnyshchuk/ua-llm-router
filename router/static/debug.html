@@ -546,7 +546,8 @@ function stepCard(index, step) {
     flags: h("span"), outp: h("div", { class: "outp", hidden: "" }) };
   /* the last step's prompt is wrapped by the planner; show the action, not the wrapper */
   const marker = "Твоя дія на останньому кроці:\n", at = step.prompt.indexOf(marker);
-  const task = (at >= 0 ? step.prompt.slice(at + marker.length) : step.prompt).split("\n")[0].slice(0, 180);
+  const task = step.prompt.startsWith("Запит користувача:") ? "Write the full answer from the results of the steps above"
+    : (at >= 0 ? step.prompt.slice(at + marker.length) : step.prompt).split("\n")[0].slice(0, 180);
   el.root = h("div", { class: "step" }, h("div", { class: "rail" }, el.num),
     h("div", { class: "body" }, h("div", { class: "head" }, h("span", { class: "tag", title: "internal name: " + step.intent }, kind(step.intent)), el.who, el.time, el.flags),
       h("div", { class: "task" }, task), el.outp));
@@ -560,7 +561,7 @@ function handleComposite(c, ev) {
     const gate = pl.gate ? GATES[pl.gate] : null;
     const label = pl.mode === "oracle" ? "Gold plan from the benchmark" : steps.length > 1 ? steps.length + " steps planned" : "One task → one call";
     put(c.gate, h("span", { class: "big" }, label),
-      pl.fallback && !pl.gate ? h("span", { class: "tag bad" }, "planner output unusable: single call instead") : null,
+      pl.fallback ? h("span", { class: "tag bad" }, "planner output unusable: single call instead") : null,
       pl.repaired && !pl.fallback ? h("span", { class: "tag warn" }, "valid after one repair") : null,
       h("span", { class: "muted", style: "font-size:15px;flex-basis:100%" },
         gate || (steps.length > 1 ? "Each step goes to the specialist for its skill; the last step writes the full answer." : "")));
