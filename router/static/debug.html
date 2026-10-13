@@ -265,7 +265,7 @@ const PROFILE_LABEL = {
    routing variants that gave no gain are not in the page; docs/progress_report_2026-10-12.md says why. */
 const PLANNER = "hybrid_gated";
 const MODE_HINT = {
-  router: "One model call. The router picks the specialist for this request.",
+  router: "One model call: the router picks one specialist for the whole request, even if it holds several tasks. For several tasks use Plan steps if needed.",
   compare: "The same request goes to the router and to one model you choose, side by side.",
   composite: "First decides whether the request is one task or several. One task: one call. Several: a short plan, one specialist per step.",
   model: "No routing: the request goes straight to the model you choose.",
@@ -283,7 +283,7 @@ const EXAMPLES = [
   { group: "hard", label: "Facts → table", mode: "composite", text: "Назви три найбільші за населенням міста України і подай відповідь таблицею Markdown зі стовпцями «Місто» і «Область»." },
   { group: "hard", label: "Extract → classify → JSON", mode: "composite", text: "Опрацюй оголошення: спочатку визнач тему й терміновість, а потім поверни лише JSON з ключами \"topic\" (utilities, culture або education) і \"urgency\" (low, medium або high).\n\nОголошення: Увага! Через прорив труби на вулиці Шевченка сьогодні з 10:00 до 18:00 не буде холодної води. Аварійна бригада вже працює." },
   { group: "limits", label: "Who is second youngest", mode: "composite", text: "Оля старша за Іру, Іра старша за Марка, а Марко старший за Данила. Хто з них другий наймолодший? Відповідай іменем і одним реченням пояснення." },
-  { group: "hard", label: "English spec → code", mode: "router", text: "Ось опис англійською: \"Write a function that returns the n-th Fibonacci number without recursion.\" Переклади опис українською, а потім напиши цю функцію на Python." },
+  { group: "hard", label: "English spec → code", mode: "composite", text: "Ось опис англійською: \"Write a function that returns the n-th Fibonacci number without recursion.\" Переклади опис українською, а потім напиши цю функцію на Python." },
   { group: "hard", label: "News → one-line JSON", mode: "router", text: "Ось новина англійською: \"The city council approved a new tram line that will connect the railway station with the university by 2027. Construction starts next spring and will cost 40 million euros.\" Переклади її українською, стисни до одного речення і поверни лише JSON з ключами \"topic\" і \"summary\"." },
   { group: "hard", label: "Read → answer → 3-line poem", mode: "router", text: "Прочитай текст: \"Penicillin was discovered in 1928 by Alexander Fleming, who noticed that mould killed bacteria in a dish he had left by the window.\" Скажи українською, хто і коли зробив це відкриття, а потім напиши про це вірш рівно з трьох рядків." },
   { group: "hard", label: "SQL + explanation", mode: "router", text: "Є таблиця orders(id, customer, amount, created_at). Напиши SQL-запит, що повертає трьох клієнтів із найбільшою загальною сумою замовлень за 2025 рік, і поясни українською двома реченнями, як він працює." },
