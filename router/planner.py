@@ -20,7 +20,19 @@ PLANNER_PROFILES = (
     "template",         # constrained workflow selector (no LLM plan)
     "hybrid_mamay12",   # free-form planner on Mamay-12B
     "hybrid_gated",     # decide "one task or several" first; one task = one call
+    # The same gate and prompt with another model writing the plan (dev comparison only).
+    "hybrid_gated_lapa",
+    "hybrid_gated_aya",
+    "hybrid_gated_mamay12",
 )
+
+# Gated profiles and the model that writes the plan (None = PLANNER_MODEL).
+GATED_PLANNERS: dict[str, str | None] = {
+    "hybrid_gated": None,
+    "hybrid_gated_lapa": "lapa",
+    "hybrid_gated_aya": "aya",
+    "hybrid_gated_mamay12": "mamay12",
+}
 
 SYSTEM_INSTRUCTION_V3_MINIMAL = """Ти плануєш виконання складеного запиту для українського асистента,
 розбиваючи його на 2-4 залежні кроки. Кожен крок має один з intent:
@@ -208,7 +220,9 @@ _SEQUENCE = re.compile(
 _TASK_VERB = (
     r"(переклад\w+|поясн\w+|напиш\w+|склад\w+|підсумуй\w*|перекаж\w+|витягн\w+|класифіку\w+"
     r"|порахуй\w*|обчисл\w+|назви|перелічи|реалізу\w+|виправ\w+|порівня\w+|опиши|визнач\w*"
-    r"|знайд\w+|розв'яж\w+|обґрунту\w+|зроби|подай|поверни|translate|explain|write|summari[sz]e|list)"
+    r"|знайд\w+|розв'яж\w+|обґрунту\w+|зроби|подай|поверни|дай\s+відповідь|відповідай|відповіси"
+    r"|розкаж\w+|наведи|додай|оціни|скороти|перефразуй|перепиши|придумай|запропонуй"
+    r"|translate|explain|write|summari[sz]e|list|answer)"
 )
 _TWO_ACTIONS = re.compile(
     r"(?i)\b" + _TASK_VERB + r"\b[^.!?\n]{0,160}?(,|\bі\b|\bй\b|\bта\b|\bа\b)\s+(також\s+|ще\s+)?" + _TASK_VERB + r"\b"
@@ -349,7 +363,9 @@ def resolve_profile(profile: str) -> tuple[str, str | None]:
         return "template", None
     if profile == "hybrid_mamay12":
         return "llm", "mamay12"
-    if profile in {"hybrid", "hybrid_minimal", "hybrid_fewshot", "hybrid_gated"}:
+    if profile in GATED_PLANNERS:
+        return "llm", GATED_PLANNERS[profile] or PLANNER_MODEL
+    if profile in {"hybrid", "hybrid_minimal", "hybrid_fewshot"}:
         return "llm", PLANNER_MODEL
     raise ValueError(f"unknown planner profile: {profile}")
 
@@ -361,7 +377,7 @@ def instruction_for_profile(profile: str) -> str:
         return SYSTEM_INSTRUCTION_FEWSHOT
     if profile in {"hybrid", "hybrid_mamay12"}:
         return SYSTEM_INSTRUCTION
-    if profile == "hybrid_gated":
+    if profile in GATED_PLANNERS:
         return SYSTEM_INSTRUCTION_GATED
     raise ValueError(f"profile {profile} has no LLM instruction")
 
@@ -388,19 +404,19 @@ async def generate_plan(
         _, planner_model = resolve_profile(profile)
         planner_model = planner_model or PLANNER_MODEL
 
-    if profile == "hybrid_gated" and _SINGLE_SYMBOL.search(user_prompt or ""):
+    if profile in GATED_PLANNERS and _SINGLE_SYMBOL.search(user_prompt or ""):
         return single_call_plan(user_prompt, router_profile), {
             "mode": "rule", "profile": profile, "template_id": None, "valid": True,
             "attempts": [], "repaired": False, "fallback": False, "gate": "single_symbol_answer",
         }
-    if profile == "hybrid_gated" and is_word_problem(user_prompt):
+    if profile in GATED_PLANNERS and is_word_problem(user_prompt):
         # Mamay-4B splits word problems into steps; a rule is more reliable here and saves the call.
         return single_call_plan(user_prompt, router_profile), {
             "mode": "rule", "profile": profile, "template_id": None, "valid": True,
             "attempts": [], "repaired": False, "fallback": False, "gate": "single_word_problem",
         }
 
-    if profile == "hybrid_gated" and not states_several_actions(user_prompt):
+    if profile in GATED_PLANNERS and not states_several_actions(user_prompt):
         # The planner model splits some one-task requests (0.035 on v7 dev). It is asked only
         # when the request states several actions, which also saves its call on the rest.
         return single_call_plan(user_prompt, router_profile), {
@@ -423,7 +439,7 @@ async def generate_plan(
             **extra,
         }
 
-    gated = profile == "hybrid_gated"
+    gated = profile in GATED_PLANNERS
     if gated:
         try:
             raw_steps = extract_json_object(hop.get("content") or "").get("steps")

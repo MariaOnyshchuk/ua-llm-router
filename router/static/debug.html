@@ -265,7 +265,7 @@ const PROFILE_LABEL = {
    routing variants that gave no gain are not in the page; docs/progress_report_2026-10-12.md says why. */
 const PLANNER = "hybrid_gated";
 const MODE_HINT = {
-  compare: "The same request goes to the router and to one model you choose, side by side.",
+  compare: "The same request goes to the router (one call or a plan, as it decides) and to one model you choose, side by side.",
   router: "Benchmark item: one call to the specialist the router picks, scored against the stored answer.",
   composite: "The router first decides whether the request is one task or several. One task: one call to the specialist for it. Several: a short plan, one specialist per step.",
   model: "No routing: the request goes straight to the model you choose.",
@@ -599,7 +599,15 @@ async function run() {
   const lanes = $("lanes"); lanes.replaceChildren(); lanes.className = "lanes";
   const path = { router: "chat", model: "chat", compare: "compare", composite: "composite" }[state.mode];
   const by = {};
-  if (state.mode === "compare") {
+  /* Compare: a typed request goes through the same gate and planner as "Ask the router". A
+     benchmark item keeps the plain one-call comparison, which is scored against its answer. */
+  const planned = state.mode === "compare" && !attached;
+  if (planned) {
+    lanes.className = "lanes two";
+    const left = h("div", { class: "lanes" });
+    by.b = newLane(nice(body.model_b) + " alone", "this model answers every request, no routing");
+    lanes.append(left, by.b.root); by.c = newComposite(left); by.c.root.querySelector("h2").textContent = "Router";
+  } else if (state.mode === "compare") {
     lanes.className = "lanes two";
     by.a = newLane("Router"); by.b = newLane(nice(body.model_b) + " alone", "this model answers every request, no routing");
     lanes.append(by.a.root, by.b.root);
@@ -608,9 +616,9 @@ async function run() {
   if (!attached && state.item) lanes.prepend(h("div", { class: "muted" }, "The prompt was edited, so this run is not scored against the loaded item."));
   clearTimeout(previewTimer); state.shown = prompt;   /* a late preview must not overwrite the live route */
   state.abort = new AbortController(); $("run").disabled = true; $("stop").disabled = false;
-  try {
-    const resp = await fetch("/debug/api/" + path, { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body), signal: state.abort.signal });
+  const stream = async (where, payload, onEvent) => {
+    const resp = await fetch("/debug/api/" + where, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload), signal: state.abort.signal });
     if (!resp.ok) throw new Error(resp.status + " " + (await resp.text()).slice(0, 300));
     const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = "";
     for (;;) {
@@ -618,12 +626,19 @@ async function run() {
       buf += dec.decode(value, { stream: true });
       let i; while ((i = buf.indexOf("\n\n")) >= 0) {
         const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
-        if (!chunk.startsWith("data:")) continue;
-        const ev = JSON.parse(chunk.slice(5));
-        if (state.mode === "composite") handleComposite(by.c, ev);
-        else { const side = ev.side || "a"; handleLane(by[side], ev, side === "a" && state.mode !== "model"); }
+        if (chunk.startsWith("data:")) onEvent(JSON.parse(chunk.slice(5)));
       }
     }
+  };
+  try {
+    if (planned) await Promise.all([
+      stream("composite", body, (ev) => handleComposite(by.c, ev)),
+      stream("chat", { ...body, mode: "model", model: body.model_b }, (ev) => handleLane(by.b, ev, false)),
+    ]);
+    else await stream(path, body, (ev) => {
+      if (state.mode === "composite") handleComposite(by.c, ev);
+      else { const side = ev.side || "a"; handleLane(by[side], ev, side === "a" && state.mode !== "model"); }
+    });
   } catch (e) {
     if (e.name !== "AbortError") lanes.append(h("div", { class: "card err" }, String(e)));
   } finally {

@@ -57,7 +57,7 @@ def required_aliases(systems: list[str]) -> set[str]:
             required.add(system)
         if system in {"router_direct", "oracle"} or system in PLANNER_PROFILES:
             required.update({"mamay4", "lapa", "aya"})
-        if system == "hybrid_mamay12":
+        if system in {"hybrid_mamay12", "hybrid_gated_mamay12"}:
             required.add("mamay12")
     return required
 
