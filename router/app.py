@@ -1,36 +1,28 @@
-"""OpenAI-compatible shim + playground UI.
+"""OpenAI-compatible router endpoint and the demo page.
 
-LiteLLM (optional, OpenAI path):
-  litellm --config litellm/config.yaml --port 4000
-
-Playground talks to vLLM ports directly (SSH tunnels to the lab):
   uvicorn router.app:app --port 4010
-  open http://localhost:4010/
+  open http://localhost:4010/        (redirects to /debug, the one page)
+
+The page and its API live in router/debug.py and router/static/debug.html. The specialists
+are reached on their vLLM ports (SSH tunnels to the lab). LiteLLM is optional:
+  litellm --config litellm/config.yaml --port 4000
 """
 
 from __future__ import annotations
 
-import asyncio
 import os
 from pathlib import Path
 from typing import Any
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from router.backends import BACKENDS, MODEL_META, PLAYGROUND_MODELS
-from router.cascade import should_retry_mamay4_micro
+from router.backends import BACKENDS, PLAYGROUND_MODELS
 from router.client import async_chat
 from router.debug import router as debug_router
-from router.ensemble import (
-    ENSEMBLE_VOTERS,
-    extract_vote_label,
-    majority_winner,
-    should_ensemble_vote,
-)
-from router.intent_rules import ROUTER_PROFILES, extract_user_text, route_intent
+from router.intent_rules import extract_user_text, route_intent
 from router.orchestrator import Plan, execute_plan
 from router.planner import PLANNER_PROFILES, generate_plan
 
@@ -66,85 +58,6 @@ def playground() -> RedirectResponse:
 @app.get("/healthz")
 def healthz() -> dict[str, str]:
     return {"status": "ok"}
-
-
-@app.get("/v1/demo/catalog")
-def catalog() -> dict[str, Any]:
-    return {
-        "models": [
-            {"id": alias, **MODEL_META[alias]} for alias in PLAYGROUND_MODELS
-        ],
-        "profiles": {
-            key: {
-                "id": key,
-                "label": spec["label"],
-                "blurb": spec["blurb"],
-                "default": spec["default"],
-            }
-            for key, spec in ROUTER_PROFILES.items()
-        },
-        "modes": [
-            {
-                "id": "single",
-                "label": "Single specialist",
-                "blurb": "Force one model; router is bypassed.",
-            },
-            {
-                "id": "router",
-                "label": "Rules router",
-                "blurb": "Regex intent → one specialist from the pool.",
-            },
-            {
-                "id": "compare",
-                "label": "Compare pool",
-                "blurb": "Same prompt to every selected specialist.",
-            },
-            {
-                "id": "cascade",
-                "label": "Micro-cascade",
-                "blurb": "Rules hop, then Mamay-4B retry on social 2 / missing digit.",
-            },
-            {
-                "id": "ensemble",
-                "label": "Ensemble vote",
-                "blurb": "Majority of Lapa + Mamay-4B + Aya on alignment / ZNO-like items.",
-            },
-            {
-                "id": "orchestrator",
-                "label": "Composite orchestrator",
-                "blurb": "Plan dependent specialist steps, execute them, return the final artifact.",
-            },
-        ],
-    }
-
-
-@app.get("/v1/demo/health")
-async def demo_health() -> dict[str, Any]:
-    rows: list[dict[str, Any]] = []
-    async with httpx.AsyncClient(timeout=2.5) as client:
-        for alias in PLAYGROUND_MODELS:
-            base, hf = BACKENDS[alias]
-            url = f"{base}/models"
-            ok = False
-            detail = ""
-            try:
-                resp = await client.get(url)
-                ok = resp.status_code == 200
-                detail = f"HTTP {resp.status_code}"
-            except Exception as exc:  # noqa: BLE001 — surface any transport error
-                detail = f"{type(exc).__name__}: {exc}"
-            meta = MODEL_META[alias]
-            rows.append(
-                {
-                    "id": alias,
-                    "ok": ok,
-                    "detail": detail,
-                    "url": url,
-                    "hf": hf,
-                    **meta,
-                }
-            )
-    return {"backends": rows, "any_up": any(r["ok"] for r in rows)}
 
 
 @app.post("/v1/route/preview")
@@ -258,191 +171,6 @@ async def orchestrate(body: dict[str, Any]) -> dict[str, Any]:
         "latency_ms": round(float(execution["latency_ms"]) + planner_latency, 1),
         "gpu_seconds": round(float(execution["gpu_seconds"]) + planner_gpu, 4),
     }
-
-
-async def _chat_one(
-    client: httpx.AsyncClient,
-    alias: str,
-    prompt: str,
-    *,
-    temperature: float,
-    max_tokens: int,
-    seed: int | None,
-) -> dict[str, Any]:
-    return await async_chat(
-        client,
-        alias,
-        prompt,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        seed=seed,
-    )
-
-
-def _as_item(prompt: str, intent: str) -> dict[str, str]:
-    """Minimal item shape so cascade / ensemble helpers can run on free-form chat."""
-    if intent == "alignment":
-        return {"bucket": "alignment", "id": "ualign-social-live", "prompt": prompt}
-    if intent == "knowledge":
-        return {"bucket": "knowledge", "id": "zno-live", "prompt": prompt}
-    return {"bucket": intent or "chat", "id": "live", "prompt": prompt}
-
-
-@app.post("/v1/demo/complete")
-async def demo_complete(body: dict[str, Any]) -> dict[str, Any]:
-    messages = body.get("messages") or []
-    prompt = str(body.get("prompt") or extract_user_text(messages)).strip()
-    if not prompt:
-        raise HTTPException(status_code=400, detail="empty prompt")
-
-    mode = str(body.get("mode") or "router")
-    profile = str(body.get("profile") or "v2")
-    pool = _pool_from_body(body) or frozenset(PLAYGROUND_MODELS)
-    forced = str(body.get("model") or "mamay4")
-    temperature = float(body.get("temperature") if body.get("temperature") is not None else 0.0)
-    max_tokens = int(body.get("max_tokens") or 256)
-    seed = body.get("seed")
-    seed_i = int(seed) if seed is not None else 42
-
-    decision = route_intent(prompt, profile=profile, pool=pool)
-    timeout = httpx.Timeout(180.0)
-
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        if mode == "single":
-            if forced not in BACKENDS:
-                raise HTTPException(status_code=400, detail=f"unknown model {forced}")
-            hop = await _chat_one(
-                client, forced, prompt, temperature=temperature, max_tokens=max_tokens, seed=seed_i
-            )
-            return {
-                "mode": mode,
-                "route": {
-                    "model": forced,
-                    "intent": "explicit",
-                    "reason": "client chose model",
-                },
-                "answers": [{**hop, "primary": True}],
-            }
-
-        if mode == "compare":
-            aliases = [a for a in PLAYGROUND_MODELS if a in pool]
-            if not aliases:
-                raise HTTPException(status_code=400, detail="empty pool")
-            hops = await asyncio.gather(
-                *[
-                    _chat_one(
-                        client,
-                        alias,
-                        prompt,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                        seed=seed_i,
-                    )
-                    for alias in aliases
-                ]
-            )
-            return {
-                "mode": mode,
-                "route": {
-                    "model": decision.model,
-                    "intent": decision.intent,
-                    "reason": decision.reason,
-                },
-                "answers": [{**h, "primary": h["alias"] == decision.model} for h in hops],
-            }
-
-        first_alias = decision.model
-        first = await _chat_one(
-            client,
-            first_alias,
-            prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            seed=seed_i,
-        )
-        answers = [{**first, "primary": True}]
-        extra: dict[str, Any] = {}
-
-        if mode == "cascade":
-            item = _as_item(prompt, decision.intent)
-            conf = should_retry_mamay4_micro(item, first.get("content") or "")
-            extra["cascade"] = {
-                "kind": "micro",
-                "first_model": first_alias,
-                "escalated": conf.escalate,
-                "confidence": conf.confidence,
-                "reason": conf.reason,
-            }
-            if conf.escalate and "mamay4" in BACKENDS:
-                retry = await _chat_one(
-                    client,
-                    "mamay4",
-                    prompt,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    seed=seed_i,
-                )
-                retry["primary"] = True
-                first["primary"] = False
-                answers = [first, retry]
-                extra["cascade"]["final_model"] = "mamay4"
-                extra["route_final"] = {
-                    "model": "mamay4",
-                    "intent": decision.intent,
-                    "reason": f"micro cascade ← {conf.reason}",
-                }
-
-        if mode == "ensemble":
-            item = _as_item(prompt, decision.intent)
-            if should_ensemble_vote(item):
-                ballots: list[tuple[str, str | None, dict]] = [
-                    (first_alias, extract_vote_label(item, first.get("content") or ""), first)
-                ]
-                for voter in ENSEMBLE_VOTERS:
-                    if voter == first_alias or voter not in pool:
-                        continue
-                    extra_hop = await _chat_one(
-                        client,
-                        voter,
-                        prompt,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                        seed=seed_i,
-                    )
-                    answers.append({**extra_hop, "primary": False})
-                    ballots.append(
-                        (
-                            voter,
-                            extract_vote_label(item, extra_hop.get("content") or ""),
-                            extra_hop,
-                        )
-                    )
-                win_alias, win_lab, _ = majority_winner(ballots, first_alias)
-                extra["ensemble"] = {
-                    "voted": True,
-                    "ballots": {a: lab for a, lab, _ in ballots},
-                    "winner_label": win_lab,
-                    "winner_model": win_alias,
-                    "flipped": win_alias != first_alias,
-                }
-                for ans in answers:
-                    ans["primary"] = ans["alias"] == win_alias
-            else:
-                extra["ensemble"] = {
-                    "voted": False,
-                    "reason": "not a discrete alignment / ZNO-like item; rules hop only",
-                }
-
-        return {
-            "mode": mode,
-            "route": {
-                "model": decision.model,
-                "intent": decision.intent,
-                "reason": decision.reason,
-            },
-            "answers": answers,
-            **extra,
-        }
 
 
 @app.post("/v1/chat/completions")
