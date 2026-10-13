@@ -89,6 +89,7 @@
   .spec.dim { opacity: .45; }
   .spec.pick { border-color: var(--pick); background: var(--pick-soft); box-shadow: 0 0 0 2px var(--pick); opacity: 1; }
   .why { margin-top: 12px; font-size: 16px; min-height: 26px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  ol.trace { margin: 0; padding-left: 1.3em; display: grid; gap: 3px; flex-basis: 100%; }
   .tag { font: 13px var(--mono); padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
   .tag.plain { background: var(--sunk); color: var(--muted); }
   .tag.good { background: transparent; border: 1px solid var(--good); color: var(--good); }
@@ -207,12 +208,7 @@
         <summary>Settings</summary>
         <div class="grid wide">
           <div id="profilebox"><label for="profile">How the specialist is chosen</label><select id="profile"></select>
-            <small>The router reads the request and picks one of the three models.</small></div>
-          <div id="plannerbox"><label for="planner">How steps are planned</label><select id="planner"></select>
-            <small>Only used in "Plan steps if needed".</small></div>
-          <div id="alignbox"><label for="align">Questions that ask for a 0/1/2 rating</label>
-            <select id="align"><option value="fewshot">Explain the scale with examples (recommended)</option><option value="baseline">Send the request as it is</option></select>
-            <small>Affects only benchmark items that rate an action on a number scale.</small></div>
+            <small>The first option also works for requests in everyday wording. The second is the version measured on the benchmark.</small></div>
           <div id="oraclebox"><label for="oracle">Benchmark item plan</label>
             <label style="display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)"><input type="checkbox" id="oracle"> use the correct plan stored with the item</label>
             <small>Shows how far a perfect plan would get. Needs an item from Benchmark tools.</small></div>
@@ -262,19 +258,12 @@ const KIND = { translate: "translation", knowledge: "facts", alignment: "ethics"
   code: "code", chat: "conversation", explicit: "your choice", fixed: "your choice", default: "conversation" };
 const kind = (i) => KIND[i] || i;
 const PROFILE_LABEL = {
-  v2_llm: "Keyword rules, then a small model if no rule fits (best for everyday wording)",
-  v2: "Keyword rules only (the version measured on the benchmark)",
-  v3_instruct: "Keyword rules + \"write a …\" requests to Mamay-4B (experiment, no gain)",
-  v1: "Old keyword rules from August",
+  v2_llm: "Keyword rules, then a small model if no rule fits",
+  v2: "Keyword rules only",
 };
-const PLANNER_LABEL = {
-  hybrid_gated: "Plan only when the request has several tasks (recommended)",
-  template: "Fixed step templates, no model (benchmark task types only)",
-  hybrid: "Old planner: always splits into 2–4 steps (for comparison)",
-  hybrid_fewshot: "Old planner with examples (for comparison)",
-  hybrid_minimal: "Old planner, short instruction (for comparison)",
-  hybrid_mamay12: "Old planner run by Mamay-12B (that model must be online)",
-};
+/* One planner is offered: it plans only when the request has several tasks. Older planners and
+   routing variants that gave no gain are not in the page; docs/progress_report_2026-10-12.md says why. */
+const PLANNER = "hybrid_gated";
 const MODE_HINT = {
   router: "One model call. The router picks the specialist for this request.",
   compare: "The same request goes to the router and to one model you choose, side by side.",
@@ -377,7 +366,9 @@ async function loadHealth() {
   state.health = d.backends;
   $("mockwarn").hidden = !Object.values(d.backends).some((b) => b.up && b.mock);
   const aliases = Object.keys(d.backends).sort((a, b) => Number(d.backends[b].up) - Number(d.backends[a].up));
-  fill($("model"), aliases.map((a) => ({ value: a, label: nice(a) + (d.backends[a].up ? "" : " (offline)") })), true);
+  /* only models that are running can be asked */
+  const online = aliases.filter((a) => d.backends[a].up);
+  fill($("model"), (online.length ? online : aliases).map((a) => ({ value: a, label: nice(a) })), true);
   const up = (a) => d.backends[a] && d.backends[a].up;
   $("model").value = ["mamay12", "aya", "lapa", "mamay4"].find(up) || aliases[0];
   /* learned profiles (knn, clf) need a library that is not installed here, so they are not offered */
@@ -388,9 +379,6 @@ async function loadHealth() {
   $("profile").value = offered.includes(wanted) ? wanted : (offered.includes("v2_llm") ? "v2_llm" : "v2");
   if (offered.includes(wanted)) document.querySelector("details.settings").open = true;
   state.startMode = ["router", "compare", "composite", "model"].includes(params.get("mode")) ? params.get("mode") : "router";
-  const planners = Object.keys(PLANNER_LABEL).filter((x) => d.planners.includes(x));
-  fill($("planner"), planners.map((x) => ({ value: x, label: PLANNER_LABEL[x] })), true);
-  $("planner").value = d.planners.includes("hybrid_gated") ? "hybrid_gated" : "hybrid";
   renderStrip(null);
 }
 function renderStrip(pick) {
@@ -400,14 +388,18 @@ function renderStrip(pick) {
   $("strip").replaceChildren(...cards);
 }
 function showWhy(trace, live) {
-  if (!trace) { $("why").replaceChildren(h("span", { class: "muted" }, "Start typing: the route is decided by rules before any model is called.")); renderStrip(null); return; }
+  if (!trace) { $("why").replaceChildren(h("span", { class: "muted" }, "Start typing: the route is decided before any answer is written.")); renderStrip(null); return; }
   renderStrip(trace.model);
-  put($("why"), h("span", { class: "tag", title: "internal name: " + trace.intent }, kind(trace.intent)), h("span", {}, "→ ", h("b", {}, nice(trace.model))),
-    h("span", { class: "muted", title: trace.reason || "" }, trace.learned ? "chosen by the learned router"
-      : /^no rule matched/.test(trace.reason || "") ? "no rule matched, so Mamay-4B named the type"
-      : /^default/.test(trace.reason || "") ? "no rule matched: default route"
-      : (WHY[trace.intent] || trace.reason || "")),
-    live ? null : h("span", { class: "tag plain" }, "preview"));
+  const hit = (trace.rules || []).find((r) => r.matched);
+  const reason = trace.reason || "";
+  const steps = [];
+  if (hit) steps.push(["Keyword rules", h("span", {}, "matched on “", h("b", {}, hit.match_text), "”")]);
+  else steps.push(["Keyword rules", "no rule matched this request"]);
+  if (/^no rule matched/.test(reason)) steps.push(["Mamay-4B was asked", h("span", {}, "it called the request ", h("b", {}, kind(trace.intent)))]);
+  else if (!hit) steps.push(["Fallback", "treated as conversation"]);
+  steps.push(["Decision", h("span", {}, h("span", { class: "tag", title: "internal name: " + trace.intent }, kind(trace.intent)), " goes to ", h("b", {}, nice(trace.model)),
+    live ? null : h("span", { class: "tag plain", style: "margin-left:8px" }, "preview"))]);
+  put($("why"), h("ol", { class: "trace" }, ...steps.map(([name, what]) => h("li", {}, h("span", { class: "muted" }, name + ": "), what))));
 }
 let previewTimer = null;
 function preview() {
@@ -481,8 +473,7 @@ function setMode(m) {
   $("modellabel").textContent = m === "compare" ? "against" : "Model";
   $("modehint").textContent = MODE_HINT[m] || "";
   $("profilebox").hidden = m === "model";
-  $("alignbox").hidden = m === "composite";
-  $("plannerbox").hidden = $("oraclebox").hidden = m !== "composite";
+  $("oraclebox").hidden = m !== "composite";
   $("routecard").hidden = m === "model";
   $("routetitle").textContent = m === "composite" ? "The three specialists" : "Where this request goes";
   if (m === "composite") showWhy(null), $("why").replaceChildren(h("span", { class: "muted" }, "The models used for this request light up as the steps run."));
@@ -597,7 +588,7 @@ async function run() {
   const prompt = $("prompt").value.trim(); if (!prompt) return;
   const attached = state.item && prompt === state.itemPrompt;
   const body = { prompt, mode: state.mode === "model" ? "model" : "router", model: $("model").value, model_b: $("model").value,
-    profile: $("profile").value, align_prompt: $("align").value, planner_profile: $("planner").value, use_oracle: $("oracle").checked,
+    profile: $("profile").value, align_prompt: "fewshot", planner_profile: PLANNER, use_oracle: $("oracle").checked,
     temperature: parseFloat($("temp").value || 0), max_tokens: parseInt($("maxtok").value || 1024), seed: $("seed").value === "" ? null : parseInt($("seed").value) };
   if (attached) { body.suite = state.item.suite; body.item_id = state.item.id; }
   const lanes = $("lanes"); lanes.replaceChildren(); lanes.className = "lanes";

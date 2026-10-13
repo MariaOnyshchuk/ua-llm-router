@@ -28,7 +28,8 @@ See `corpus/README.md`.
 | **`mixed_ua_v4_balanced.jsonl`** | **192** | **32×6** | Historical eval (weeks 6–10) |
 | `mixed_ua_v6_screen.jsonl` | 4237 | warehouse draw | Discriminability screening (not for claims) |
 | `mixed_ua_v6.jsonl` | 2414 | 683×3 + instruct 327; chat/code appendix | Withdrawn 12 Oct 2026 (inverted selection) — [`docs/mixed_ua_v6.md`](../docs/mixed_ua_v6.md) |
-| **`mixed_ua_v7.jsonl`** | **4237** | whole screening pool; dev 1487, test 2750 (knowledge 794, translate 795, alignment 800, instruct 361) | **Claim suite.** No score-based selection; v4 items forced to dev. Build: `scripts/benchmarks/build_mixed_ua_v7.py` |
+| **`mixed_ua_v7.jsonl`** | **4237** | whole screening pool plus HumanEval for code; dev 1542, test 2859 (knowledge 794, translate 795, alignment 800, instruct 361, code 109) | **Claim suite.** No score-based selection; v4 items forced to dev. Build: `scripts/benchmarks/build_mixed_ua_v7.py` |
+| `intent_natural_v1.jsonl` | 72 | 12 hand-written everyday requests per intent | Routing diagnostics only (right intent, right model). Not a quality benchmark |
 
 ## Tiny samples (`samples/`) — legacy / hand extras only
 

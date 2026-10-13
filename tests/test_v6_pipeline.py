@@ -80,6 +80,15 @@ class McqAndIfevalTests(unittest.TestCase):
         self.assertEqual(score_ifeval("Напишіть лист.\n\nШановний…", ["combination:repeat_prompt"], kwargs, request)["score"], 1.0)
         self.assertEqual(score_ifeval("Шановний…", ["combination:repeat_prompt"], kwargs, request)["score"], 0.0)
 
+    def test_extract_code_without_a_fence_keeps_the_function_body(self) -> None:
+        from scripts.score_results import extract_code
+
+        plain = "def add(a, b):\n    return a + b"
+        self.assertEqual(extract_code(plain), plain)
+        self.assertEqual(extract_code("Ось розв'язок:\n" + plain + "\n\nЦя функція додає два числа."), plain)
+        self.assertEqual(extract_code("```python\n" + plain + "\n```\nпояснення"), plain)
+        self.assertEqual(extract_code("просто текст"), "просто текст")
+
     def test_score_row_ifeval_item(self) -> None:
         row = {
             "id": "ifeval-0001",
@@ -183,16 +192,6 @@ class LearnedRouterTests(unittest.TestCase):
         d = route_intent("Переклади з англійської: hello", profile="v2")
         self.assertEqual(d.model, "aya")
         self.assertEqual(d.intent, "translate")
-
-    def test_v3_instruct_only_moves_unmatched_writing_tasks(self) -> None:
-        text = "Напишіть пісню про інновації для підлітків."
-        self.assertEqual(route_intent(text, profile="v2").model, "aya")
-        d = route_intent(text, profile="v3_instruct")
-        self.assertEqual((d.model, d.intent), ("mamay4", "instruct"))
-        hello = "Привіт! Як справи?"
-        self.assertEqual(route_intent(hello, profile="v3_instruct").model, "aya")
-        translate = "Переклади з англійської: write a poem"
-        self.assertEqual(route_intent(translate, profile="v3_instruct").model, "aya")
 
     def test_v2_llm_asks_the_model_only_when_no_rule_matched(self) -> None:
         from router import intent_rules

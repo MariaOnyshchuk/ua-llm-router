@@ -38,6 +38,7 @@ Local laptop copy. **Full `mixed_ua_v3` JSONL runs (18 × 182 rows) live on the 
 | [`v7_dev_router_bucketfs/`](v7_dev_router_bucketfs/) | 12 Oct | Same router with two worked examples per bucket (knowledge, translate, instruct). Worse than without: macro −0.014 [−0.027, −0.001]. Dropped. |
 | [`v7_dev_mamay12_fewshot/`](v7_dev_mamay12_fewshot/) | 12 Oct | Mamay-12B on the 400 dev alignment items with the same few-shot prompt the router uses (0.738; baseline prompt 0.730). |
 | [`v7_confidence/`](v7_confidence/) | 12 Oct | First-token probabilities of four models on dev knowledge and alignment (806 items). Confidence-based model choice did not help; see `analysis/v7_dev_router_experiments.json`. |
+| [`v7_code_dev/`](v7_code_dev/) | 13 Oct | The 55 HumanEval dev items of v7 on the three specialists: Mamay-4B **0.636**, Aya 0.455, Lapa 0.436 (unit tests passed). Rules v2 send all 55 to Mamay-4B. Summary: `analysis/v7_dev_code_humaneval.json`. |
 | [`v6_screen/`](v6_screen/) | 4 Sep | Screening runs of Mamay-4B, Lapa and Aya on the 4237-item pool (old scorer). Not for claims; the same raw runs, rescored, are the item scores in `v7_pool/`. |
 | [`analysis/`](analysis/) | — | Derived summaries: bootstrap comparisons, planner split counts, v7 dev tables, AgentCoMa dev summary. Each file names its source run. |
 | [`tables/`](tables/) | — | Wide CSV exports of the score files. |

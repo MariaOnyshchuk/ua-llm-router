@@ -150,9 +150,22 @@ def extract_code(text: str) -> str:
     m = CODE_FENCE_RE.search(text)
     if m:
         return m.group(1).strip()
-    # fallback: lines that look like python
-    lines = [ln for ln in text.splitlines() if ln.strip().startswith(("def ", "class ", "import ", "from "))]
-    return "\n".join(lines).strip() if lines else text.strip()
+    # No fence: take the code from its first top-level statement to the end, then drop trailing
+    # lines of prose until it compiles. Until 13 Oct 2026 this branch kept only the lines that
+    # start with def/class/import/from, which threw away every function body, so a correct
+    # answer without a fence (Lapa on HumanEval: 55 of 55) failed with IndentationError.
+    lines = text.splitlines()
+    start = next((i for i, ln in enumerate(lines) if ln.startswith(("def ", "class ", "import ", "from ", "@"))), None)
+    if start is None:
+        return text.strip()
+    block = lines[start:]
+    while block:
+        try:
+            compile("\n".join(block), "<answer>", "exec")
+            return "\n".join(block).strip()
+        except SyntaxError:
+            block = block[:-1]
+    return "\n".join(lines[start:]).strip()
 
 
 def score_chat(content: str) -> dict[str, Any]:
@@ -405,9 +418,43 @@ CODE_TESTS = {
 }
 
 
+# Runs one HumanEval check in a child process. The answer is model-written code: in-process
+# `exec` could not be stopped by the old thread timeout, and on 13 Oct 2026 one answer took
+# the whole scoring process down. The child gets a CPU and memory limit and is killed on timeout.
+_HE_DRIVER = r"""
+import json, sys
+try:
+    import resource
+    resource.setrlimit(resource.RLIMIT_CPU, (8, 8))
+    try:
+        resource.setrlimit(resource.RLIMIT_AS, (2 << 30, 2 << 30))
+    except (ValueError, OSError):
+        pass
+except ImportError:
+    pass
+p = json.load(sys.stdin)
+code, prompt, test, entry = p["code"], p["prompt"], p["test"], p["entry"]
+try:
+    ns = {}
+    try:
+        exec(code, ns, ns)
+    except Exception:
+        ns = {}
+        exec(prompt + "\n" + code, ns, ns)
+    if entry not in ns:
+        exec(prompt + "\n" + code, ns, ns)
+    exec(test, ns, ns)
+    ns["check"](ns[entry])
+except BaseException as e:
+    sys.stdout.write("FAIL:" + type(e).__name__)
+    sys.exit(1)
+sys.stdout.write("PASS")
+"""
+
+
 def score_humaneval(content: str, row: dict[str, Any]) -> dict[str, Any]:
-    """Run HumanEval check(candidate) with a short timeout."""
-    import concurrent.futures
+    """Run HumanEval check(candidate) in a child process with a time and memory limit."""
+    import subprocess
 
     row = humaneval_fields(row)
     code = extract_code(content or "")
@@ -416,28 +463,17 @@ def score_humaneval(content: str, row: dict[str, Any]) -> dict[str, Any]:
     entry = str(row.get("he_entry_point") or "")
     if not test or not entry:
         return {"score": 0.0, "detail": "humaneval_missing_test"}
-
-    def _run() -> None:
-        ns: dict[str, Any] = {}
-        try:
-            exec(code, ns, ns)
-        except Exception:
-            ns = {}
-            exec(prompt + "\n" + code, ns, ns)
-        if entry not in ns:
-            exec(prompt + "\n" + code, ns, ns)
-        exec(test, ns, ns)
-        ns["check"](ns[entry])
-
+    payload = json.dumps({"code": code, "prompt": prompt, "test": test, "entry": entry})
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            fut = pool.submit(_run)
-            fut.result(timeout=8.0)
-        return {"score": 1.0, "detail": "humaneval_pass"}
-    except concurrent.futures.TimeoutError:
+        proc = subprocess.run([sys.executable, "-c", _HE_DRIVER], input=payload, capture_output=True,
+                              text=True, timeout=12.0)
+    except subprocess.TimeoutExpired:
         return {"score": 0.0, "detail": "humaneval_timeout"}
-    except Exception as e:
-        return {"score": 0.0, "detail": f"humaneval_fail:{type(e).__name__}"}
+    out = (proc.stdout or "").strip()
+    if proc.returncode == 0 and out.endswith("PASS"):
+        return {"score": 1.0, "detail": "humaneval_pass"}
+    kind = out.rsplit("FAIL:", 1)[-1] if "FAIL:" in out else f"exit{proc.returncode}"
+    return {"score": 0.0, "detail": f"humaneval_fail:{kind}"}
 
 
 def score_code(content: str, item_id: str, row: dict[str, Any] | None = None) -> dict[str, Any]:

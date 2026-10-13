@@ -9,6 +9,10 @@ and assigned to dev or test at random inside its source stratum.
 Items that also appear in mixed_ua_v4_balanced go to dev, because routing
 rules, prompts and few-shot examples were tuned on v4.
 
+The pool has no scored code items outside v4, so the code bucket is filled from
+HumanEval (164 English Python tasks with unit tests, MIT licence, already in
+benchmarks/corpus/). The 32 HumanEval tasks used in mixed_ua_v5 go to dev.
+
 Items that share text stay in one split: the two directions of one FLORES or
 WMT-22 sentence pair, and items with an identical prompt.
 
@@ -29,6 +33,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 POOL = ROOT / "benchmarks" / "mixed_ua_v6_screen.jsonl"
 TUNED_ON = ROOT / "benchmarks" / "mixed_ua_v4_balanced.jsonl"
+# Extra scored items that are not in the screening pool, and the suite they were already run on.
+EXTRA = ROOT / "benchmarks" / "corpus" / "humaneval_code_en.jsonl"
+EXTRA_SEEN_IN = ROOT / "benchmarks" / "mixed_ua_v5.jsonl"
 OUT = ROOT / "benchmarks" / "mixed_ua_v7.jsonl"
 CLAIM_BUCKETS = ("knowledge", "translate", "alignment", "instruct")
 
@@ -105,10 +112,13 @@ def main() -> None:
     args = parser.parse_args()
 
     rows = read_jsonl(Path(args.pool))
+    pool_ids = {r["id"] for r in rows}
+    extra = [r for r in read_jsonl(EXTRA) if r["id"] not in pool_ids]
+    rows += extra
     ids = [r["id"] for r in rows]
     if len(set(ids)) != len(ids):
         raise SystemExit("duplicate ids in the pool")
-    forced_dev = {r["id"] for r in read_jsonl(TUNED_ON)} & set(ids)
+    forced_dev = ({r["id"] for r in read_jsonl(TUNED_ON)} | {r["id"] for r in read_jsonl(EXTRA_SEEN_IN)}) & set(ids)
     split = assign_splits(rows, forced_dev, args.dev_share, args.seed)
 
     out = Path(args.out)
@@ -133,7 +143,9 @@ def main() -> None:
         "seed": args.seed,
         "dev_share": args.dev_share,
         "n": len(rows),
-        "forced_dev_from_v4": len(forced_dev),
+        "forced_dev_from_v4_and_v5": len(forced_dev),
+        "extra_items": {"source": str(EXTRA.relative_to(ROOT)), "n": len(extra),
+                        "note": "HumanEval, English Python tasks scored by unit tests (score_mode=humaneval)"},
         "claim_buckets": list(CLAIM_BUCKETS),
         "appendix_buckets": ["chat", "code"],
         "by_split_bucket": {s: dict(sorted(c.items())) for s, c in counts.items()},

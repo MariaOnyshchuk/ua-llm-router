@@ -153,5 +153,9 @@ Maria asked for the work to continue without stopping, so these were done as wel
   −0.042 [−0.061, −0.023] on the macro and −0.168 on instruct; with the format guard −0.018 [−0.036, 0.000].
   The scheduled 02:08 run did not fire, so this was done in the morning.
 - [ ] **16. Dev-split lab runs** (plain and `FORMAT_GUARD=1`): not started.
+- [x] **17. Code bucket for v7 (13 Oct).** HumanEval added: 55 dev, 109 test. Dev: Mamay-4B 0.636, Aya 0.455, Lapa 0.436.
+- [x] **18. Code scorer fixed (13 Oct).** Unfenced answers keep their function bodies; checks run in a child process.
+  No existing score changed.
+- [x] **19. Page and code cleaned (13 Oct).** One page; options that do not work removed; `v3_instruct` removed.
 
 ALL DONE

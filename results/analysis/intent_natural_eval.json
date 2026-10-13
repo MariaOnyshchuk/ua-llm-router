@@ -25,48 +25,48 @@
      }
     },
     "llm": {
-     "intent_accuracy": 0.819,
+     "intent_accuracy": 0.833,
      "intent_ci95": [
-      0.715,
-      0.891
+      0.731,
+      0.902
      ],
-     "model_accuracy": 0.875,
+     "model_accuracy": 0.861,
      "model_ci95": [
-      0.779,
-      0.933
+      0.763,
+      0.923
      ],
      "by_intent": {
       "alignment": "12/12",
       "chat": "11/12",
-      "code": "12/12",
-      "instruct": "4/12",
+      "code": "10/12",
+      "instruct": "6/12",
       "knowledge": "12/12",
-      "translate": "8/12"
+      "translate": "9/12"
      }
     },
     "hybrid": {
-     "intent_accuracy": 0.847,
+     "intent_accuracy": 0.861,
      "intent_ci95": [
-      0.747,
-      0.912
+      0.763,
+      0.923
      ],
-     "model_accuracy": 0.903,
+     "model_accuracy": 0.889,
      "model_ci95": [
-      0.813,
-      0.952
+      0.796,
+      0.943
      ],
      "by_intent": {
       "alignment": "12/12",
       "chat": "11/12",
-      "code": "12/12",
-      "instruct": "6/12",
+      "code": "10/12",
+      "instruct": "8/12",
       "knowledge": "12/12",
-      "translate": "8/12"
+      "translate": "9/12"
      }
     }
    },
    "llm_unusable_replies": 0,
-   "llm_latency_p50_ms": 275.6,
+   "llm_latency_p50_ms": 215.2,
    "hybrid_share_of_requests_sent_to_llm": 0.806,
    "items": [
     {
@@ -87,8 +87,8 @@
      "id": "nat-translate-03",
      "gold": "translate",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "translate",
+     "hybrid": "translate"
     },
     {
      "id": "nat-translate-04",
@@ -129,8 +129,8 @@
      "id": "nat-translate-09",
      "gold": "translate",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "nat-translate-10",
@@ -332,14 +332,14 @@
      "id": "nat-instruct-02",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "nat-instruct-03",
      "gold": "instruct",
      "rules_v2": "instruct",
-     "llm": "chat",
+     "llm": "translate",
      "hybrid": "instruct"
     },
     {
@@ -388,8 +388,8 @@
      "id": "nat-instruct-10",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "nat-instruct-11",
@@ -430,8 +430,8 @@
      "id": "nat-code-04",
      "gold": "code",
      "rules_v2": "chat",
-     "llm": "code",
-     "hybrid": "code"
+     "llm": "knowledge",
+     "hybrid": "knowledge"
     },
     {
      "id": "nat-code-05",
@@ -465,8 +465,8 @@
      "id": "nat-code-09",
      "gold": "code",
      "rules_v2": "chat",
-     "llm": "code",
-     "hybrid": "code"
+     "llm": "knowledge",
+     "hybrid": "knowledge"
     },
     {
      "id": "nat-code-10",
@@ -576,72 +576,72 @@
    ]
   },
   "v7_dev_sample": {
-   "n": 264,
+   "n": 282,
    "methods": {
     "rules_v2": {
-     "intent_accuracy": 0.867,
+     "intent_accuracy": 0.876,
      "intent_ci95": [
-      0.821,
-      0.903
+      0.832,
+      0.909
      ],
-     "model_accuracy": 0.867,
+     "model_accuracy": 0.876,
      "model_ci95": [
-      0.821,
-      0.903
+      0.832,
+      0.909
      ],
      "by_intent": {
       "alignment": "50/50",
       "chat": "31/32",
-      "code": "32/32",
+      "code": "50/50",
       "instruct": "16/50",
       "knowledge": "50/50",
       "translate": "50/50"
      }
     },
     "llm": {
-     "intent_accuracy": 0.814,
+     "intent_accuracy": 0.862,
      "intent_ci95": [
-      0.763,
-      0.857
+      0.817,
+      0.897
      ],
-     "model_accuracy": 0.83,
+     "model_accuracy": 0.876,
      "model_ci95": [
-      0.78,
-      0.87
+      0.832,
+      0.909
      ],
      "by_intent": {
       "alignment": "50/50",
-      "chat": "30/32",
-      "code": "32/32",
-      "instruct": "7/50",
-      "knowledge": "46/50",
+      "chat": "27/32",
+      "code": "50/50",
+      "instruct": "17/50",
+      "knowledge": "49/50",
       "translate": "50/50"
      }
     },
     "hybrid": {
-     "intent_accuracy": 0.879,
+     "intent_accuracy": 0.897,
      "intent_ci95": [
-      0.834,
-      0.913
+      0.856,
+      0.927
      ],
-     "model_accuracy": 0.883,
+     "model_accuracy": 0.901,
      "model_ci95": [
-      0.838,
-      0.916
+      0.86,
+      0.93
      ],
      "by_intent": {
       "alignment": "50/50",
-      "chat": "29/32",
-      "code": "32/32",
-      "instruct": "21/50",
+      "chat": "26/32",
+      "code": "50/50",
+      "instruct": "27/50",
       "knowledge": "50/50",
       "translate": "50/50"
      }
     }
    },
    "llm_unusable_replies": 1,
-   "llm_latency_p50_ms": 273.7,
-   "hybrid_share_of_requests_sent_to_llm": 0.246,
+   "llm_latency_p50_ms": 215.8,
+   "hybrid_share_of_requests_sent_to_llm": 0.23,
    "items": [
     {
      "id": "zno-his-20-20-2915",
@@ -661,7 +661,7 @@
      "id": "arc-MCAS_2004_8_3",
      "gold": "knowledge",
      "rules_v2": "knowledge",
-     "llm": "code",
+     "llm": "knowledge",
      "hybrid": "knowledge"
     },
     {
@@ -843,7 +843,7 @@
      "id": "mmlu-electrical_engineering-1924",
      "gold": "knowledge",
      "rules_v2": "knowledge",
-     "llm": "code",
+     "llm": "knowledge",
      "hybrid": "knowledge"
     },
     {
@@ -906,7 +906,7 @@
      "id": "belebele-https:--en.wikivoyage.org-wiki-New_Mexico_Pueblos",
      "gold": "knowledge",
      "rules_v2": "knowledge",
-     "llm": "chat",
+     "llm": "knowledge",
      "hybrid": "knowledge"
     },
     {
@@ -1767,15 +1767,15 @@
      "id": "ifeval-3089",
      "gold": "instruct",
      "rules_v2": "instruct",
-     "llm": "chat",
+     "llm": "instruct",
      "hybrid": "instruct"
     },
     {
      "id": "ifeval-2010",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "translate",
+     "hybrid": "translate"
     },
     {
      "id": "if-029",
@@ -1788,8 +1788,8 @@
      "id": "ifeval-1886",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "ifeval-2305",
@@ -1830,8 +1830,8 @@
      "id": "ifeval-3536",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "ifeval-1739",
@@ -1844,15 +1844,15 @@
      "id": "ifeval-2517",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "ifeval-1237",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "ifeval-2585",
@@ -1879,8 +1879,8 @@
      "id": "ifeval-1893",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "code",
+     "hybrid": "code"
     },
     {
      "id": "ifeval-3025",
@@ -1907,7 +1907,7 @@
      "id": "ifeval-1305",
      "gold": "instruct",
      "rules_v2": "instruct",
-     "llm": "chat",
+     "llm": "instruct",
      "hybrid": "instruct"
     },
     {
@@ -1963,8 +1963,8 @@
      "id": "ifeval-1964",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "ifeval-2465",
@@ -1977,15 +1977,15 @@
      "id": "if-005",
      "gold": "instruct",
      "rules_v2": "instruct",
-     "llm": "chat",
+     "llm": "knowledge",
      "hybrid": "instruct"
     },
     {
      "id": "ifeval-3653",
      "gold": "instruct",
      "rules_v2": "chat",
-     "llm": "code",
-     "hybrid": "code"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "ifeval-2078",
@@ -2012,7 +2012,7 @@
      "id": "if-015",
      "gold": "instruct",
      "rules_v2": "instruct",
-     "llm": "chat",
+     "llm": "instruct",
      "hybrid": "instruct"
     },
     {
@@ -2040,15 +2040,15 @@
      "id": "if-022",
      "gold": "instruct",
      "rules_v2": "instruct",
-     "llm": "chat",
+     "llm": "instruct",
      "hybrid": "instruct"
     },
     {
      "id": "chat-032",
      "gold": "chat",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "chat-027",
@@ -2117,8 +2117,8 @@
      "id": "chat-028",
      "gold": "chat",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "instruct",
+     "hybrid": "instruct"
     },
     {
      "id": "chat-006",
@@ -2257,8 +2257,8 @@
      "id": "chat-004",
      "gold": "chat",
      "rules_v2": "chat",
-     "llm": "chat",
-     "hybrid": "chat"
+     "llm": "knowledge",
+     "hybrid": "knowledge"
     },
     {
      "id": "chat-030",
@@ -2268,7 +2268,14 @@
      "hybrid": "chat"
     },
     {
-     "id": "code-015",
+     "id": "humaneval-131",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-029",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
@@ -2282,28 +2289,14 @@
      "hybrid": "code"
     },
     {
-     "id": "code-003",
+     "id": "code-010",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
      "hybrid": "code"
     },
     {
-     "id": "code-023",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-021",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-002",
+     "id": "humaneval-145",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
@@ -2324,56 +2317,7 @@
      "hybrid": "code"
     },
     {
-     "id": "code-027",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-011",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-025",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-017",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-026",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
      "id": "code-009",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-016",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-007",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
@@ -2387,56 +2331,21 @@
      "hybrid": "code"
     },
     {
-     "id": "code-012",
+     "id": "humaneval-030",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
      "hybrid": "code"
     },
     {
-     "id": "code-010",
+     "id": "humaneval-157",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
      "hybrid": "code"
     },
     {
-     "id": "code-014",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-020",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-004",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-032",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-028",
-     "gold": "code",
-     "rules_v2": "code",
-     "llm": "code",
-     "hybrid": "code"
-    },
-    {
-     "id": "code-029",
+     "id": "humaneval-109",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
@@ -2450,7 +2359,70 @@
      "hybrid": "code"
     },
     {
-     "id": "code-019",
+     "id": "humaneval-011",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-103",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-028",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-118",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-017",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-100",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-032",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-115",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-072",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-025",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
@@ -2464,6 +2436,125 @@
      "hybrid": "code"
     },
     {
+     "id": "code-007",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-136",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-123",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-023",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-113",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-027",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-154",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-080",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-042",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-004",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-033",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-027",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-067",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-124",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-074",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "code-026",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-076",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
      "id": "code-022",
      "gold": "code",
      "rules_v2": "code",
@@ -2471,21 +2562,56 @@
      "hybrid": "code"
     },
     {
-     "id": "code-024",
+     "id": "humaneval-061",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
      "hybrid": "code"
     },
     {
-     "id": "code-018",
+     "id": "code-016",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",
      "hybrid": "code"
     },
     {
-     "id": "code-006",
+     "id": "humaneval-104",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-102",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-004",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-159",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-144",
+     "gold": "code",
+     "rules_v2": "code",
+     "llm": "code",
+     "hybrid": "code"
+    },
+    {
+     "id": "humaneval-095",
      "gold": "code",
      "rules_v2": "code",
      "llm": "code",

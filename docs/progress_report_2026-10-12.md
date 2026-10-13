@@ -589,6 +589,67 @@ What changed with the fix:
 - Simulated table: specialists' macro Mamay-4B 0.632, Lapa 0.611, Aya 0.650;
   simulated rules v2 0.689; route oracle 0.783.
 
+## Code bucket, code scorer, and what was removed (13 Oct, midday)
+
+### Code items in v7
+
+All 32 code and 32 chat items of the pool come from v4, so they sit in dev and
+the test split had no code at all. HumanEval (164 English Python tasks with
+unit tests, MIT licence, already in `benchmarks/corpus/`) is now part of v7 as
+the code bucket: 55 dev, 109 test; the 32 tasks used in v5 are in dev. No
+earlier item changed its split. v7 is now 4401 items (dev 1542, test 2859).
+LeetCode was not used: its problem texts are not openly licensed. Chat stays
+dev-only; it has no scored public data.
+
+Dev, HumanEval items only (`results/analysis/v7_dev_code_humaneval.json`):
+
+| Model (n=55) | Tests passed | 95% interval | Answers with a code fence |
+|---|---:|---|---:|
+| **Mamay-4B** (where rules v2 send code) | **0.636** | [0.509, 0.764] | 55 |
+| Aya-8B | 0.455 | [0.327, 0.582] | 55 |
+| Lapa-12B | 0.436 | [0.309, 0.564] | 0 |
+
+Mamay-4B − Aya: +0.18 [+0.06, +0.31]. Mamay-4B − Lapa: +0.20 [+0.09, +0.31].
+The code route is right. Mamay-12B has not been run on these items yet.
+
+### Two fixes in `scripts/score_results.py`
+
+| Problem | Effect | Fix |
+|---|---|---|
+| With no code fence in the answer, `extract_code` kept only lines starting with `def`, `class`, `import`, `from` and dropped every function body | Lapa, which answers without a fence, scored 0 of 55 with `IndentationError` | Take the code from its first top-level statement and trim trailing prose until it compiles |
+| Model-written code was run with `exec` inside the scoring process; the thread timeout could not stop it | One answer killed the scoring process | Each check runs in a child process with a CPU and memory limit and a 12 s timeout |
+
+Checked on the 15 raw files that are local (v4 runs of weeks 7, 8, 9, 11 and
+the v7 dev and pool runs): no code score changes, because every answer there
+has a fence. Mamay-4B and Aya give the same 35 and 25 passes before and after.
+
+### Removed from the code and the page, and why
+
+| Removed | Why | Record kept in |
+|---|---|---|
+| Rules profile `v3_instruct` (send "write a …" requests to Mamay-4B) | Not distinguishable from rules v2: instruct +0.013 [−0.025, +0.049]; it also moved 18 of 32 chat items | `results/analysis/v7_dev_instruct_profile.json`, this report |
+| Old playground page `router/static/index.html` | Replaced by the one demo page | git history |
+| Page options: old rules `v1`, old planners (`hybrid`, `hybrid_minimal`, `hybrid_fewshot`, `hybrid_mamay12`), `template`, learned `knn` / `clf`, the alignment prompt switch, offline models | `v1` is superseded by `v2`. The old planners split 68% of single-skill requests. `template` only knows five benchmark task types. `knn` / `clf` need a library that is not installed and were never run on v7. The alignment few-shot prompt is always better, so it is always on | this report |
+
+Still in the code although they gave no gain, because earlier reported results
+depend on them (decision for Maria): the old planner profiles, `template`,
+rules `v1`, `--bucket-fewshot`, the cascade and ensemble modes of
+`run_small_router_cluster.py`, and the learned router.
+
+Why the other tried ideas did not work, in one place:
+
+| Idea | Why it did not help |
+|---|---|
+| Confidence cascade | Lapa is over-confident (0.99 or more on almost every first token, right on about 75%), so its confidence says nothing; where Mamay-12B is unsure the specialists are also wrong |
+| Verify-and-fix second pass | The checking model rewrites text that was already fine and breaks other constraints |
+| Two worked examples per bucket | Examples distract on knowledge and translation |
+| Per-source route table | The rules already send each source to its best specialist |
+| Old planner | Its prompt demanded 2–4 steps for every request and its one example leaked into plans |
+
+Intent classifier after one prompt edit (the translate and instruct lines):
+everyday set, hybrid, right intent 0.86 [0.76, 0.92] (was 0.85); benchmark
+wording 0.90 [0.86, 0.93] with the 50 HumanEval items now in the sample.
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.
@@ -597,7 +658,7 @@ Nothing in this section has been run. The test splits are untouched.
 
 | Part | Choice | File | Last commit that changed it |
 |---|---|---|---|
-| Routing | rules profile `v2` | `router/intent_rules.py` | `5bf829b` (added `v3_instruct` beside it; `v2` rules unchanged since before v7) |
+| Routing | rules profile `v2` (or `v2_llm`, open) | `router/intent_rules.py` | this branch; `v2` rules unchanged since before v7 |
 | Alignment prompt | `--align-prompt fewshot` | `scripts/alignment_prompt_variants.py` | `11a1d0d` |
 | Bucket few-shot | none (it made dev worse) | — | — |
 | Format guard | proposed, pending a live dev run | `router/format_guard.py` | this branch |
@@ -614,7 +675,7 @@ test runs.
 
 | Decision | State |
 |---|---|
-| Use the `v3_instruct` profile | Not recommended: not distinguishable from `v2` on dev (+0.006 [−0.030, +0.041] on instruct). |
+| Use the `v3_instruct` profile | Removed from the code on 13 Oct: no gain. |
 | Escalate word problems to Mamay-12B | Decided on 12 Oct: no. Mamay-12B is a reference baseline only. |
 | Fix the three IFEval checks and rescore the cited runs | Done 13 Oct. v6 files (withdrawn) were not rescored. |
 | Include the format guard in the frozen router | Open. Offline dev estimate: instruct +0.095 [+0.063, +0.131]; needs a live dev run. |

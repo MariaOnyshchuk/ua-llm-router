@@ -1,0 +1,83 @@
+{
+ "suite": "mixed_ua_v7",
+ "split": "dev",
+ "bucket": "code (HumanEval items only)",
+ "n": 55,
+ "scorer": "extract_code fixed and checks run in a child process, 13 Oct 2026",
+ "note": "Live run of 13 Oct 2026, one pass, T=0, seed 42, max_tokens 1024, three requests at a time. Rules v2 route all 55 to Mamay-4B, so the router row equals Mamay-4B.",
+ "systems": {
+  "mamay4": {
+   "pass_rate": 0.636,
+   "ci95": [
+    0.509,
+    0.764
+   ],
+   "outcomes": {
+    "humaneval_pass": 35,
+    "humaneval_fail:AssertionError": 17,
+    "humaneval_fail:ValueError": 1,
+    "humaneval_fail:IndexError": 1,
+    "humaneval_fail:TypeError": 1
+   },
+   "answers_with_code_fence": 55,
+   "latency_p50_ms": 8396
+  },
+  "aya": {
+   "pass_rate": 0.455,
+   "ci95": [
+    0.327,
+    0.582
+   ],
+   "outcomes": {
+    "humaneval_pass": 25,
+    "humaneval_fail:AssertionError": 26,
+    "humaneval_fail:ValueError": 2,
+    "humaneval_fail:IndexError": 1,
+    "humaneval_fail:AttributeError": 1
+   },
+   "answers_with_code_fence": 55,
+   "latency_p50_ms": 1338
+  },
+  "lapa": {
+   "pass_rate": 0.436,
+   "ci95": [
+    0.309,
+    0.564
+   ],
+   "outcomes": {
+    "humaneval_pass": 24,
+    "humaneval_fail:AssertionError": 22,
+    "humaneval_fail:NameError": 3,
+    "humaneval_fail:ValueError": 1,
+    "humaneval_fail:exit-24": 1,
+    "humaneval_fail:TypeError": 1,
+    "humaneval_fail:IndexError": 2,
+    "humaneval_fail:AttributeError": 1
+   },
+   "answers_with_code_fence": 0,
+   "latency_p50_ms": 4021
+  }
+ },
+ "lapa_minus_mamay4": {
+  "diff": -0.2,
+  "ci95": [
+   -0.309,
+   -0.091
+  ]
+ },
+ "mamay4_minus_aya": {
+  "diff": 0.182,
+  "ci95": [
+   0.055,
+   0.309
+  ]
+ },
+ "lapa_minus_aya": {
+  "diff": -0.018,
+  "ci95": [
+   -0.145,
+   0.109
+  ]
+ },
+ "route_oracle": 0.691
+}

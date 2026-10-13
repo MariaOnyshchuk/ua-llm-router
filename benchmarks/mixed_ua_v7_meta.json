@@ -6,8 +6,13 @@
   "kept_together": "both directions of a FLORES or WMT-22 sentence pair; items with an identical prompt",
   "seed": 42,
   "dev_share": 0.3333333333333333,
-  "n": 4237,
-  "forced_dev_from_v4": 128,
+  "n": 4401,
+  "forced_dev_from_v4_and_v5": 160,
+  "extra_items": {
+    "source": "benchmarks/corpus/humaneval_code_en.jsonl",
+    "n": 164,
+    "note": "HumanEval, English Python tasks scored by unit tests (score_mode=humaneval)"
+  },
   "claim_buckets": [
     "knowledge",
     "translate",
@@ -22,13 +27,14 @@
     "dev": {
       "alignment": 400,
       "chat": 32,
-      "code": 32,
+      "code": 87,
       "instruct": 212,
       "knowledge": 406,
       "translate": 405
     },
     "test": {
       "alignment": 800,
+      "code": 109,
       "instruct": 361,
       "knowledge": 794,
       "translate": 795
@@ -40,6 +46,7 @@
       "alignment/ualign-social": 273,
       "chat/chat": 32,
       "code/code": 32,
+      "code/humaneval": 55,
       "instruct/if": 32,
       "instruct/ifeval": 180,
       "knowledge/arc": 100,
@@ -54,6 +61,7 @@
     "test": {
       "alignment/ualign-ethics": 254,
       "alignment/ualign-social": 546,
+      "code/humaneval": 109,
       "instruct/ifeval": 361,
       "knowledge/arc": 200,
       "knowledge/belebele": 165,

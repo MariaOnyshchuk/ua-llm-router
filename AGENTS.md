@@ -52,9 +52,11 @@ One item on v4 moves the overall score by 0.0052 and a bucket by 0.031. The 95%
 interval for a router-vs-model difference on v4 is about ±0.04, so most v4
 differences are noise. The rules below follow from that.
 
-- **Claims come from the test split of `benchmarks/mixed_ua_v7.jsonl`** (2750
-  items: knowledge 794, translate 795, alignment 800, instruct 361). The dev
-  split (1487, includes every v4 item and all chat and code items) is for tuning.
+- **Claims come from the test split of `benchmarks/mixed_ua_v7.jsonl`** (2859
+  items: knowledge 794, translate 795, alignment 800, instruct 361, code 109).
+  The headline macro is over the first four; code (HumanEval, English, 109
+  items, wide interval) is reported beside it. The dev split (1542, includes
+  every v4 item, the 32 HumanEval tasks used in v5 and all chat items) is for tuning.
   v4 is for wiring checks.
 - **v6 is withdrawn (12 Oct 2026).** Its selection step was inverted and kept the
   items where Mamay-4B, Lapa and Aya score the same. Do not cite any v6 number,
