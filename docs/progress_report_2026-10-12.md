@@ -650,6 +650,45 @@ Intent classifier after one prompt edit (the translate and instruct lines):
 everyday set, hybrid, right intent 0.86 [0.76, 0.92] (was 0.85); benchmark
 wording 0.90 [0.86, 0.93] with the 50 HumanEval items now in the sample.
 
+## Serving for the demo: three specialists on one card (13 Oct, afternoon)
+
+`cluster/serve_pack_fp8.sbatch` keeps Lapa-12B, Aya-8B and Mamay-4B on one RTX 6000 Ada
+(49 140 MiB) for the demo page and manual tests. It is the serving half of the week-11 job
+`cluster/eval_pack_fp8.sbatch`, on the usual ports, with no eval attached.
+
+How the three fit:
+
+1. **FP8 weights.** vLLM is started with `--quantization fp8`, which stores each weight in
+   8 bits instead of 16 at load time. Weights take about half of the bf16 size; no separate
+   quantised checkpoint is needed.
+2. **A fixed share of the card per model.** By default a vLLM server reserves 0.90 of the
+   card, most of it for the KV cache, whatever the model size. Here each server gets
+   `--gpu-memory-utilization` set to a share that covers its weights and a small cache:
+   0.42, 0.28 and 0.18, 0.88 in total.
+3. **Shorter context.** `--max-model-len 4096` instead of 8192, so the small cache is enough.
+4. **Start in order.** The servers start one after another, largest first, and each must
+   answer before the next one starts; started together they compete for the same free memory.
+   The job stops at once if the card is not empty.
+
+| Model | Share of the card | Memory held (MiB) |
+|---|---:|---:|
+| Lapa-12B, FP8 | 0.42 | 21 392 |
+| Aya-8B, FP8 | 0.28 | 14 532 |
+| Mamay-4B, FP8 | 0.18 | 9 726 |
+| **Three specialists** | **0.88** | **45 650** |
+| Mamay-12B, bf16, on a second card shared with another user | 0.58 | 29 130 |
+
+Limits. This setup is for the demo, not for measurements: claim runs stay bf16, one model
+per card at 0.90. The only quality number for the pack is the week-11 run on v4 (0.852
+against 0.848 for bf16, one run each, not a claim). Throughput under parallel load was not
+measured; the three servers share one card's compute. Mamay-12B at 0.58 is likewise a
+demo setting.
+
+Qwen2.5-Coder is not served. Rules v2 send code to Mamay-4B (v4 code 0.984 against 0.969
+for Qwen-Coder-7B), so no route leads to Qwen and it is not a baseline either. The pack has
+no room for it: 0.12 of the card is left, about 5.9 GB, and the 7B model needs more than
+that in FP8. Qwen has not been run on v7.
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.
