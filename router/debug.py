@@ -361,8 +361,10 @@ async def health() -> dict[str, Any]:
             try:
                 r = await client.get(f"{base}/models")
                 data = (r.json().get("data") or [{}]) if r.status_code == 200 else [{}]
-                out[alias] = {"up": r.status_code == 200, "base": base, "model": model,
-                              "mock": bool(data[0].get("mock"))}
+                mock = bool(data[0].get("mock"))
+                # Two aliases can share a port (Mamay-12B and Mamay-27B): up only if this model is served.
+                served = mock or any(d.get("id") == model for d in data)
+                out[alias] = {"up": r.status_code == 200 and served, "base": base, "model": model, "mock": mock}
             except Exception:  # noqa: BLE001
                 out[alias] = {"up": False, "base": base, "model": model}
     return {"backends": out, "profiles": sorted(ROUTER_PROFILES), "planners": sorted(PLANNER_PROFILES)}
