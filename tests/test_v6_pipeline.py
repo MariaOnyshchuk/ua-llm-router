@@ -67,6 +67,19 @@ class McqAndIfevalTests(unittest.TestCase):
         )
         self.assertEqual(got["score"], 1.0)
 
+    def test_ifeval_bullets_placeholders_and_repeat_prompt(self) -> None:
+        bullets = "Ось список:\n* один\n* два\n- три"
+        self.assertEqual(score_ifeval(bullets, ["detectable_format:number_bullet_lists"], [{"num_bullets": 3}])["score"], 1.0)
+        self.assertEqual(score_ifeval(bullets, ["detectable_format:number_bullet_lists"], [{"num_bullets": 4}])["score"], 0.0)
+        self.assertEqual(score_ifeval("**жирний** текст без пунктів", ["detectable_format:number_bullet_lists"], [{"num_bullets": 1}])["score"], 0.0)
+        ua = "Запрошуємо до [місто] на [дата]."
+        self.assertEqual(score_ifeval(ua, ["detectable_content:number_placeholders"], [{"num_placeholders": 2}])["score"], 1.0)
+        self.assertEqual(score_ifeval(ua, ["detectable_content:number_placeholders"], [{"num_placeholders": 3}])["score"], 0.0)
+        request = "Напишіть лист. Спочатку повторіть запит слово в слово, потім дайте відповідь."
+        kwargs = [{"prompt_to_repeat": "Напишіть лист."}]
+        self.assertEqual(score_ifeval("Напишіть лист.\n\nШановний…", ["combination:repeat_prompt"], kwargs, request)["score"], 1.0)
+        self.assertEqual(score_ifeval("Шановний…", ["combination:repeat_prompt"], kwargs, request)["score"], 0.0)
+
     def test_score_row_ifeval_item(self) -> None:
         row = {
             "id": "ifeval-0001",

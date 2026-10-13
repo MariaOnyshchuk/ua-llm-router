@@ -16,7 +16,9 @@
 - Cluster jobs for the v7 and AgentCoMa test runs are written (not run); submit lines are in the report.
 - Format guard: offline on dev it lifts router instruct by +0.095 [+0.063, +0.131] and makes the router not
   distinguishable from Mamay-12B on the macro (−0.006 [−0.023, +0.011]). Tuned on dev, not yet run live.
-- Three wrong checks found in the IFEval scorer; they hide part of Mamay-12B's lead on instruct. Not fixed.
+- IFEval scorer fixed in the morning of 13 Oct and local v7 runs rescored: router − Mamay-12B on dev is −0.042
+  [−0.061, −0.023]; with the format guard −0.018 [−0.036, 0.000]. See "After the IFEval scorer fix" in the report.
+- The night run scheduled for 02:08 did not fire. Nothing ran between 01:05 and the morning.
 
 **Blocked**
 
@@ -25,7 +27,6 @@
 **Maria must run or decide**
 
 - Push the branch: `git push --force-with-lease origin 2026-08-31-323p` (history was rewritten to drop 17 `Co-Authored-By` trailers; backup branch `backup/before-trailer-rewrite-20261013`).
-- Decide on the scorer fix first (three IFEval checks). It changes every instruct number and needs a rescore of the cited runs.
 - Run the new jobs on the **dev** split once (`sbatch cluster/eval_v7_router.sbatch`, then with `FORMAT_GUARD=1`) and compare with the report before any test run.
 - Decide whether the format guard goes into the frozen router.
 - Decide whether v7 test runs the planner (`hybrid_gated`) or only one-hop rules v2.
@@ -146,5 +147,11 @@ Maria asked for the work to continue without stopping, so these were done as wel
 - [x] **13. Scorer finding, not fixed.** Three wrong checks in `scripts/ifeval_check.py` (bullet lists,
   placeholders, repeat the request) mis-score 40 of 265 dev constraints. With them repaired the instruct gap to
   Mamay-12B is larger (−0.155 instead of −0.120). The scorer was left unchanged: a fix means rescoring every cited run.
+- [x] **14. Model-as-classifier routing (13 Oct, 01:00).** Profile `v2_llm`; on 72 everyday requests the right
+  intent is named 0.36 (rules) / 0.82 (Mamay-4B) / 0.85 (hybrid); on benchmark wording 0.87 / 0.81 / 0.88.
+- [x] **15. IFEval scorer fixed and local v7 runs rescored (13 Oct, morning).** Router − Mamay-12B on v7 dev is now
+  −0.042 [−0.061, −0.023] on the macro and −0.168 on instruct; with the format guard −0.018 [−0.036, 0.000].
+  The scheduled 02:08 run did not fire, so this was done in the morning.
+- [ ] **16. Dev-split lab runs** (plain and `FORMAT_GUARD=1`): not started.
 
 ALL DONE

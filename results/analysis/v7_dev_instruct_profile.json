@@ -43,12 +43,12 @@
   },
   "instruct": {
    "n": 212,
-   "v2": 0.5574,
-   "v3_instruct": 0.5629,
-   "diff": 0.0055,
+   "v2": 0.6266,
+   "v3_instruct": 0.6392,
+   "diff": 0.0126,
    "ci95": [
-    -0.0299,
-    0.0409
+    -0.0252,
+    0.0487
    ],
    "items_rerouted": 80,
    "verdict": "not distinguishable"
@@ -79,12 +79,12 @@
   }
  },
  "macro4": {
-  "v2": 0.6715,
-  "v3_instruct": 0.6729,
-  "diff": 0.0014,
+  "v2": 0.6888,
+  "v3_instruct": 0.692,
+  "diff": 0.0032,
   "ci95": [
-   -0.0079,
-   0.0102
+   -0.0061,
+   0.0126
   ],
   "verdict": "not distinguishable"
  },
@@ -100,5 +100,6 @@
    "lapa": 10
   }
  },
- "recommendation": "do not adopt"
+ "recommendation": "do not adopt",
+ "scorer": "IFEval checks fixed 13 Oct 2026"
 }

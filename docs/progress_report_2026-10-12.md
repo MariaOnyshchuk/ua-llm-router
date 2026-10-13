@@ -528,6 +528,67 @@ the right specialist as correct.
 
 The hybrid is available as rules profile `v2_llm` (rules v2 unchanged).
 
+## After the IFEval scorer fix (13 Oct, morning)
+
+The three wrong checks in `scripts/ifeval_check.py` are fixed (bullet lists
+registered under the right id and counted exactly; placeholders in any script;
+`repeat_prompt` compared with `prompt_to_repeat`), with a test. Only
+`mixed_ua_v6` (withdrawn) and `mixed_ua_v7` contain IFEval items, so no v4 run
+is affected. Rescored: the three specialists on the pool, the dev router run,
+the dev bucket few-shot run and Mamay-12B on dev. **Every instruct and macro
+number above this section is from before the fix; use the tables below.**
+Copies of the old files are in `logs/before_ifeval_fix/` (local).
+
+v7 dev, live runs, router = rules v2 with alignment few-shot
+(`results/analysis/v7_dev_router_vs_mamay12.json`):
+
+| Bucket (n) | Router | Mamay-12B | Difference | 95% interval | Verdict |
+|---|---:|---:|---:|---|---|
+| knowledge (406) | 0.737 | 0.732 | +0.005 | [−0.032, +0.042] | not distinguishable |
+| translate (405) | 0.686 | 0.698 | −0.011 | [−0.021, −0.000] | router lower |
+| alignment (400) | 0.745 | 0.738 | +0.007 | [−0.025, +0.043] | not distinguishable |
+| instruct (212) | 0.622 | 0.790 | −0.168 | [−0.226, −0.108] | router lower |
+| macro of four | 0.697 | 0.739 | −0.042 | [−0.061, −0.023] | router lower |
+
+Macro of four, other comparisons (`results/analysis/v7_dev_format_guard.json`):
+
+| Comparison | A | B | Difference | 95% interval | Verdict |
+|---|---:|---:|---:|---|---|
+| router − best single specialist (Aya) | 0.697 | 0.650 | +0.047 | [+0.026, +0.069] | higher |
+| router + format guard − router | 0.721 | 0.697 | +0.024 | [+0.015, +0.033] | higher |
+| router + guard − Mamay-12B | 0.721 | 0.739 | −0.018 | [−0.036, +0.000] | not distinguishable |
+| router + guard − Mamay-12B + guard | 0.721 | 0.744 | −0.023 | [−0.041, −0.005] | lower |
+| router with bucket few-shot − router | 0.685 | 0.697 | −0.012 | [−0.026, +0.002] | not distinguishable |
+
+Dev instruct with the format guard (offline, stored answers):
+
+| System | Raw | With guard | Difference | 95% interval |
+|---|---:|---:|---:|---|
+| Router rules v2 | 0.622 | 0.717 | +0.095 | [+0.063, +0.131] |
+| Mamay-4B | 0.676 | 0.732 | +0.056 | [+0.032, +0.083] |
+| Aya | 0.605 | 0.710 | +0.105 | [+0.071, +0.142] |
+| Lapa | 0.550 | 0.656 | +0.106 | [+0.072, +0.143] |
+| Mamay-12B | 0.790 | 0.809 | +0.019 | [+0.006, +0.035] |
+
+What changed with the fix:
+
+- The instruct gap to Mamay-12B is wider than reported before (−0.168, was
+  −0.120): the old scorer hid constraints that Mamay-12B satisfies more often.
+  The macro gap is −0.042 (was −0.030).
+- The format guard still gives +0.095 on instruct and +0.024 on the macro.
+  With it the router is not distinguishable from Mamay-12B without the guard,
+  and is below Mamay-12B with the guard (−0.023 [−0.041, −0.005]). The earlier
+  sentence "the router draws level with Mamay-12B" holds only for the first of
+  those two comparisons.
+- Bucket few-shot: was "worse" (−0.014 [−0.027, −0.001]); now not
+  distinguishable (−0.012 [−0.026, +0.002]). Still no reason to use it.
+- `v3_instruct` (simulated): instruct +0.013 [−0.025, +0.049]; still not
+  distinguishable.
+- Second pass on instruct: Mamay-4B fixing itself −0.033 [−0.066, 0.000], Lapa
+  −0.050 [−0.085, −0.014], Aya −0.072 [−0.127, −0.017]. Still dropped.
+- Simulated table: specialists' macro Mamay-4B 0.632, Lapa 0.611, Aya 0.650;
+  simulated rules v2 0.689; route oracle 0.783.
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.
@@ -540,7 +601,7 @@ Nothing in this section has been run. The test splits are untouched.
 | Alignment prompt | `--align-prompt fewshot` | `scripts/alignment_prompt_variants.py` | `11a1d0d` |
 | Bucket few-shot | none (it made dev worse) | — | — |
 | Format guard | proposed, pending a live dev run | `router/format_guard.py` | this branch |
-| Scorer | `scripts/ifeval_check.py` has three wrong checks; fix and rescore before the test runs | — | — |
+| Scorer | `scripts/ifeval_check.py` fixed on 13 Oct; local v7 runs rescored | `scripts/ifeval_check.py` | this branch |
 | Planner | `hybrid_gated` | `router/planner.py` | `9dbb1b7` |
 | Decoding | T=0, seed 42, max_tokens 1024, one pass on v7; 3 repeats on AgentCoMa | — | — |
 | Specialists | Mamay-4B, Lapa-12B, Aya-8B, bf16, `gpu_memory_utilization` 0.90, one model per card | `cluster/serve_*.sbatch` | — |
@@ -555,7 +616,7 @@ test runs.
 |---|---|
 | Use the `v3_instruct` profile | Not recommended: not distinguishable from `v2` on dev (+0.006 [−0.030, +0.041] on instruct). |
 | Escalate word problems to Mamay-12B | Decided on 12 Oct: no. Mamay-12B is a reference baseline only. |
-| Fix the three IFEval checks and rescore the cited runs | Open, and it comes first: it changes every instruct number. |
+| Fix the three IFEval checks and rescore the cited runs | Done 13 Oct. v6 files (withdrawn) were not rescored. |
 | Include the format guard in the frozen router | Open. Offline dev estimate: instruct +0.095 [+0.063, +0.131]; needs a live dev run. |
 | Run the planner (`hybrid_gated`) on v7 test, or only one-hop rules v2 | Open. v7 items are single-skill, so the planner can only cost calls there; the dev false-split rate is 0.035. One-hop rules v2 is the comparable row to the solo models. |
 

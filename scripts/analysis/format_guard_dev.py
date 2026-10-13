@@ -4,12 +4,6 @@
 Applies the guard to stored answers and rescores them. No model is called. Rows are
 filtered to the dev split before anything is computed.
 
-Also reports a what-if with three checks in scripts/ifeval_check.py repaired for this
-analysis only (the scorer itself is not changed):
-  - detectable_format:number_bullet_lists is registered under detectable_content, so it never passes;
-  - number_placeholders matches Latin capitals only, so "[місто]" is not counted;
-  - repeat_prompt compares with the whole request instead of `prompt_to_repeat`.
-
   PYTHONPATH=. python scripts/analysis/format_guard_dev.py
 """
 
@@ -19,7 +13,6 @@ import ast
 import glob
 import json
 import random
-import re
 import statistics as st
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -31,7 +24,7 @@ import sys  # noqa: E402
 sys.path.insert(0, str(ROOT))
 
 from router.format_guard import apply, detect  # noqa: E402
-from scripts.ifeval_check import BULLET_RE, _kwargs_list, _relation_ok, check_instruction, score_ifeval  # noqa: E402
+from scripts.ifeval_check import score_ifeval  # noqa: E402
 
 RAW = {
     "router": "results/v7_dev_router/router_matrix_v2_fewshot_*Z.jsonl",
@@ -64,27 +57,11 @@ def instruction_ids(row: dict) -> list[str]:
     return list(ast.literal_eval(ids)) if isinstance(ids, str) else list(ids)
 
 
-def item_score(row: dict, text: str, repaired_checks: bool) -> float | None:
-    ids = instruction_ids(row)
-    if not ids:
+def item_score(row: dict, text: str) -> float | None:
+    if not instruction_ids(row):
         return None  # hand-written items without IFEval metadata keep their stored score
-    if not repaired_checks:
-        return score_ifeval(text, row.get("ifeval_instruction_id_list"), row.get("ifeval_kwargs"),
-                            row.get("prompt", ""))["score"]
-    flags = []
-    for iid, kw in zip(ids, _kwargs_list(row.get("ifeval_kwargs"), len(ids))):
-        if iid == "detectable_format:number_bullet_lists":
-            ok = len(BULLET_RE.findall(text)) >= int(kw.get("num_bullets") or 1)
-        elif iid == "detectable_content:number_placeholders":
-            ok = _relation_ok(len(re.findall(r"\[[^\[\]\n]{1,40}\]", text)), int(kw.get("num_placeholders") or 1),
-                              str(kw.get("relation") or "at least"))
-        elif iid == "combination:repeat_prompt":
-            target = str(kw.get("prompt_to_repeat") or "").strip()
-            ok = bool(target) and text.strip().startswith(target)
-        else:
-            ok = check_instruction(iid, text, kw, row.get("prompt", ""))
-        flags.append(bool(ok))
-    return sum(flags) / len(flags)
+    return score_ifeval(text, row.get("ifeval_instruction_id_list"), row.get("ifeval_kwargs"),
+                        row.get("prompt", ""))["score"]
 
 
 def main() -> None:
@@ -121,9 +98,8 @@ def main() -> None:
             text = row.get("content") or ""
             guarded, made = apply(row["prompt"], text)
             changed[name] += bool(made)
-            for tag, value, repaired in (("raw", text, False), ("guard", guarded, False),
-                                         ("raw_fixed", text, True), ("guard_fixed", guarded, True)):
-                s = item_score(row, value, repaired)
+            for tag, value in (("raw", text), ("guard", guarded)):
+                s = item_score(row, value)
                 scores[(name, tag)][i] = stored[(name, i)] if s is None else s
     for name in RAW:
         assert all(abs(scores[(name, "raw")][i] - stored[(name, i)]) < 1e-9 for i in dev), f"{name}: rescoring drifted"
@@ -150,12 +126,6 @@ def main() -> None:
             "router + guard vs Mamay-12B raw": paired(("router", "guard"), ("mamay12", "raw")),
             "router + guard vs Mamay-12B + guard": paired(("router", "guard"), ("mamay12", "guard")),
         },
-        "repaired_checks_what_if": {
-            "per_system": {name: {"raw": round(st.mean(scores[(name, "raw_fixed")].values()), 4),
-                                  "guard": round(st.mean(scores[(name, "guard_fixed")].values()), 4)} for name in RAW},
-            "router raw vs Mamay-12B raw": paired(("router", "raw_fixed"), ("mamay12", "raw_fixed")),
-            "router + guard vs Mamay-12B + guard": paired(("router", "guard_fixed"), ("mamay12", "guard_fixed")),
-        },
     }
     path = ROOT / "results/analysis/v7_dev_format_guard.json"
     path.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -167,11 +137,6 @@ def main() -> None:
         print(f"| {name} | {r['b']:.3f} | {r['a']:.3f} | {r['diff']:+.3f} | [{r['ci95'][0]:+.3f}, {r['ci95'][1]:+.3f}] | {r['answers_changed']} |")
     for title, r in out["comparisons"].items():
         print(f"{title}: {r['a']:.3f} vs {r['b']:.3f}, {r['diff']:+.3f} [{r['ci95'][0]:+.3f}, {r['ci95'][1]:+.3f}] {r['verdict']}")
-    w = out["repaired_checks_what_if"]
-    print("what-if, three checks repaired:", w["per_system"])
-    for title in ("router raw vs Mamay-12B raw", "router + guard vs Mamay-12B + guard"):
-        r = w[title]
-        print(f"  {title}: {r['a']:.3f} vs {r['b']:.3f}, {r['diff']:+.3f} [{r['ci95'][0]:+.3f}, {r['ci95'][1]:+.3f}] {r['verdict']}")
     print(f"wrote {path}")
 
 

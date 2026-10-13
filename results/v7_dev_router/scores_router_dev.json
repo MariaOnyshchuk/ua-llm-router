@@ -2,8 +2,8 @@
   "systems": {
     "router_matrix_v2_fewshot": {
       "n": 1487,
-      "overall_mean": 0.7072,
-      "overall_mean_macro": 0.7633,
+      "overall_mean": 0.7171,
+      "overall_mean_macro": 0.7748,
       "latency_avg_ms": 2232.9,
       "latency_p50_ms": 374.5,
       "latency_p95_ms": 12891.6,
@@ -32,7 +32,7 @@
           "n": 32
         },
         "instruct": {
-          "quality_mean": 0.5527,
+          "quality_mean": 0.6219,
           "latency_avg_ms": 10398.7,
           "latency_p50_ms": 7087.0,
           "latency_p95_ms": 31950.7,

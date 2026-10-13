@@ -12,7 +12,11 @@ from typing import Any, Callable
 
 from scripts.mcq_format import as_list
 
-PLACEHOLDER_RE = re.compile(r"\[[A-Z0-9_ -]{1,20}\]")
+# Any bracketed span, as in the official IFEval check. Until 13 Oct 2026 only Latin capitals
+# were accepted, so a Ukrainian placeholder such as "[місто]" was never counted.
+PLACEHOLDER_RE = re.compile(r"\[[^\[\]\n]+\]")
+# Markdown bullets as the official check counts them: lines starting with "* " or "- ".
+MD_BULLET_RE = re.compile(r"(?m)^\s*(?:\*(?!\*)|-)\s+\S")
 HIGHLIGHT_RE = re.compile(r"\*[^*]+\*")
 TITLE_RE = re.compile(r"<<.+>>")
 BULLET_RE = re.compile(r"(?m)^\s*(?:[-*•]|\d+[.)])\s+\S+")
@@ -121,11 +125,13 @@ def check_instruction(instruction_id: str, text: str, kwargs: dict[str, Any], pr
         and str(kw.get("postscript_marker") or "").lower() in text.lower()
         if kw.get("postscript_marker")
         else bool(POSTSCRIPT_RE.search(text)),
-        "detectable_content:number_bullet_lists": lambda: _relation_ok(
-            len(BULLET_RE.findall(text)),
-            int(kw.get("num_bullets") or 1),
-            "at least",
-        ),
+        # The id in the data is detectable_format:number_bullet_lists. Until 13 Oct 2026 it was
+        # registered only under detectable_content, so it was unknown and never passed. The
+        # request asks for "exactly N bullet points", as the official check requires.
+        "detectable_format:number_bullet_lists": lambda: len(MD_BULLET_RE.findall(text))
+        == int(kw.get("num_bullets") or 1),
+        "detectable_content:number_bullet_lists": lambda: len(MD_BULLET_RE.findall(text))
+        == int(kw.get("num_bullets") or 1),
         "detectable_format:number_highlighted_sections": lambda: _relation_ok(
             len(HIGHLIGHT_RE.findall(text)),
             int(kw.get("num_highlights") or 1),
@@ -144,7 +150,9 @@ def check_instruction(instruction_id: str, text: str, kwargs: dict[str, Any], pr
         },
         "combination:two_responses": lambda: text.count("******") >= 1
         and len([p for p in text.split("******") if p.strip()]) >= 2,
-        "combination:repeat_prompt": lambda: (prompt or "") and text.strip().startswith((prompt or "").strip()),
+        # The answer must start with kwargs["prompt_to_repeat"], not with the whole request
+        # (which also holds the instruction to repeat). Fixed 13 Oct 2026.
+        "combination:repeat_prompt": lambda: _starts_with_repeat(text, kw, prompt),
         "startend:end_checker": lambda: text.rstrip().endswith(str(kw.get("end_phrase") or "")),
         "startend:quotation": lambda: text.strip().startswith('"') and text.strip().endswith('"'),
         "change_case:english_capital": lambda: bool(text) and text == text.upper(),
@@ -164,6 +172,11 @@ def check_instruction(instruction_id: str, text: str, kwargs: dict[str, Any], pr
         return bool(fn())
     except Exception:
         return False
+
+
+def _starts_with_repeat(text: str, kw: dict[str, Any], prompt: str) -> bool:
+    target = str(kw.get("prompt_to_repeat") or prompt or "").strip().lower()
+    return bool(target) and text.strip().lower().startswith(target)
 
 
 def _nth_paragraph_first_word(text: str, kw: dict[str, Any]) -> bool:

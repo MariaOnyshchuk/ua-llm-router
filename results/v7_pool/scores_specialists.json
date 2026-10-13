@@ -2,8 +2,8 @@
   "systems": {
     "aya": {
       "n": 4237,
-      "overall_mean": 0.6457,
-      "overall_mean_macro": 0.7205,
+      "overall_mean": 0.6519,
+      "overall_mean_macro": 0.7281,
       "latency_avg_ms": 2099.4,
       "latency_p50_ms": 1054.6,
       "latency_p95_ms": 9242.9,
@@ -32,7 +32,7 @@
           "n": 32
         },
         "instruct": {
-          "quality_mean": 0.5047,
+          "quality_mean": 0.5506,
           "latency_avg_ms": 8001.8,
           "latency_p50_ms": 6832.0,
           "latency_p95_ms": 19763.7,
@@ -56,8 +56,8 @@
     },
     "lapa": {
       "n": 4237,
-      "overall_mean": 0.6182,
-      "overall_mean_macro": 0.7114,
+      "overall_mean": 0.6244,
+      "overall_mean_macro": 0.719,
       "latency_avg_ms": 3395.1,
       "latency_p50_ms": 500.5,
       "latency_p95_ms": 20726.0,
@@ -86,7 +86,7 @@
           "n": 32
         },
         "instruct": {
-          "quality_mean": 0.4695,
+          "quality_mean": 0.5154,
           "latency_avg_ms": 17264.6,
           "latency_p50_ms": 14142.1,
           "latency_p95_ms": 56138.5,
@@ -110,8 +110,8 @@
     },
     "mamay4": {
       "n": 4237,
-      "overall_mean": 0.6084,
-      "overall_mean_macro": 0.7221,
+      "overall_mean": 0.6181,
+      "overall_mean_macro": 0.7339,
       "latency_avg_ms": 3153.3,
       "latency_p50_ms": 532.0,
       "latency_p95_ms": 19390.9,
@@ -140,7 +140,7 @@
           "n": 32
         },
         "instruct": {
-          "quality_mean": 0.571,
+          "quality_mean": 0.6422,
           "latency_avg_ms": 16962.7,
           "latency_p50_ms": 13612.0,
           "latency_p95_ms": 44897.1,
