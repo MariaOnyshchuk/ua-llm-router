@@ -172,6 +172,7 @@ against a plan that cannot work.
 | 7 | Decide on escalation: send word problems to Mamay-12B (0.48 vs 0.32 dev) and report the extra GPU | one design row | decision |
 | 8 | Mamay-27B FP8 on v7 test | second reference | 1 GPU |
 | 9 | Update `key_takeaways.md`, `thesis_scope.md`, `conclusion.md`, HF card from the frozen tables | consistent docs | steps 3, 6 |
+| 10 | (added 14 Oct) One larger model with a few-shot prompt against decomposition: Mamay-12B with k worked examples from composite v2 train (k fixed on dev), against router one call and router with planner, on composite v2 and AgentCoMa test; optional Mamay-12B with "list the steps, then answer" in one call, and Mamay-4B with the same few-shot prompt | answers "why not one bigger model with a good prompt" for composite requests | few-shot option in `scripts/run_composite_router.py`; freeze before test |
 
 ## Update, same day: v7 built, oracle plan fixed, second review
 
