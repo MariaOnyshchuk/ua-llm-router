@@ -103,7 +103,7 @@ differences are noise. The rules below follow from that.
 - The lab `~/Diploma` is **not a git checkout**. Copy changed files with `scp`
   and verify with a checksum diff before running.
 - Prefer co-located serve + eval in one sbatch (pattern:
-  `cluster/eval_s2_v4.sbatch`, `cluster/eval_v6_solo.sbatch`) so the job
+  `cluster/eval_s2_v4.sbatch`, `cluster/eval_v7_solo.sbatch`) so the job
   survives a dropped SSH session and nvidia-smi sees only its GPU.
 - Check `squeue -u $USER` and `nvidia-smi` before submitting; do not start a
   fair single-model run while another model is resident on the same GPU.
