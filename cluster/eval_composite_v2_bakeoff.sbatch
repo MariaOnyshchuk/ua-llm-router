@@ -95,7 +95,7 @@ wait_port 8001 lapa
 wait_port 8005 aya
 
 cd "${ROOT}"
-python scripts/build_composite_benchmark.py --version v2 --check
+python scripts/benchmarks/build_composite_benchmark.py --version v2 --check
 
 python scripts/run_composite_router.py \
   --bench benchmarks/mixed_ua_composite_v2.jsonl \

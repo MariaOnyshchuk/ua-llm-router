@@ -26,8 +26,8 @@ from router.planner import (
     is_word_problem,
 )
 from router.workflows import select_plan, select_template
-from scripts.build_agentcoma_benchmark import wrap_row
-from scripts.build_composite_benchmark import (
+from scripts.benchmarks.build_agentcoma_benchmark import wrap_row
+from scripts.benchmarks.build_composite_benchmark import (
     FAMILIES_V2,
     SPLIT_COUNTS_V2,
     build_items,

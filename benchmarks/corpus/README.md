@@ -4,8 +4,8 @@
 
 Regenerate:
 ```bash
-python scripts/extract_full_corpora.py
-python scripts/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
+python scripts/benchmarks/extract_full_corpora.py
+python scripts/benchmarks/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
 ```
 
 | File | Rows | Notes |

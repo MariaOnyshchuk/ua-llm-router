@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SRC = ROOT / "benchmarks" / "agentcoma_uk_50items_merged.jsonl"
 DEFAULT_OUT = ROOT / "benchmarks" / "agentcoma_uk_50_composite.jsonl"
 

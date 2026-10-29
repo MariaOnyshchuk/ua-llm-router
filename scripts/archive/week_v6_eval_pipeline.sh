@@ -41,7 +41,7 @@ wait_health() {
 case "$PHASE" in
   screen)
     if [[ ! -f "$SCREEN" ]]; then
-      echo "missing $SCREEN — run: python scripts/sample_screening_suite.py" >&2
+      echo "missing $SCREEN — run: python scripts/benchmarks/sample_screening_suite.py" >&2
       exit 1
     fi
     wait_health mamay4 8003
@@ -58,7 +58,7 @@ case "$PHASE" in
         --max-tokens "$MAX_TOKENS" --out-dir results/v6_screen
     fi
     python scripts/score_results.py results/v6_screen/*.jsonl --out results/v6_screen/scores_screen.json
-    echo "next: PYTHONPATH=. python scripts/curate_discriminative_suite.py --suite $SCREEN --scores results/v6_screen/*_detail.jsonl --systems mamay4 lapa aya --out $V6 --keep-appendix"
+    echo "next: PYTHONPATH=. python scripts/benchmarks/curate_discriminative_suite.py --suite $SCREEN --scores results/v6_screen/*_detail.jsonl --systems mamay4 lapa aya --out $V6 --keep-appendix"
     ;;
   v6_solo_mamay4)
     wait_health mamay4 8003

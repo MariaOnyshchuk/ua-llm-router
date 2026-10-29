@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from router.orchestrator import Plan, plan_signature  # noqa: E402
 from router.workflows import select_plan, select_template  # noqa: E402
-from scripts.build_composite_benchmark import build_items_v2, validate_items_v2  # noqa: E402
+from scripts.benchmarks.build_composite_benchmark import build_items_v2, validate_items_v2  # noqa: E402
 
 
 def load_items(path: Path | None) -> list[dict[str, Any]]:

@@ -54,7 +54,7 @@ benchmarks/
 
 ```bash
 # ZNO (needs git clone of NLPForUA/ZNO or path to tests/*.json)
-python scripts/sample_zno.py --zno-dir /path/to/ZNO --n 24 --out benchmarks/samples/zno_knowledge_v1.jsonl
+python scripts/benchmarks/sample_zno.py --zno-dir /path/to/ZNO --n 24 --out benchmarks/samples/zno_knowledge_v1.jsonl
 
 # UA-Code-Bench (HF; bands 1–2) — inventory only until Eolymp judge
 python scripts/benchmarks/sample_uacode.py --n 32 --bands 1,2 --out benchmarks/samples/uacode_easy_v1.jsonl
@@ -105,8 +105,8 @@ planner sees only the top-level prompt.
 Build and validate:
 
 ```bash
-python scripts/build_composite_benchmark.py
-python scripts/build_composite_benchmark.py --check
+python scripts/benchmarks/build_composite_benchmark.py
+python scripts/benchmarks/build_composite_benchmark.py --check
 ```
 
 Run a six-item smoke and then the deterministic evaluation:
@@ -164,7 +164,7 @@ answer marker (`Відповідь:`, `=`) — or the last number in the text �
 `answer_composition` (`numeric`, handles `19 000`, `19,000`, `2,2`):
 
 ```bash
-python scripts/build_agentcoma_benchmark.py \
+python scripts/benchmarks/build_agentcoma_benchmark.py \
   --src benchmarks/agentcoma_uk_200_merged.jsonl \
   --out benchmarks/agentcoma_uk_200_composite.jsonl
 # lab, 3 GPUs (mamay4 / lapa / aya), pattern of eval_composite_v2_bakeoff:

@@ -2,7 +2,7 @@
 """Sample ZNO-Eval single-answer questions into our knowledge JSONL schema.
 
 Usage:
-  python scripts/sample_zno.py --zno-dir vendor/ZNO --n 24 --seed 42 \\
+  python scripts/benchmarks/sample_zno.py --zno-dir vendor/ZNO --n 24 --seed 42 \\
     --out benchmarks/samples/zno_knowledge_v1.jsonl
 """
 

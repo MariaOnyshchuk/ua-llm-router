@@ -62,17 +62,17 @@ The v4 micro-cascade escalate rate ≈1.56% with Δ≈0 is expected: cascade gai
 
 ```bash
 # 1. Warehouse (HF; skip keys that fail)
-python scripts/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
+python scripts/benchmarks/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
 
 # 2. Screening draw (≤1200/bucket or the whole pool)
-python scripts/sample_screening_suite.py --per-bucket 1200 --seed 42 \
+python scripts/benchmarks/sample_screening_suite.py --per-bucket 1200 --seed 42 \
   --out benchmarks/mixed_ua_v6_screen.jsonl
 
 # 3. Cluster: one pass per model (not 3×)
 bash scripts/week_v6_eval_pipeline.sh screen
 
 # 4. Curate (exclude incomplete mamay12 screening)
-PYTHONPATH=. python scripts/curate_discriminative_suite.py \
+PYTHONPATH=. python scripts/benchmarks/curate_discriminative_suite.py \
   --suite benchmarks/mixed_ua_v6_screen.jsonl \
   --scores results/v6_screen/*_detail.jsonl \
   --systems mamay4 lapa aya \

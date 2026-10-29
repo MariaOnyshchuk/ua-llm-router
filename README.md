@@ -29,7 +29,7 @@ hybrid planner **0.768**. See [docs/week_10_composite.md](docs/week_10_composite
 
 ```bash
 # CPU-only schema and unit checks
-python scripts/build_composite_benchmark.py --check
+python scripts/benchmarks/build_composite_benchmark.py --check
 python -m unittest discover -s tests -v
 
 # Requires live specialist backends

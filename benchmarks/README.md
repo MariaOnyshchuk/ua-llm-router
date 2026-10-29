@@ -11,8 +11,8 @@
 | **Total extracted** | **≈14 644** |
 
 ```bash
-python scripts/extract_full_corpora.py
-python scripts/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
+python scripts/benchmarks/extract_full_corpora.py
+python scripts/benchmarks/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
 ```
 
 See `corpus/README.md`.

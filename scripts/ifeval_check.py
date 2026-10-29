@@ -10,7 +10,7 @@ import json
 import re
 from typing import Any, Callable
 
-from scripts.mcq_format import as_list
+from scripts.benchmarks.mcq_format import as_list
 
 # Any bracketed span, as in the official IFEval check. Until 13 Oct 2026 only Latin capitals
 # were accepted, so a Ukrainian placeholder such as "[місто]" was never counted.

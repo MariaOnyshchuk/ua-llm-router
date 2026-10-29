@@ -10,8 +10,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from router.intent_rules import route_intent
-from scripts.curate_discriminative_suite import difficulty_balanced, keep_high_variance, proxy_stats
-from scripts.extract_ua_leaderboard import (
+from scripts.benchmarks.curate_discriminative_suite import difficulty_balanced, keep_high_variance, proxy_stats
+from scripts.benchmarks.extract_ua_leaderboard import (
     rows_from_arc,
     rows_from_belebele,
     rows_from_ifeval,
@@ -19,7 +19,7 @@ from scripts.extract_ua_leaderboard import (
     rows_from_wmt,
 )
 from scripts.ifeval_check import score_ifeval
-from scripts.mcq_format import letter_from_answer
+from scripts.benchmarks.mcq_format import letter_from_answer
 from scripts.sample_size_ci import accuracy_ci, binomial_n
 from scripts.score_results import score_alignment, score_knowledge, score_row
 

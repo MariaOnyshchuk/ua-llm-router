@@ -2,7 +2,7 @@
 """IRT-inspired curation: keep high between-model score variance, then balance difficulty.
 
 Usage:
-  python scripts/curate_discriminative_suite.py \\
+  python scripts/benchmarks/curate_discriminative_suite.py \\
     --suite benchmarks/mixed_ua_v6_screen.jsonl \\
     --scores results/v6_screen/scores_*_detail.jsonl \\
     --out benchmarks/mixed_ua_v6.jsonl
@@ -19,7 +19,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from scripts.sample_size_ci import binomial_n  # noqa: E402

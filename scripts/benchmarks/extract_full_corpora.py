@@ -5,9 +5,9 @@ This is the warehouse layer. Tiny samples/ files stay for historical runs;
 balanced suites are built FROM these corpora.
 
 Usage:
-  python scripts/extract_full_corpora.py
-  python scripts/extract_full_corpora.py --only zno,flores,ualign,uacode
-  python scripts/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
+  python scripts/benchmarks/extract_full_corpora.py
+  python scripts/benchmarks/extract_full_corpora.py --only zno,flores,ualign,uacode
+  python scripts/benchmarks/extract_full_corpora.py --only ifeval,belebele,mmlu,arc,wmt22
 """
 
 from __future__ import annotations
@@ -18,17 +18,17 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from scripts.extract_ua_leaderboard import (  # noqa: E402
+from scripts.benchmarks.extract_ua_leaderboard import (  # noqa: E402
     extract_arc_ukr,
     extract_belebele_uk,
     extract_ifeval_ukr,
     extract_mmlu_ukr,
     extract_wmt22,
 )
-from scripts.sample_zno import SUBJECT_FILES, format_prompt, is_eligible, iter_tasks  # noqa: E402
+from scripts.benchmarks.sample_zno import SUBJECT_FILES, format_prompt, is_eligible, iter_tasks  # noqa: E402
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:

@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from scripts.mcq_format import choices_from_item, format_mcq_prompt, letter_from_answer
+from scripts.benchmarks.mcq_format import choices_from_item, format_mcq_prompt, letter_from_answer
 
 
 def write_jsonl(path, rows: list[dict]) -> None:

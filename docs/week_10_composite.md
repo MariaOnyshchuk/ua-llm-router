@@ -106,7 +106,7 @@ Artifacts: `results/week_10_composite_hybrid_v3/`.
 
 ## Implementation
 
-- Benchmark builder: `scripts/build_composite_benchmark.py`
+- Benchmark builder: `scripts/benchmarks/build_composite_benchmark.py`
 - Benchmark: `benchmarks/mixed_ua_composite_v1.jsonl`
 - Planner: `router/planner.py`
 - Executor: `router/orchestrator.py`

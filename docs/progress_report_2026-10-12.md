@@ -88,7 +88,7 @@ Router rules v2 against Mamay-12B, macro over the four claim buckets:
 
 ### 1. The v6 suite is selected the wrong way round
 
-`scripts/curate_discriminative_suite.py` sorts each bucket by variance,
+`scripts/benchmarks/curate_discriminative_suite.py` sorts each bucket by variance,
 highest first, then keeps `pool[drop_n:]`. That drops the 43% of items with
 the **highest** between-model variance and keeps the lowest. The docstring and
 `docs/mixed_ua_v6.md` say the opposite.
@@ -130,7 +130,7 @@ lab); the earlier screening pass for that model had failed with HTTP 0.
 In `benchmarks/agentcoma_uk_200_composite.jsonl` the first oracle step
 ("filter") does not contain the task text, and the second step asks for "only
 the number, no explanation". The filter model answers about an invented class
-of students on every item. Source: `scripts/build_agentcoma_benchmark.py`.
+of students on every item. Source: `scripts/benchmarks/build_agentcoma_benchmark.py`.
 Every earlier AgentCoMa "oracle" number is invalid and `plan_match` is measured
 against a plan that cannot work.
 
