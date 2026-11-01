@@ -15,7 +15,8 @@ Fallbacks are recorded for every router, per skill:
 - learned routers: hard fallbacks (predicted model outside the pool, which sends the request to Aya in
   router/learned.py), exact ties between the top predicted scores (argmax then takes the first model in
   list order, Mamay-4B, so the choice comes from list order, not from the prediction) and near ties (top two
-  predicted scores less than 0.02 apart).
+  predicted scores less than 0.01, 0.02 or 0.05 apart). These are the learned routers' counterpart of the
+  rules' "no rule matched": items where the router has no real winner.
 
 Decision rule, fixed before the run: switch to a learned router if the lower end of the interval of
 (learned − rules v2) is above −0.02, against both rules variants.
@@ -93,7 +94,9 @@ def main() -> None:
         fallback_flags[kind] = {
             "hard_fallback_default_aya": np.array([str(m) not in MODELS for m in picks[kind]]),
             "exact_tie_first_in_list": gap <= 1e-9,
-            "near_tie_under_0.02": gap < 0.02,
+            "gap_under_0.01": gap < 0.01,
+            "gap_under_0.02": gap < 0.02,
+            "gap_under_0.05": gap < 0.05,
         }
 
     per_item = {m: Q[:, j] for j, m in enumerate(MODELS)}
