@@ -8,9 +8,9 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low. All of these are v4 development numbers; claims come from
-> `mixed_ua_v7` test.
+> `tasks_public_4401` test.
 
-*21 Aug 2026. Suite: `mixed_ua_v4_balanced.jsonl` (192×3), T=0, seed=42, few-shot alignment.*
+*21 Aug 2026. Suite: `tasks_mixed_192.jsonl` (192×3), T=0, seed=42, few-shot alignment.*
 
 This run uses the suite’s gold `bucket` label, not regex: **chat→Aya**, **code→Mamay-4B**, knowledge/alignment→Lapa, instruct→Mamay-4B, translate→Aya. Qwen unused (3 GPUs).
 

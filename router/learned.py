@@ -63,6 +63,26 @@ class SentenceTransformerEncoder:
         return np.asarray(vecs, dtype=np.float32)
 
 
+class QualityArgmaxRouter:
+    """RouterBench-style predictive router: a regressor predicts the score of every model
+    from the prompt embedding; the router picks the model with the highest predicted score
+    (the max-quality end of the cost-quality curve, lambda = inf)."""
+
+    def __init__(self, regressor: Any, models: tuple[str, ...]) -> None:
+        self.regressor = regressor
+        self.models = tuple(models)
+
+    def predict_quality(self, X: np.ndarray) -> np.ndarray:
+        return np.clip(np.asarray(self.regressor.predict(X), dtype=np.float64), 0.0, 1.0)
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        return np.array([self.models[j] for j in self.predict_quality(X).argmax(axis=1)])
+
+
+_ENCODERS: dict[str, Encoder] = {}
+_MODELS: dict[str, Any] = {}
+
+
 def load_encoder(config: dict[str, Any]) -> Encoder:
     kind = str(config.get("encoder") or "hash")
     if kind == "hash":
@@ -96,16 +116,28 @@ def predict_alias(text: str, kind: str) -> tuple[str, str]:
     config = load_config(kind)
     if not config:
         return "", f"learned {kind}: no artifacts"
-    model = _load_sklearn(kind)
+    model_key = str(artifact_dir(kind) / "model.pkl")
+    model = _MODELS.get(model_key)
     if model is None:
-        return "", f"learned {kind}: missing model.pkl"
-    encoder = load_encoder(config)
+        model = _load_sklearn(kind)
+        if model is None:
+            return "", f"learned {kind}: missing model.pkl"
+        _MODELS[model_key] = model
+    enc_key = json.dumps({k: config.get(k) for k in ("encoder", "encoder_name", "encoder_revision", "encoder_dim")},
+                         sort_keys=True)
+    encoder = _ENCODERS.get(enc_key)
+    if encoder is None:
+        encoder = _ENCODERS[enc_key] = load_encoder(config)
     vec = encoder.encode([text or ""])
     pred = model.predict(vec)[0]
     alias = str(pred)
     if alias not in ROUTER_MODELS:
         alias = str(config.get("default") or "aya")
-    return alias, f"learned {kind} → {alias}"
+    reason = f"learned {kind} → {alias}"
+    if isinstance(model, QualityArgmaxRouter):
+        q = model.predict_quality(vec)[0]
+        reason += " (predicted " + ", ".join(f"{m} {v:.2f}" for m, v in zip(model.models, q)) + ")"
+    return alias, reason
 
 
 def route_learned(

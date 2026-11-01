@@ -8,9 +8,9 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low. All of these are v4 development numbers; claims come from
-> `mixed_ua_v7` test.
+> `tasks_public_4401` test.
 
-*31 Aug 2026. Suite: `mixed_ua_v4_balanced.jsonl` (192), T=0, seed=42, **1 repeat**, max_tokens=256, few-shot alignment.*
+*31 Aug 2026. Suite: `tasks_mixed_192.jsonl` (192), T=0, seed=42, **1 repeat**, max_tokens=256, few-shot alignment.*
 
 Rules v2 first hop, then **majority vote only** on votable discrete labels: all **alignment** (32) + **ZNO** (`id` starts with `zno-`, 24). Voters: Lapa, Mamay-4B, Aya. Tie-break = first hop. Open knowledge / chat / code / translate stay single-call.
 

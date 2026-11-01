@@ -1,0 +1,16 @@
+{
+  "system": "lapa",
+  "repeat": 1,
+  "bench": "/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/benchmarks/graphs_mixed_100_dev.jsonl",
+  "split_filter": null,
+  "n": 100,
+  "failures": 0,
+  "calls": 100,
+  "latency_ms_total": 1374306.7,
+  "gpu_seconds_total": 1374.3067,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 1024
+  }
+}

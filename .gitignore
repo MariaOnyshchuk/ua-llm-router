@@ -29,6 +29,7 @@ results/week_10_composite_hybrid_v3/earlier_20260927T0933/
 # AgentCoMa is gated and does not publish a reusable dataset license.
 # Keep locally translated prompt files out of this repository.
 benchmarks/agentcoma_uk_50*.jsonl
+benchmarks/graphs_agentcoma_*.jsonl
 benchmarks/agentcoma_uk_150*.jsonl
 benchmarks/agentcoma_uk_200*.jsonl
 
@@ -47,3 +48,9 @@ results/week_13_agentcoma_*/*.partial
 # Raw generation rows (prompt + model answer) from early weeks were committed by mistake and are
 # untracked on 30 Sep 2026. Names end in a UTC timestamp; item-level *_detail / scores files do not.
 results/**/*_[0-9]*T[0-9]*Z.jsonl
+
+# Cached Wikipedia API answers (router/wiki_search.py); rebuilt by scripts/build_wiki_cache.py
+.cache/
+
+# Generated HTML viewers (scripts/benchmarks/render_composite_viewer.py)
+benchmarks/viewers/

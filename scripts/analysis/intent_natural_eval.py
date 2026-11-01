@@ -3,7 +3,7 @@
 
 Methods: rules v2; a small model as classifier (router/llm_intent.py); hybrid (rules
 first, the model only when no rule matched). Two sets: hand-written everyday requests
-(benchmarks/intent_natural_v1.jsonl) and a sample of mixed_ua_v7 dev in benchmark
+(benchmarks/intent_requests_72.jsonl) and a sample of mixed_ua_v7 dev in benchmark
 wording. Needs the classifier model on its usual port. Wilson 95% intervals.
 
   PYTHONPATH=. python scripts/analysis/intent_natural_eval.py
@@ -49,8 +49,8 @@ def main() -> None:
     args = p.parse_args()
 
     natural = [{"id": r["id"], "gold": r["intent"], "prompt": r["prompt"]}
-               for r in rows(ROOT / "benchmarks/intent_natural_v1.jsonl")]
-    dev = [r for r in rows(ROOT / "benchmarks/mixed_ua_v7.jsonl") if r.get("split") == "dev"]   # dev only
+               for r in rows(ROOT / "benchmarks/intent_requests_72.jsonl")]
+    dev = [r for r in rows(ROOT / "benchmarks/tasks_public_4401.jsonl") if r.get("split") == "dev"]   # dev only
     rng = random.Random(42)
     bench = []
     for bucket in ("knowledge", "translate", "alignment", "instruct", "chat", "code"):

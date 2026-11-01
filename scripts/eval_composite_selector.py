@@ -115,7 +115,7 @@ def main() -> None:
     parser.add_argument(
         "--bench",
         type=Path,
-        default=ROOT / "benchmarks" / "mixed_ua_composite_v2.jsonl",
+        default=ROOT / "benchmarks" / "archive" / "mixed_ua_composite_v2.jsonl",
     )
     parser.add_argument("--split", default="", help="train,dev,test or comma list")
     parser.add_argument(

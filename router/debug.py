@@ -38,12 +38,12 @@ DETAIL_GLOBS = ("results/v7_dev_*/scores*_dev_detail.jsonl", "results/v6_*/score
 
 SUITES: dict[str, dict[str, Any]] = {
     # Only the dev split is browsable: test items must stay unseen until the router is frozen.
-    "v7": {"path": "benchmarks/mixed_ua_v7.jsonl", "kind": "single", "split": "dev", "note": "claim suite, dev split (1487)"},
-    "v6": {"path": "benchmarks/mixed_ua_v6.jsonl", "kind": "single", "note": "withdrawn 12 Oct 2026 (2414 items)"},
-    "v4": {"path": "benchmarks/mixed_ua_v4_balanced.jsonl", "kind": "single", "note": "dev suite, wiring checks"},
+    "v7": {"path": "benchmarks/tasks_public_4401.jsonl", "kind": "single", "split": "dev", "note": "claim suite, dev split (1487)"},
+    "v6": {"path": "benchmarks/archive/mixed_ua_v6.jsonl", "kind": "single", "note": "withdrawn 12 Oct 2026 (2414 items)"},
+    "v4": {"path": "benchmarks/tasks_mixed_192.jsonl", "kind": "single", "note": "dev suite, wiring checks"},
     "agentcoma": {
-        "path": "benchmarks/agentcoma_uk_200_composite.jsonl",
-        "merged": "benchmarks/agentcoma_uk_200_merged.jsonl",
+        "path": "benchmarks/graphs_agentcoma_200.jsonl",
+        "merged": "benchmarks/graphs_agentcoma_200_source.jsonl",
         "kind": "composite",
         "split": "dev",
         "note": "AgentCoMa-UK dev split (50), local only",

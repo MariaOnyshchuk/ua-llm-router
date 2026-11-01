@@ -24,6 +24,7 @@ from router.planner import (
     enforce_final_constraint,
     generate_plan,
     is_word_problem,
+    request_data,
 )
 from router.workflows import select_plan, select_template
 from scripts.benchmarks.build_agentcoma_benchmark import wrap_row
@@ -640,6 +641,53 @@ class GatedPlannerTests(unittest.TestCase):
         self.assertEqual(plan.steps[-1].depends_on, ("a", "b"))
         self.assertIn("{{b.content}}", plan.steps[-1].prompt)
 
+    def test_first_step_gets_the_data_the_planner_dropped(self) -> None:
+        notice = "Гімназія нагадує про контрольну з алгебри в кабінеті 21."
+        prompt = (
+            "Спочатку витягни з оголошення subject і number, потім класифікуй його. "
+            f"Фінально поверни лише JSON.\n\nОголошення:\n{notice}"
+        )
+        reply = (
+            '{"steps":[{"id":"s1","intent":"knowledge","depends_on":[],"prompt":"Витягни з оголошення subject і number."},'
+            '{"id":"s2","intent":"knowledge","depends_on":["s1"],"prompt":"Класифікуй {{s1.content}}"},'
+            '{"id":"s3","intent":"instruct","depends_on":["s2"],"prompt":"JSON {{s2.content}}"}]}'
+        )
+        plan, _, _ = self._run(prompt, reply)
+        self.assertIn(notice, plan.steps[0].prompt)
+        # A step that works on an earlier result does not get the source again.
+        self.assertNotIn(notice, plan.steps[1].prompt)
+
+    def test_first_step_keeps_data_it_already_has(self) -> None:
+        prompt = "Переклади й поясни.\n\nSource: The Kyiv Zoo was founded in 1908."
+        reply = (
+            '{"steps":[{"id":"s1","intent":"translate","depends_on":[],"prompt":"Переклади: Source:  The Kyiv Zoo was founded in 1908."},'
+            '{"id":"s2","intent":"instruct","depends_on":["s1"],"prompt":"Поясни {{s1.content}}"}]}'
+        )
+        plan, _, _ = self._run(prompt, reply)
+        self.assertNotIn("Дані із запиту", plan.steps[0].prompt)
+
+    def test_request_data_finds_options_without_a_blank_line(self) -> None:
+        prompt = "Дай відповідь і поясни.\nСтолиця Японії:\nА Осака\nБ Кіото\nВ Токіо"
+        self.assertEqual(request_data(prompt), "А Осака\nБ Кіото\nВ Токіо")
+        self.assertIsNone(request_data("Переклади 'early bird' і поясни значення."))
+
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_composite_graphs_mixed_100_dev_rubric_types():
+    import importlib.util
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location(
+        "scorer", Path(__file__).resolve().parents[1] / "scripts/score_composite_results.py")
+    sc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sc)
+    assert sc.count_sentences("Перше речення. Друге о 18.30 у залі! Третє") == 3
+    assert sc.score_rubric("Ціна 2,5 грн. Разом 13 365 грн.", {"type": "has_number", "value": 13365})[0] == 1.0
+    assert sc.score_rubric("Оцінка: 0", {"type": "regex", "pattern": r"(?i)оцінка:\s*0\b"})[0] == 1.0
+    either = {"type": "any", "rubrics": [{"type": "contains_any", "values": ["courage"]},
+                                         {"type": "contains_any", "values": ["bravery"]}]}
+    assert sc.score_rubric("Bravery", either)[0] == 1.0
+    assert sc.score_rubric("Fear", either)[0] == 0.0

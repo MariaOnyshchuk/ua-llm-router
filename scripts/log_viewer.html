@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Log viewer</title>
+<!--
+  Local viewer for run logs (.jsonl / .json). Open this file in a browser, then
+  drop a folder (logs/..., results/...) or files on the page. Nothing is uploaded:
+  the page has no network calls and reads the files in the browser only.
+
+  - Left: files. Tick the box next to a file to pin it for side-by-side compare by id.
+  - Middle: records, with search, auto-built filters and sort.
+  - Right: one record. Query / reference / output first, then steps, then the rest.
+  - A scores*detail*.jsonl in the same folder is joined to run rows on
+    (source file, id, repeat) or (system, id).
+  Keys: j / k or arrows = next / previous record, / = search.
+-->
+<style>
+:root{--bg:#fafaf8;--pane:#fff;--line:#e3e2dd;--text:#1f1f1c;--dim:#77756d;--sel:#e8eefc;--acc:#2f5fd0;
+  --q:#2f5fd0;--r:#8a6d1a;--o:#1d7a4c;--ok:#1d7a4c;--okbg:#e2f3e9;--bad:#b3261e;--badbg:#fbe4e2;--mid:#8a6d1a;--midbg:#f6edd2;--chip:#f0efea;--mark:#ffe58a}
+@media (prefers-color-scheme:dark){:root{--bg:#18181a;--pane:#1f1f22;--line:#34343a;--text:#e6e5e0;--dim:#96958d;--sel:#2a3350;--acc:#8aa9ff;
+  --q:#8aa9ff;--r:#d9b85a;--o:#6fcf9b;--ok:#6fcf9b;--okbg:#1d3529;--bad:#ff8a80;--badbg:#44211f;--mid:#d9b85a;--midbg:#3b3219;--chip:#2b2b30;--mark:#6b5a12}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:grid;grid-template-columns:270px 380px 1fr;background:var(--bg);color:var(--text);font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+aside,section,main{height:100vh;overflow:auto;border-right:1px solid var(--line)}
+aside,section{background:var(--pane)}
+main{border:0;padding:14px 20px 60px}
+.bar{position:sticky;top:0;z-index:2;background:var(--pane);border-bottom:1px solid var(--line);padding:8px}
+input[type=text],select,button{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:3px 7px}
+input[type=text]{width:100%}
+button{cursor:pointer}
+button:hover{border-color:var(--acc)}
+select.on{border-color:var(--acc);color:var(--acc)}
+.btns{display:flex;gap:6px;margin-bottom:6px}
+.btns button{flex:1}
+summary{cursor:pointer;color:var(--dim);padding:3px 8px;word-break:break-all}
+.f{display:flex;gap:6px;align-items:flex-start;padding:3px 8px 3px 14px;cursor:pointer;font-size:12px;word-break:break-all}
+.f:hover,.rec:hover{background:var(--bg)}
+.f.cur,.rec.cur{background:var(--sel)}
+.f span{flex:1}
+small,.dim{color:var(--dim)}
+.facets{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.facets select{max-width:176px;font-size:12px;padding:2px 4px}
+.stat{margin-top:6px;font-size:12px;color:var(--dim)}
+.rec{padding:6px 10px;border-bottom:1px solid var(--line);cursor:pointer}
+.rec .t{display:flex;gap:6px;align-items:center;font-weight:600}
+.rec .t span.id{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec .p{color:var(--dim);font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.mid{background:var(--mid)}
+.tag{font-weight:400;font-size:11px;color:var(--dim);background:var(--chip);border-radius:4px;padding:0 5px;white-space:nowrap}
+h1{font-size:16px;margin:0;flex:1;word-break:break-all}
+.head{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin:18px 0 6px}
+.chips,.row{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;align-items:center}
+.row>b{margin-right:4px}
+.chip{background:var(--chip);border-radius:4px;padding:1px 6px;font-size:12px;word-break:break-word}
+.chip i{font-style:normal;color:var(--dim);margin-right:5px}
+.chip.ok{background:var(--okbg);color:var(--ok)}.chip.bad{background:var(--badbg);color:var(--bad)}.chip.mid{background:var(--midbg);color:var(--mid)}
+.tb{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:5px;background:var(--pane);margin:8px 0}
+.tb.q{border-left-color:var(--q)}.tb.r{border-left-color:var(--r)}.tb.o{border-left-color:var(--o)}
+.tl{display:flex;gap:8px;align-items:center;padding:3px 8px;border-bottom:1px solid var(--line);font-size:12px}
+.tb.q .tl b{color:var(--q)}.tb.r .tl b{color:var(--r)}.tb.o .tl b{color:var(--o)}
+.tl span{color:var(--dim);flex:1}
+.tl button{font-size:11px;padding:0 6px}
+.tx{padding:8px 10px;white-space:pre-wrap;word-break:break-word;font-size:13.5px;line-height:1.5}
+.tx.clamp{max-height:24em;overflow:hidden}
+body.mono .tx,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+pre{white-space:pre-wrap;word-break:break-word;margin:6px 0;padding:8px;background:var(--chip);border-radius:5px}
+mark{background:var(--mark);color:inherit}
+main details{border-left:2px solid var(--line);margin:8px 0;padding-left:8px}
+main summary{padding:2px 0;font-weight:600;color:var(--text)}
+.card{position:relative;border:1px solid var(--line);border-radius:6px;padding:4px 10px 4px 30px;margin:8px 0;background:var(--bg)}
+.idx{position:absolute;left:8px;top:8px;color:var(--dim);font-weight:600}
+table{border-collapse:collapse;font-size:12px;margin:4px 0 8px}
+td,th{border:1px solid var(--line);padding:2px 8px;text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:500}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.cmp .col>div:first-child{font-size:12px;word-break:break-all}
+.empty{color:var(--dim);padding:40px 20px;text-align:center;line-height:1.8}
+body.drag::after{content:"Drop files or a folder";position:fixed;inset:0;background:rgba(47,95,208,.15);border:3px dashed var(--acc);display:grid;place-items:center;font-size:22px;z-index:9}
+</style>
+<body>
+<aside>
+  <div class="bar">
+    <div class="btns"><button id="pickDir">Open folder</button><button id="pickFiles">Open files</button></div>
+    <input type="text" id="ff" placeholder="filter file names">
+    <input type="file" id="inDir" webkitdirectory multiple hidden><input type="file" id="inFiles" multiple accept=".json,.jsonl,.ndjson" hidden>
+  </div>
+  <div id="files"><div class="empty">Drop a folder here<br>(for example <code>logs/</code>)<br>or use the buttons above.<br>Files stay on this machine.</div></div>
+</aside>
+<section>
+  <div class="bar">
+    <input type="text" id="q" placeholder="search in records  ( / )">
+    <div class="facets" id="facets"></div>
+    <div class="stat" id="stat"></div>
+  </div>
+  <div id="list"></div>
+</section>
+<main id="detail"><div class="empty">Pick a file on the left, then a record.</div></main>
+<script>
+const $=s=>document.querySelector(s);
+const S={files:[],cur:null,rows:[],sel:-1,q:'',facets:{},sort:'',md:false,shown:0};
+const QK=/^(prompt|input_prompt|input|query|question.*|task|text)$/, RK=/^(reference|ref|expected|target|final_step_expected)$/,
+      OK=/^(content|answer|final|final_output|got|output|response|completion)$/;
+const SCORE=/^(score|final_score|stage_mean|intent_f1)$/, CLOSED=/^(plan|oracle_plan|attempts|ifeval_kwargs|top)$/;
+const PRIMARY=['score','final_score','final_success','correct','plan_match','ok'];
+const FACET_PRI=['bucket','family','system','split','kind','mode','alias','model','planner','profile','variant','final_success','score','correct','ok','plan_match','workflow_error','http_status','finish_reason','router.model','router.intent','planning.gate','repeat'];
+const ORD={q:0,r:1,o:2,'':3};
+let TXT=[];
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function hl(s){s=String(s);const q=S.q;if(!q)return esc(s);const low=s.toLowerCase();let out='',i=0,j;
+  while((j=low.indexOf(q,i))>=0){out+=esc(s.slice(i,j))+'<mark>'+esc(s.slice(j,j+q.length))+'</mark>';i=j+q.length}
+  return out+esc(s.slice(i))}
+const md=s=>s.split('```').map((p,i)=>i%2?`<pre>${hl(p.replace(/^\w*\n/,''))}</pre>`:hl(p).replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>')).join('');
+const fmt=v=>typeof v==='number'&&!Number.isInteger(v)?+v.toFixed(4):v;
+const isShort=v=>v==null||(typeof v!=='object'&&(typeof v!=='string'||(v.length<=100&&!v.includes('\n'))));
+const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+const isFlatObj=x=>isObj(x)&&Object.values(x).every(v=>isShort(v)||(Array.isArray(v)&&v.length<=6&&v.every(isShort)));
+const kindOf=k=>QK.test(k)?'q':RK.test(k)?'r':OK.test(k)?'o':'';
+const tone=(k,v)=>v===true?'ok':v===false?'bad':k==='http_status'&&v!==200?'bad':/error/.test(k)?'bad':
+  SCORE.test(k)&&typeof v==='number'?(v>=1?'ok':v<=0?'bad':'mid'):'';
+
+// ---------- files ----------
+async function walk(entry,out){
+  if(entry.isFile){const file=await new Promise((res,rej)=>entry.file(res,rej));out.push({file,path:entry.fullPath.slice(1)})}
+  else if(!/^(\.git|\.venv|node_modules|__pycache__)$/.test(entry.name)){const rd=entry.createReader();
+    for(;;){const es=await new Promise((res,rej)=>rd.readEntries(res,rej));if(!es.length)break;for(const e of es)await walk(e,out)}}
+}
+function addFiles(items){
+  for(const {file,path} of items){
+    if(!/\.(jsonl|ndjson|json)$/i.test(path)||S.files.some(f=>f.path===path))continue;
+    const cut=path.lastIndexOf('/');
+    S.files.push({file,path,name:path.slice(cut+1),dir:cut<0?'':path.slice(0,cut),pin:false});
+  }
+  S.files.sort((a,b)=>a.dir.localeCompare(b.dir)||a.name.localeCompare(b.name));
+  renderFiles();
+}
+function renderFiles(){
+  const ff=$('#ff').value.toLowerCase(),dirs=new Map();
+  S.files.forEach((f,i)=>{if(ff&&!f.path.toLowerCase().includes(ff))return;if(!dirs.has(f.dir))dirs.set(f.dir,[]);dirs.get(f.dir).push(i)});
+  $('#files').innerHTML=[...dirs].map(([d,ix])=>`<details open><summary>${esc(d||'.')}</summary>${ix.map(i=>{const f=S.files[i];
+    return `<div class="f${f===S.cur?' cur':''}" data-i="${i}"><input type="checkbox" title="pin for side-by-side compare by id"${f.pin?' checked':''}><span>${esc(f.name)}</span><small>${f.file.size>1e6?(f.file.size/1e6).toFixed(1)+'M':Math.ceil(f.file.size/1e3)+'K'}</small></div>`}).join('')}</details>`).join('')
+    ||'<div class="empty">No .json / .jsonl files.</div>';
+}
+async function parseRaw(f){
+  if(f.recs)return;
+  const text=await f.file.text();let recs=[],bad=0;
+  if(/\.json$/i.test(f.name)){
+    try{const j=JSON.parse(text);
+      recs=Array.isArray(j)?j:isObj(j)&&Object.keys(j).length>3&&Object.values(j).every(isObj)?Object.entries(j).map(([k,v])=>({_key:k,...v})):[j]}
+    catch(e){bad=1}
+  }else for(const line of text.split('\n')){const t=line.trim();if(!t||t[0]==='#')continue;try{recs.push(JSON.parse(t))}catch(e){bad++}}
+  f.recs=recs.map(r=>isObj(r)?r:{value:r});f.bad=bad;
+}
+const isScoreFile=f=>/scores?.*detail.*\.jsonl$/i.test(f.name);
+const titleOf=(r,i)=>String(r.id??r.case??r.item_id??r._key??(r.ts?r.ts.slice(5,19).replace('T',' ')+(r.kind?' '+r.kind:''):null)??(typeof r.task==='string'&&r.task.length<60?r.task:null)??'#'+(i+1));
+function bfs(root,keys){
+  const queue=[root];
+  for(let n=0;n<queue.length&&n<400;n++){const o=queue[n];
+    for(const [k,v] of Object.entries(o)){
+      if(keys.includes(k)){if(typeof v==='string'&&v)return v;if(isObj(v)&&typeof v.text==='string')return v.text}
+      if(v&&typeof v==='object')queue.push(v)}}
+  return '';
+}
+const queryOf=r=>bfs(r,['prompt','input_prompt','question_composition_uk','question','query','task','input']);
+const outputOf=r=>bfs(r,['content','answer','final','final_output','got','output','response']);
+function flat(r,sc){
+  const m={};
+  for(const [k,v] of Object.entries(r)){if(v==null)continue;
+    if(typeof v!=='object')m[k]=v;
+    else if(!Array.isArray(v))for(const [k2,v2] of Object.entries(v))if(v2!=null&&typeof v2!=='object')m[k+'.'+k2]=v2}
+  if(sc)for(const [k,v] of Object.entries(sc))if(v!=null&&typeof v!=='object'&&!(k in m))m[k]=v;
+  return m;
+}
+async function load(f){
+  if(f.rows)return;
+  await parseRaw(f);
+  const scores=new Map();
+  if(!isScoreFile(f))for(const g of S.files)if(g.dir===f.dir&&g!==f&&isScoreFile(g)){
+    await parseRaw(g);
+    for(const s of g.recs){
+      const keys=s.source?[`${s.source}|${s.id}|${s.repeat??''}`,`${s.source}|${s.id}|`]:[`${s.system}|${s.id}`];
+      for(const k of keys)if(!scores.has(k))scores.set(k,s)}
+  }
+  f.rows=f.recs.map((r,i)=>{
+    const sc=scores.get(`${f.name}|${r.id}|${r.repeat??''}`)??scores.get(`${f.name}|${r.id}|`)??scores.get(`${r.system}|${r.id}`);
+    return {r,i,sc,fl:flat(r,sc),title:titleOf(r,i),prev:queryOf(r).slice(0,220)}});
+  f.byId=new Map();for(const row of f.rows)if(!f.byId.has(row.title))f.byId.set(row.title,row);
+  // facets and sort keys
+  const vals={};
+  for(const row of f.rows)for(const [k,v] of Object.entries(row.fl))if(!kindOf(k)&&(typeof v!=='string'||v.length<=40))(vals[k]??=new Map()).set(v,(vals[k].get(v)||0)+1);
+  const n=f.rows.length;
+  f.facets=Object.entries(vals).filter(([k,m])=>m.size>=2&&m.size<=([...m.keys()].some(v=>typeof v==='number')?6:14)&&m.size<n)
+    .sort((a,b)=>(FACET_PRI.indexOf(a[0])+1||99)-(FACET_PRI.indexOf(b[0])+1||99)).slice(0,12);
+  f.nums=Object.keys(vals).filter(k=>[...vals[k].keys()].every(v=>typeof v==='number')&&vals[k].size>2);
+  f.primary=PRIMARY.find(k=>f.rows.some(row=>k in row.fl));
+}
+async function openFile(f){
+  await load(f);
+  S.cur=f;S.facets={};S.sort='';S.sel=-1;
+  renderFiles();renderFacets();applyFilter();
+  if(S.rows.length)select(0);else $('#detail').innerHTML=`<div class="empty">No records${f.bad?` (${f.bad} unparsable lines)`:''}.</div>`;
+}
+
+// ---------- list ----------
+function renderFacets(){
+  const f=S.cur;
+  $('#facets').innerHTML=f.facets.map(([k,m])=>`<select data-k="${esc(k)}"${k in S.facets?' class="on"':''}><option value="">${esc(k)}: all</option>${
+    [...m].sort((a,b)=>b[1]-a[1]).map(([v,c])=>`<option value="${esc(JSON.stringify(v))}"${k in S.facets&&S.facets[k]===v?' selected':''}>${esc(v)} (${c})</option>`).join('')}</select>`).join('')
+    +(f.nums.length?`<select id="sort"${S.sort?' class="on"':''}><option value="">sort: file order</option>${f.nums.map(k=>['↑','↓'].map(a=>`<option${S.sort===a+k?' selected':''} value="${a}${esc(k)}">${a} ${esc(k)}</option>`).join('')).join('')}</select>`:'');
+}
+function applyFilter(){
+  const f=S.cur;if(!f)return;
+  let rows=f.rows.filter(row=>{
+    for(const k in S.facets)if(row.fl[k]!==S.facets[k])return false;
+    if(S.q){row.low??=(JSON.stringify(row.r)+(row.sc?JSON.stringify(row.sc):'')).toLowerCase();if(!row.low.includes(S.q))return false}
+    return true});
+  if(S.sort){const k=S.sort.slice(1),d=S.sort[0]==='↑'?1:-1;rows=[...rows].sort((a,b)=>((a.fl[k]??Infinity*d)-(b.fl[k]??Infinity*d))*d)}
+  S.rows=rows;S.shown=0;$('#list').innerHTML='';moreRows();
+  let st=`${rows.length} / ${f.rows.length} records`;
+  if(f.primary){const xs=rows.map(r=>r.fl[f.primary]).filter(v=>v!=null).map(Number);if(xs.length)st+=` · mean ${f.primary} ${(xs.reduce((a,b)=>a+b,0)/xs.length).toFixed(3)} (n=${xs.length})`}
+  if(f.bad)st+=` · ${f.bad} unparsable lines`;
+  $('#stat').textContent=st;
+}
+function moreRows(){
+  const f=S.cur,end=Math.min(S.shown+200,S.rows.length);let h='';
+  for(let n=S.shown;n<end;n++){const row=S.rows[n],v=f.primary?row.fl[f.primary]:undefined,bad=row.fl.http_status!=null&&row.fl.http_status!==200;
+    const c=bad?'bad':v==null?'':tone('score',typeof v==='boolean'?+v:v);
+    const tags=['bucket','family','kind','alias','model','mode'].map(k=>row.fl[k]).filter(x=>x!=null).slice(0,3).map(x=>`<span class="tag">${esc(x)}</span>`).join('');
+    h+=`<div class="rec${n===S.sel?' cur':''}" data-n="${n}"><div class="t"><span class="dot ${c}"></span><span class="id">${hl(row.title)}</span>${tags}${typeof v==='number'?`<span class="tag">${fmt(v)}</span>`:''}</div><div class="p">${hl(row.prev)}</div></div>`}
+  $('#list').insertAdjacentHTML('beforeend',h);S.shown=end;
+}
+function select(n,scroll){
+  if(n<0||n>=S.rows.length)return;
+  while(n>=S.shown)moreRows();
+  $('#list .cur')?.classList.remove('cur');S.sel=n;
+  const el=$(`#list [data-n="${n}"]`);el.classList.add('cur');if(scroll)el.scrollIntoView({block:'nearest'});
+  renderDetail();
+}
+
+// ---------- detail ----------
+const chip=(k,v)=>`<span class="chip ${tone(k,v)}"><i>${esc(k)}</i>${hl(fmt(v))}</span>`;
+function textBlock(k,v,kind){
+  TXT.push(v);
+  return `<div class="tb ${kind}"><div class="tl"><b>${esc(k)}</b><span>${v.length} chars</span><button data-cp="${TXT.length-1}">copy</button></div><div class="tx clamp">${S.md?md(v):hl(v)}</div></div>`;
+}
+const det=(label,body,open)=>`<details${open?' open':''}><summary>${esc(label)}</summary>${body}</details>`;
+function table(rows){
+  const cols=[...new Set(rows.flatMap(Object.keys))];
+  return `<table><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr>${rows.map(r=>`<tr>${cols.map(c=>{const v=r[c];
+    return `<td class="chip ${tone(c,v)}" style="border-radius:0">${v==null?'':hl(Array.isArray(v)?v.join(', '):fmt(v))}</td>`}).join('')}</tr>`).join('')}</table>`;
+}
+function renderAny(x,depth){
+  if(isObj(x))return renderObj(x,depth);
+  if(Array.isArray(x))return x.every(v=>typeof v!=='object')?x.map(v=>isShort(v)?`<span class="chip">${hl(fmt(v))}</span>`:textBlock('',v,'')).join(''):renderNested('',x,depth);
+  return isShort(x)?`<span class="chip">${hl(fmt(x))}</span>`:textBlock('',x,'');
+}
+function renderNested(k,v,depth){
+  const open=!CLOSED.test(k)&&depth<5;
+  if(Array.isArray(v)){
+    if(v.every(isShort))return `<div class="row"><b>${esc(k)}</b>${v.map(x=>`<span class="chip">${hl(fmt(x))}</span>`).join('')}</div>`;
+    if(v.every(isFlatObj))return det(`${k} (${v.length})`,table(v),open);
+    return det(`${k} (${v.length})`,v.map((x,i)=>`<div class="card"><span class="idx">${i+1}</span>${renderAny(x,depth+1)}</div>`).join(''),open);
+  }
+  if(Object.entries(v).every(([k2,x])=>isShort(x)&&!kindOf(k2)))return `<div class="row"><b>${esc(k)}</b>${Object.entries(v).filter(e=>e[1]!=null).map(e=>chip(...e)).join('')}</div>`;
+  return det(k,renderObj(v,depth+1),open);
+}
+function renderObj(o,depth,skip){
+  const chips=[],blocks=[],nest=[];
+  for(const [k,v] of Object.entries(o)){
+    if(v==null||v===''||skip?.includes(v))continue;
+    if(typeof v==='object'){if(Array.isArray(v)?v.length:Object.keys(v).length)nest.push([k,v]);continue}
+    const kind=kindOf(k);
+    if(typeof v==='string'&&(kind||!isShort(v)))blocks.push([k,v,kind]);else chips.push(chip(k,v));
+  }
+  blocks.sort((a,b)=>ORD[a[2]]-ORD[b[2]]);
+  return (chips.length?`<div class="chips">${chips.join('')}</div>`:'')+blocks.map(b=>textBlock(...b)).join('')+nest.map(([k,v])=>renderNested(k,v,depth)).join('');
+}
+function renderDetail(){
+  const row=S.rows[S.sel],f=S.cur;if(!row)return;
+  TXT=[];
+  let h=`<div class="head"><h1>${hl(row.title)}</h1><span class="dim">${S.sel+1} / ${S.rows.length}</span>
+    <button id="tmd">${S.md?'raw text':'render markdown'}</button><button id="tmono">mono</button><button data-cp="json">copy JSON</button></div>`;
+  // the query and the answer first, wherever they sit in the record; the full record follows
+  const q=queryOf(row.r),ref=row.r.reference??row.r.ref,out=outputOf(row.r),top=[q,ref,out].filter(x=>typeof x==='string'&&x);
+  if(q)h+=textBlock('query',q,'q');
+  if(ref!=null&&ref!=='')h+=textBlock('reference',String(ref),'r');
+  const pins=S.files.filter(g=>g.pin&&g.rows);
+  if(pins.length&&!(pins.length===1&&pins[0]===f)){
+    const cols=[...new Set([f,...pins])].map(g=>{const other=g===f?row:g.byId.get(row.title);
+      const body=!other?'<div class="dim">no record with this id</div>':
+        `<div class="chips">${[g.primary,'detail','final_detail','alias','router.model'].filter(k=>k&&other.fl[k]!=null).map(k=>chip(k,other.fl[k])).join('')}</div>`+textBlock('output',outputOf(other.r),'o');
+      return `<div class="col"><div><b>${esc(g.name)}</b></div>${body}</div>`}).join('');
+    h+=`<h2>Compare by id</h2><div class="cmp">${cols}</div>`;
+  }else if(out)h+=textBlock('output',out,'o');
+  if(row.sc){const {id,system,source,...rest}=row.sc;h+=`<h2>Score (joined${source?' from '+esc(source):''})</h2>`+renderObj(rest,0)}
+  h+=`<h2>Record</h2>`+renderObj(row.r,0,top)+det('raw JSON',`<pre>${esc(JSON.stringify(row.r,null,2))}</pre>`,false);
+  const d=$('#detail');d.innerHTML=h;d.scrollTop=0;clamp(d);
+}
+// "show all" only where the text is actually cut; re-run when a <details> opens
+function clamp(root){
+  root.querySelectorAll('.tx.clamp').forEach(el=>{
+    if(el.dataset.c||!el.clientHeight)return;el.dataset.c=1;
+    if(el.scrollHeight>el.clientHeight+4)el.insertAdjacentHTML('afterend','<div class="tl" style="border:0"><button data-more>show all</button></div>');
+  });
+}
+
+// ---------- events ----------
+$('#pickDir').onclick=()=>$('#inDir').click();
+$('#pickFiles').onclick=()=>$('#inFiles').click();
+for(const id of ['#inDir','#inFiles'])$(id).onchange=e=>{addFiles([...e.target.files].map(file=>({file,path:file.webkitRelativePath||file.name})));e.target.value=''};
+$('#ff').oninput=renderFiles;
+addEventListener('dragover',e=>{e.preventDefault();document.body.classList.add('drag')});
+addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('drag')});
+addEventListener('drop',async e=>{
+  e.preventDefault();document.body.classList.remove('drag');
+  const entries=[...e.dataTransfer.items].map(i=>i.webkitGetAsEntry?.()).filter(Boolean),out=[];
+  for(const en of entries)await walk(en,out);
+  addFiles(out);
+});
+$('#files').onclick=async e=>{
+  const el=e.target.closest('.f');if(!el)return;const f=S.files[el.dataset.i];
+  if(e.target.matches('input')){f.pin=e.target.checked;if(f.pin)await load(f);if(S.cur)renderDetail();return}
+  openFile(f);
+};
+$('#list').onclick=e=>{const el=e.target.closest('.rec');if(el)select(+el.dataset.n)};
+$('#list').parentElement.onscroll=e=>{const s=e.target;if(S.shown<S.rows.length&&s.scrollTop+s.clientHeight>s.scrollHeight-400)moreRows()};
+let qt;$('#q').oninput=e=>{clearTimeout(qt);qt=setTimeout(()=>{S.q=e.target.value.trim().toLowerCase();S.sel=-1;applyFilter();if(S.rows.length)select(0)},150)};
+$('#facets').onchange=e=>{
+  if(e.target.id==='sort')S.sort=e.target.value;
+  else if(e.target.value==='')delete S.facets[e.target.dataset.k];else S.facets[e.target.dataset.k]=JSON.parse(e.target.value);
+  renderFacets();applyFilter();if(S.rows.length)select(0);else $('#detail').innerHTML='<div class="empty">No records match.</div>';
+};
+$('#detail').onclick=e=>{
+  const t=e.target;
+  if(t.dataset.cp){navigator.clipboard.writeText(t.dataset.cp==='json'?JSON.stringify(S.rows[S.sel].r,null,2):TXT[t.dataset.cp]);t.textContent='copied';setTimeout(()=>t.textContent=t.dataset.cp==='json'?'copy JSON':'copy',900)}
+  else if('more' in t.dataset){const tx=t.parentElement.previousElementSibling;t.textContent=tx.classList.toggle('clamp')?'show all':'collapse'}
+  else if(t.id==='tmd'){S.md=!S.md;renderDetail()}
+  else if(t.id==='tmono')document.body.classList.toggle('mono');
+};
+$('#detail').addEventListener('toggle',e=>{if(e.target.open)clamp(e.target)},true);
+addEventListener('keydown',e=>{
+  if(e.target.matches('input,select')){if(e.key==='Escape')e.target.blur();return}
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='j'||e.key==='ArrowDown'){e.preventDefault();select(S.sel+1,true)}
+  else if(e.key==='k'||e.key==='ArrowUp'){e.preventDefault();select(S.sel-1,true)}
+  else if(e.key==='/'){e.preventDefault();$('#q').focus()}
+});
+</script>
+</body>
+</html>

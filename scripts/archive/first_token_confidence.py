@@ -46,7 +46,7 @@ async def one(client: httpx.AsyncClient, sem: asyncio.Semaphore, alias: str, ite
 
 async def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--bench", default="benchmarks/mixed_ua_v7.jsonl")
+    parser.add_argument("--bench", default="benchmarks/tasks_public_4401.jsonl")
     parser.add_argument("--split", default="dev")
     parser.add_argument("--buckets", default="knowledge,alignment")
     parser.add_argument("--systems", default="lapa,mamay4,aya")

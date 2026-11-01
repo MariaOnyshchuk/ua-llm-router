@@ -8,7 +8,7 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low. All of these are v4 development numbers; claims come from
-> `mixed_ua_v7` test.
+> `tasks_public_4401` test.
 
 *21 Aug 2026.*
 

@@ -11,7 +11,7 @@ cd "$ROOT"
 source .venv/bin/activate
 
 PHASE="${1:-solos}"
-BENCH="benchmarks/mixed_ua_v4_balanced.jsonl"
+BENCH="benchmarks/tasks_mixed_192.jsonl"
 
 wait_health() {
   local alias="$1"

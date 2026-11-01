@@ -62,6 +62,6 @@ If Aya/EuroLLM lose translate to Mamay-4B on `mixed_ua_v4`, try **Qwen2.5-7B** o
 
 Do **not** put Mamay-12B or Tower+ in the “different model” slot. Use them only as optional same-family ceilings.
 
-Next concrete step: serve Aya (or EuroLLM) alone on `mixed_ua_v4_balanced`, compare per-bucket to Mamay-4B and Lapa, then rewrite routes to:
+Next concrete step: serve Aya (or EuroLLM) alone on `tasks_mixed_192`, compare per-bucket to Mamay-4B and Lapa, then rewrite routes to:
 
 `mamay4 + lapa + <winner third>`.

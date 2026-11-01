@@ -32,7 +32,7 @@ file automatically. Keep it short; put long explanations in `docs/`.
 
 ## Evaluation protocol
 
-- **Development suite (not for claims):** `benchmarks/mixed_ua_v4_balanced.jsonl`
+- **Development suite (not for claims):** `benchmarks/tasks_mixed_192.jsonl`
   (192 = 32×6), `T=0`, `seed=42`, `max_tokens=256`, `--align-prompt fewshot`,
   **3 repeats**. Every number quoted next to the router's 0.848 must use this.
 - `mixed_ua_v6` uses `max_tokens=1024` and different items. Never place v3, v4,
@@ -52,7 +52,7 @@ One item on v4 moves the overall score by 0.0052 and a bucket by 0.031. The 95%
 interval for a router-vs-model difference on v4 is about ±0.04, so most v4
 differences are noise. The rules below follow from that.
 
-- **Claims come from the test split of `benchmarks/mixed_ua_v7.jsonl`** (2859
+- **Claims come from the test split of `benchmarks/tasks_public_4401.jsonl`** (2859
   items: knowledge 794, translate 795, alignment 800, instruct 361, code 109).
   The headline macro is over the first four; code (HumanEval, English, 109
   items, wide interval) is reported beside it. The dev split (1542, includes
@@ -110,6 +110,10 @@ differences are noise. The rules below follow from that.
 - Pull results back with `rsync` into the matching `results/<group>/` folder.
 
 ## Editing conventions
+
+- Dataset files are named `<unit>_<origin>_<number of tasks>[_<split>].jsonl` (unit: tasks, graphs or nodes;
+  origin: synthetic, public or mixed). "v4" is `tasks_mixed_192`, "v7" is `tasks_public_4401`. Every file starts
+  with a `# why:` line from `scripts/benchmarks/dataset_headers.py`; historical sets are in `benchmarks/archive/`.
 
 - Ask before destructive actions, deleting result files, or spending money
   (API runs). Reversible edits that follow from the request: just do them.

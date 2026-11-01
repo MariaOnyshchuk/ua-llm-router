@@ -42,13 +42,13 @@ every step is ticked or blocked.
 ## Steps
 
 - [x] **1. Commit the work that is already in the tree.**
-  Done 13 Oct: seven commits by topic (`3dae3f1` … `584adae`). `benchmarks/mixed_ua_v7.jsonl` committed under the
+  Done 13 Oct: seven commits by topic (`3dae3f1` … `584adae`). `benchmarks/tasks_public_4401.jsonl` committed under the
   exception in `TASK.md`. `docs/HANDOFF.md` left untracked on purpose, see `DECISIONS.md`.
   Run the tests first. Group the modified and untracked files into a few
   commits by topic (v7 build and v6 withdrawal; planner `hybrid_gated` and its
   tests; debug UI; AgentCoMa oracle fix; v7 dev results and analysis; progress
   report and figures). Check every `.jsonl` as `TASK.md` says. Leave
-  `benchmarks/mixed_ua_v7.jsonl` out only if it fails that check; record the
+  `benchmarks/tasks_public_4401.jsonl` out only if it fails that check; record the
   decision.
 
 - [x] **2. Make the test suite green without new dependencies.**
@@ -69,7 +69,7 @@ every step is ticked or blocked.
   as it is) that keeps these on Mamay-4B. Estimate it from the stored scores
   in `results/v7_pool/scores_specialists_detail.jsonl`, **dev rows only**: that
   file also holds test items, so first keep the ids with `"split": "dev"` in
-  `benchmarks/mixed_ua_v7.jsonl`. Give a paired bootstrap interval against
+  `benchmarks/tasks_public_4401.jsonl`. Give a paired bootstrap interval against
   rules v2, for instruct and for the macro of four. This is a simulation from
   baseline-prompt scores, not a live run; say so. For reference, the live
   rules v2 router scored 0.553 on dev instruct

@@ -6,7 +6,7 @@ Social items (0/1/2) get optional prompt variants; ethics left as-is.
 
 Example (on lab, with :8001 and :8003 up):
   python scripts/archive/run_alignment_ablation.py \\
-    --bench benchmarks/mixed_ua_v4_balanced.jsonl \\
+    --bench benchmarks/tasks_mixed_192.jsonl \\
     --systems lapa:baseline,lapa:fewshot,mamay4:baseline,mamay4:fewshot \\
     --out-dir results/week_5_alignment_ablation
 """
@@ -54,7 +54,7 @@ def parse_systems(spec: str) -> list[tuple[str, str]]:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--bench", type=Path, default=ROOT / "benchmarks/mixed_ua_v4_balanced.jsonl")
+    p.add_argument("--bench", type=Path, default=ROOT / "benchmarks/tasks_mixed_192.jsonl")
     p.add_argument(
         "--systems",
         default="lapa:baseline,lapa:clarified,lapa:fewshot,mamay4:baseline,mamay4:fewshot",

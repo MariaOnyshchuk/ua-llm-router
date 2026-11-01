@@ -315,7 +315,7 @@ No monetary cost data exists; inference is self-hosted.
 
 **Raw runs, 2026-07-27:** the eight `*_mixed_ua_v1_*.jsonl` and `*_external_ua_v2_*.jsonl` files in `results/`. Each row carries its own `vram_snapshot_mb` field; the per-run `.meta.json` files written by the runner were left on the cluster and still need to be copied back.
 
-**Benchmarks:** `benchmarks/mixed_ua_v0.jsonl`, `mixed_ua_v1.jsonl`, `mixed_ua_v2.jsonl`, `external_ua_v2.jsonl`, and the per-source samples in `benchmarks/samples/`.
+**Benchmarks:** `benchmarks/archive/mixed_ua_v0.jsonl`, `mixed_ua_v1.jsonl`, `mixed_ua_v2.jsonl`, `external_ua_v2.jsonl`, and the per-source samples in `benchmarks/samples/`.
 
 **Historical, do not cite as results:** all `results/*_20260725T*.jsonl`, plus `scores_s0_s1.json`, `scores_s0_s1_s2.json`, `scores_dual.json`, `scores_with_latency.json`, `scores_small_vs_large.json`.
 

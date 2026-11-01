@@ -34,7 +34,7 @@ def load_jsonl(path: Path) -> list[dict]:
 
 
 def main() -> None:
-    items = load_jsonl(ROOT / "benchmarks" / "mixed_ua_v0.jsonl")
+    items = load_jsonl(ROOT / "benchmarks" / "archive" / "mixed_ua_v0.jsonl")
     out_dir = ROOT / "results"
     out_dir.mkdir(exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")

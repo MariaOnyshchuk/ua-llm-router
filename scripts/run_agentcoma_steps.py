@@ -33,11 +33,11 @@ from router.backends import BACKENDS  # noqa: E402
 from router.client import async_chat  # noqa: E402
 from score_composite_results import mean, score_rubric  # noqa: E402
 
-MERGED = "benchmarks/agentcoma_uk_200_merged.jsonl"
+MERGED = "benchmarks/graphs_agentcoma_200_source.jsonl"
 
 
 def load_jsonl(path: Path) -> list[dict]:
-    return [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    return [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip() and not x.startswith("#")]
 
 
 async def run(args: argparse.Namespace) -> None:

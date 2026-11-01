@@ -108,6 +108,20 @@ def normalise(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value)).strip().casefold()
 
 
+# A sentence ends with . ! ? or … followed by a space, a line break or the end of the text.
+# Decimal points (2.5), times (18.30) and initials inside a number do not end a sentence.
+SENTENCE_END_RE = re.compile(r"[.!?…]+(?=\s|$)")
+
+
+def count_sentences(content: str) -> int:
+    text = re.sub(r"```[\s\S]*?```", " ", content or "").strip()
+    if not text:
+        return 0
+    ends = SENTENCE_END_RE.findall(text)
+    tail = SENTENCE_END_RE.split(text)[-1].strip()
+    return len(ends) + (1 if tail else 0)
+
+
 NUMBER_RE = re.compile(r"-?\d+(?:[ \u00a0]\d{3})+(?:[.,]\d+)?|-?\d+(?:[.,]\d+)?")
 ANSWER_MARK_RE = re.compile(r"(?:відповідь|answer|разом|загалом|=)\s*[:\-–—]?\s*", re.I)
 
@@ -159,6 +173,54 @@ def score_numeric(content: str, rubric: dict[str, Any]) -> tuple[float, str]:
 
 def score_rubric(content: str, rubric: dict[str, Any]) -> tuple[float, str]:
     kind = rubric.get("type")
+    # Generic checks used by the composite graph pilot (27 Oct). They do not change how the
+    # older rubric types score.
+    if kind == "all":
+        parts = [score_rubric(content, sub) for sub in rubric.get("rubrics") or []]
+        if not parts:
+            return 0.0, "all: no checks"
+        return sum(s for s, _ in parts) / len(parts), "all: " + "; ".join(d for _, d in parts)
+    if kind == "not_contains":
+        text = normalise(content)
+        found = [v for v in rubric.get("values") or [] if normalise(v) in text]
+        return float(not found), f"not_contains found={found}"
+    if kind == "line_prefix_count":
+        prefix = str(rubric.get("prefix") or "")
+        lines = [line.strip() for line in (content or "").splitlines() if line.strip()]
+        hits = sum(line.startswith(prefix) for line in lines)
+        want = int(rubric.get("count") or 0)
+        return float(hits == want), f"lines with {prefix!r}: {hits}/{want}"
+    if kind == "one_word":
+        words = (content or "").strip().strip(".!?,;:«»\"'").split()
+        got = words[0].casefold() if len(words) == 1 else ""
+        return float(got == normalise(rubric.get("value"))), f"one_word got={' '.join(words)[:30]!r}"
+    if kind == "min_count":
+        n = (content or "").count(str(rubric.get("value") or ""))
+        want = int(rubric.get("count") or 0)
+        return float(n >= want), f"count {rubric.get('value')!r}: {n}/{want}"
+    # Added for the graphs_mixed_100_dev set (28 Oct 2026); older types are unchanged.
+    if kind == "any":
+        parts = [score_rubric(content, sub) for sub in rubric.get("rubrics") or []]
+        if not parts:
+            return 0.0, "any: no checks"
+        best = max(parts, key=lambda p: p[0])
+        return best[0], "any: " + best[1]
+    if kind == "sentence_count":
+        n = count_sentences(content)
+        lo = int(rubric.get("min", rubric.get("count", 0)))
+        hi = int(rubric.get("max", rubric.get("count", 10**6)))
+        return float(lo <= n <= hi), f"sentences {n} (want {lo}..{hi})"
+    if kind == "has_number":
+        # The number appears anywhere in the text (for answers that state several numbers).
+        expected = float(rubric.get("value"))
+        tol = float(rubric.get("tolerance", 1e-6))
+        found = extract_numbers(content)
+        ok = any(math.isclose(v, expected, rel_tol=1e-9, abs_tol=tol) for v in found)
+        return float(ok), f"has_number {expected:g}: {'yes' if ok else 'no'}"
+    if kind == "regex":
+        flags = re.I if rubric.get("ignore_case") else 0
+        hit = re.search(str(rubric.get("pattern") or ""), (content or "").strip(), flags | re.M)
+        return float(bool(hit)), f"regex {'hit' if hit else 'miss'}"
     if kind == "contains_all":
         values = [normalise(x) for x in rubric.get("values") or []]
         text = normalise(content)

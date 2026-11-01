@@ -123,7 +123,7 @@ smoke "${MAMAY_PORT}" "INSAIT-Institute/MamayLM-Gemma-3-4B-IT-v1.0" mamay4
 
 cd "${ROOT}"
 python scripts/run_small_router_cluster.py --mode router_matrix \
-  --bench benchmarks/mixed_ua_v4_balanced.jsonl \
+  --bench benchmarks/tasks_mixed_192.jsonl \
   --align-prompt fewshot \
   --repeats 1 \
   --out-dir results/week_11_pack_fp8
@@ -148,7 +148,7 @@ else
 fi
 
 python scripts/run_small_router_cluster.py --mode router_matrix \
-  --bench benchmarks/mixed_ua_v4_balanced.jsonl \
+  --bench benchmarks/tasks_mixed_192.jsonl \
   --align-prompt fewshot \
   --repeats 3 \
   --out-dir results/week_11_pack_fp8

@@ -71,7 +71,7 @@ fi
 
 cd "${ROOT}"
 python scripts/run_small_router_cluster.py --mode mamay12 \
-  --bench benchmarks/mixed_ua_v4_balanced.jsonl \
+  --bench benchmarks/tasks_mixed_192.jsonl \
   --align-prompt fewshot \
   --repeats 3 \
   --out-dir results/week_9_baselines

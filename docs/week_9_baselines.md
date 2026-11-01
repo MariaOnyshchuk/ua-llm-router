@@ -8,13 +8,13 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low. All of these are v4 development numbers; claims come from
-> `mixed_ua_v7` test.
+> `tasks_public_4401` test.
 
 *S2 scored 26 Sep 2026. S3 not run (API spend not approved).*
 
 Everything so far compares the router against models **inside its own pool**, which a reviewer can call circular. These two runs give the comparisons a decision-maker actually weighs: *scale up one open model* or *call a hosted frontier model*.
 
-Both use the product protocol: `mixed_ua_v4_balanced` (192), `T=0`, `seed=42`, `max_tokens=256`, `--align-prompt fewshot`, 3 repeats.
+Both use the product protocol: `tasks_mixed_192` (192), `T=0`, `seed=42`, `max_tokens=256`, `--align-prompt fewshot`, 3 repeats.
 
 | Slot | System | Where | Cost |
 |------|--------|-------|------|
@@ -44,7 +44,7 @@ squeue -u "$USER"                      # wait for R
 curl -s localhost:8002/v1/models       # health
 
 python scripts/run_small_router_cluster.py --mode mamay12 \
-  --bench benchmarks/mixed_ua_v4_balanced.jsonl \
+  --bench benchmarks/tasks_mixed_192.jsonl \
   --align-prompt fewshot \
   --repeats 3 \
   --out-dir results/week_9_baselines

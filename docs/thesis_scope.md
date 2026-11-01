@@ -8,7 +8,7 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low, so do not subtract one of them from a rescored number. All
-> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+> of these are v4 development numbers; claims come from `tasks_public_4401` test.
 
 *Reframed 31 Aug 2026. Supersedes the original "less VRAM than one big model" framing, which our own week-8 measurements do not support.*
 
@@ -57,13 +57,13 @@ S2 and S3 are the two reference points that turn "router beats its own pool" (ne
 
 ## 5. Evaluation
 
-**Single-skill claim suite:** `benchmarks/mixed_ua_v7.jsonl` (4237 items, no score-based selection; dev 1487 for tuning, test 2750 for claims: knowledge 794, translate 795, alignment 800, instruct 361). `mixed_ua_v6` (2414) is withdrawn 12 Oct 2026, see [`docs/mixed_ua_v6.md`](mixed_ua_v6.md): its selection kept the items where the three specialists score the same, so no v6 number is cited. State on v7 **dev** (12 Oct, not a claim): router 0.680 vs Mamay-12B 0.710 on the macro of four buckets, difference −0.030 [−0.048, −0.012], all of it in instruct; router vs the best single specialist +0.046 [+0.025, +0.069]. Details: [`docs/progress_report_2026-10-12.md`](progress_report_2026-10-12.md). Decoding for v7: `T=0`, `seed=42`, `max_tokens=1024`, one pass.
+**Single-skill claim suite:** `benchmarks/tasks_public_4401.jsonl` (4237 items, no score-based selection; dev 1487 for tuning, test 2750 for claims: knowledge 794, translate 795, alignment 800, instruct 361). `mixed_ua_v6` (2414) is withdrawn 12 Oct 2026, see [`docs/mixed_ua_v6.md`](mixed_ua_v6.md): its selection kept the items where the three specialists score the same, so no v6 number is cited. State on v7 **dev** (12 Oct, not a claim): router 0.680 vs Mamay-12B 0.710 on the macro of four buckets, difference −0.030 [−0.048, −0.012], all of it in instruct; router vs the best single specialist +0.046 [+0.025, +0.069]. Details: [`docs/progress_report_2026-10-12.md`](progress_report_2026-10-12.md). Decoding for v7: `T=0`, `seed=42`, `max_tokens=1024`, one pass.
 
 Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Code + HumanEval (code). Chat and instruct are hand-written — open UA data barely exists for them, and that is a stated limitation.
 
-**Composite suite (v1, historical):** `benchmarks/mixed_ua_composite_v1.jsonl` — 36 deterministic items, 12 each for translate→code, knowledge→explain, and translate→knowledge→write. The stored workflow is hidden from the LLM planner. Final success uses executable tests, exact JSON/labels, and constrained evidence checks.
+**Composite suite (v1, historical):** `benchmarks/archive/mixed_ua_composite_v1.jsonl` — 36 deterministic items, 12 each for translate→code, knowledge→explain, and translate→knowledge→write. The stored workflow is hidden from the LLM planner. Final success uses executable tests, exact JSON/labels, and constrained evidence checks.
 
-**Composite suite (v2):** `benchmarks/mixed_ua_composite_v2.jsonl` — 200 items, five families, explicit `train/dev/test` with disjoint source pools. Constrained template selection is the frozen planner (`template`); free-form hybrid remains a baseline. Do not mix v1 and v2 finals in one comparison cell.
+**Composite suite (v2):** `benchmarks/archive/mixed_ua_composite_v2.jsonl` — 200 items, five families, explicit `train/dev/test` with disjoint source pools. Constrained template selection is the frozen planner (`template`); free-form hybrid remains a baseline. Do not mix v1 and v2 finals in one comparison cell.
 
 **Metrics:** quality per bucket/family, final task success, all-stages-pass, plan exact match, intent F1, invalid-plan rate, calls, latency mean / p50 / p95, GPU-seconds per prompt for self-hosted systems, USD per 1000 queries for the API baseline.
 
@@ -81,6 +81,8 @@ Sources: ZNO-Eval (knowledge), FLORES-200 (translate), UAlign (alignment), UA-Co
 - Mixing fairness-preference datasets (StereoSet-UK, BBQ-UK, …) into the UAlign quality mean
 
 Learned **routing** (embedding kNN / logistic regression profiles `knn` and `clf`) is in scope as a RouterBench-style comparison against Rules v2, Oracle, and BestSingle. The product default remains Rules v2 until that bake-off wins.
+
+From 27 Oct 2026 the learned routers follow RouterBench (arXiv 2403.12031) instead of predicting one label: kNN and MLP regressors predict the score of every specialist from the e5 prompt embedding, the router picks the largest λ·P − cost (cost = latency), and a sweep of λ gives a cost-quality curve summarised by AIQ against the Zero router (mixtures of single models). `scripts/analysis/routerbench_dev.py` runs this offline on v7 dev with 5-fold CV; the old `knn`/`clf` artifacts were trained on items now in v7 test and are not used. First dev result: both routers are above the Zero router (AIQ 0.686 and 0.690 vs 0.650) and above Aya alone, but not distinguishable from rules v2 or from the best model per gold bucket; their score predictions are barely better than predicting the mean (MSE 0.159–0.172 vs 0.172–0.189), so they learn the bucket, not which items a model gets wrong. Item oracle: 0.783.
 
 ## 8. Composite-task phase
 

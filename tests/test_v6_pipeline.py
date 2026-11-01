@@ -274,6 +274,41 @@ class LearnedRouterTests(unittest.TestCase):
             self.assertEqual(d.model, "aya")
             self.assertIn("learned", d.intent)
 
+    def test_quality_argmax_router_ignores_step_intent(self) -> None:
+        try:
+            from sklearn.neighbors import KNeighborsRegressor
+        except ModuleNotFoundError:
+            self.skipTest("scikit-learn is not installed in this environment")
+
+        from router import learned as learned_mod
+        from router.learned import HashEncoder, QualityArgmaxRouter
+
+        encoder = HashEncoder(32)
+        prompts = ["Переклади українською: Hello", "Відповідь ЗНО, варіант:", "Напиши функцію add"]
+        scores = [[0.1, 0.2, 0.9], [0.2, 0.9, 0.1], [0.9, 0.1, 0.2]]  # mamay4, lapa, aya
+        reg = KNeighborsRegressor(n_neighbors=1).fit(encoder.encode(prompts), scores)
+        router = QualityArgmaxRouter(reg, ("mamay4", "lapa", "aya"))
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "mlp"
+            dest.mkdir()
+            (dest / "model.pkl").write_bytes(pickle.dumps(router))
+            (dest / "config.json").write_text(json.dumps({"encoder": "hash", "encoder_dim": 32}))
+            with patch.object(learned_mod, "ARTIFACT_ROOT", Path(tmp)):
+                d1 = route_intent(prompts[1], profile="mlp")
+                d2 = route_intent(prompts[2], profile="mlp", intent_hint="translate")
+        self.assertEqual(d1.model, "lapa")
+        self.assertIn("predicted", d1.reason)
+        self.assertEqual(d2.model, "mamay4")
+
+    def test_composite_runner_knows_learned_systems(self) -> None:
+        from scripts.run_composite_router import known_system, required_aliases, split_routing
+
+        for name in ("router_knn", "router_mlp", "oracle+knn", "hybrid_gated_aya+mlp"):
+            self.assertTrue(known_system(name), name)
+        self.assertFalse(known_system("oracle+v3"))
+        self.assertEqual(split_routing("oracle+mlp"), ("oracle", "mlp"))
+        self.assertEqual(required_aliases(["router_knn"]), {"mamay4", "lapa", "aya"})
+
     def test_knn_missing_artifacts_falls_back(self) -> None:
         from router import learned as learned_mod
 

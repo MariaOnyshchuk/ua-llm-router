@@ -57,7 +57,7 @@ curl -sf "http://127.0.0.1:8003/v1/models" >/dev/null
 
 cd "${ROOT}"
 PYTHONPATH=. python -u scripts/run_planner_grid.py \
-  --bench benchmarks/agentcoma_uk_50_composite.jsonl \
+  --bench benchmarks/graphs_agentcoma_50_dev.jsonl \
   --models mamay4 \
   --variants minimal_v3 \
   --max-tokens 1024 \

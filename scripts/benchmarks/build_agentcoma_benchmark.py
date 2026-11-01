@@ -17,16 +17,16 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SRC = ROOT / "benchmarks" / "agentcoma_uk_50items_merged.jsonl"
-DEFAULT_OUT = ROOT / "benchmarks" / "agentcoma_uk_50_composite.jsonl"
+DEFAULT_SRC = ROOT / "benchmarks" / "graphs_agentcoma_50_dev_source.jsonl"
+DEFAULT_OUT = ROOT / "benchmarks" / "graphs_agentcoma_50_dev.jsonl"
 
 # Known local source files -> expected item count and provenance tag.
 # ``agentcoma_uk_200_merged`` = 50 dev items (claude_manual_v1) + 150 test
 # items (claude_manual_v2); each row carries ``split`` in {dev, test}.
 KNOWN_SOURCES: dict[str, tuple[int, str]] = {
-    "agentcoma_uk_50items_merged.jsonl": (50, "agentcoma_uk_50_claude_manual_v1"),
-    "agentcoma_uk_150_test_translated.jsonl": (150, "agentcoma_uk_150_test_claude_manual_v2"),
-    "agentcoma_uk_200_merged.jsonl": (200, "agentcoma_uk_200_claude_manual_v1v2"),
+    "graphs_agentcoma_50_dev_source.jsonl": (50, "agentcoma_uk_50_claude_manual_v1"),
+    "graphs_agentcoma_150_test_source.jsonl": (150, "agentcoma_uk_150_test_claude_manual_v2"),
+    "graphs_agentcoma_200_source.jsonl": (200, "agentcoma_uk_200_claude_manual_v1v2"),
 }
 
 # Until 12 Oct 2026 the filter prompt did not contain the task and the compute

@@ -65,7 +65,7 @@ def item_score(row: dict, text: str) -> float | None:
 
 
 def main() -> None:
-    bench = {r["id"]: r for r in rows(str(ROOT / "benchmarks/mixed_ua_v7.jsonl"))}
+    bench = {r["id"]: r for r in rows(str(ROOT / "benchmarks/tasks_public_4401.jsonl"))}
     dev_all = {i for i, r in bench.items() if r.get("split") == "dev"}
     dev = sorted(i for i in dev_all if bench[i]["bucket"] == "instruct")
     keep = set(dev)

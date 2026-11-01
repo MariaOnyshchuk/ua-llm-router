@@ -98,7 +98,7 @@ cd "${ROOT}"
 python scripts/benchmarks/build_composite_benchmark.py --version v2 --check
 
 python scripts/run_composite_router.py \
-  --bench benchmarks/mixed_ua_composite_v2.jsonl \
+  --bench benchmarks/archive/mixed_ua_composite_v2.jsonl \
   --systems "${SYSTEMS}" \
   --split "${SPLIT}" \
   --repeats "${REPEATS}" \

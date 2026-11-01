@@ -6,7 +6,7 @@ Runs ONLY the planning step (short JSON, no specialist execution) across
 match against oracle_plan on mixed_ua_composite_v1.
 
   PYTHONPATH=. python scripts/run_planner_grid.py \
-      --bench benchmarks/mixed_ua_composite_v1.jsonl \
+      --bench benchmarks/archive/mixed_ua_composite_v1.jsonl \
       --out results/tables/a2_planner_grid.csv
 """
 
@@ -274,7 +274,7 @@ async def run_grid(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--bench", default="benchmarks/mixed_ua_composite_v1.jsonl")
+    parser.add_argument("--bench", default="benchmarks/archive/mixed_ua_composite_v1.jsonl")
     parser.add_argument("--out", default="results/tables/a2_planner_grid.csv")
     parser.add_argument("--save-plans", default="results/a2_planner_grid")
     parser.add_argument("--models", default=",".join(DEFAULT_MODELS))

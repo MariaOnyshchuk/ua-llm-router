@@ -10,6 +10,7 @@ are reached on their vLLM ports (SSH tunnels to the lab). LiteLLM is optional:
 
 from __future__ import annotations
 
+import asyncio
 import os
 from pathlib import Path
 from typing import Any
@@ -25,11 +26,38 @@ from router.debug import router as debug_router
 from router.intent_rules import extract_user_text, route_intent
 from router.orchestrator import Plan, execute_plan
 from router.planner import PLANNER_PROFILES, generate_plan
+from router.wiki_search import WikiClient, wiki_augment
 
 LITELLM_BASE = os.getenv("LITELLM_BASE", "http://localhost:4000").rstrip("/")
 LITELLM_KEY = os.getenv("LITELLM_MASTER_KEY", "sk-diploma-dev")
 AUTO_MODELS = {"auto", "router", "ua-router"}
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+# Wikipedia passages for knowledge requests: per request with "wiki": true, or for all with ROUTER_WIKI=1.
+WIKI_DEFAULT = os.getenv("ROUTER_WIKI") == "1"
+_wiki_client: WikiClient | None = None
+
+
+def _wiki() -> WikiClient:
+    global _wiki_client
+    if _wiki_client is None:
+        _wiki_client = WikiClient()
+    return _wiki_client
+
+
+def _last_user_text(messages: list[dict[str, Any]]) -> str:
+    for m in reversed(messages):
+        if m.get("role") == "user":
+            return m["content"] if isinstance(m.get("content"), str) else ""
+    return ""
+
+
+def _with_last_user_text(messages: list[dict[str, Any]], text: str) -> list[dict[str, Any]]:
+    out = [dict(m) for m in messages]
+    for m in reversed(out):
+        if m.get("role") == "user":
+            m["content"] = text
+            break
+    return out
 
 app = FastAPI(title="UA specialist intent router", version="0.2.0")
 app.include_router(debug_router)
@@ -179,11 +207,18 @@ async def chat_completions(request: Request):
     requested = body.get("model") or "auto"
     profile = str(body.get("router_profile") or "v2")
     pool = _pool_from_body(body)
+    use_wiki = bool(body.pop("wiki", WIKI_DEFAULT))
 
     if requested in AUTO_MODELS:
         text = extract_user_text(body.get("messages") or [])
         decision = route_intent(text, profile=profile, pool=pool)
         body = {**body, "model": decision.model}
+        wiki_meta = None
+        user_text = _last_user_text(body.get("messages") or [])
+        if use_wiki and user_text:
+            augmented, wiki_meta = await asyncio.to_thread(wiki_augment, user_text, decision.intent, _wiki())
+            if augmented != user_text:
+                body["messages"] = _with_last_user_text(body.get("messages") or [], augmented)
         route_meta = {
             "x-router-model": _header_safe(decision.model),
             "x-router-intent": _header_safe(decision.intent),
@@ -194,6 +229,17 @@ async def chat_completions(request: Request):
             "intent": decision.intent,
             "reason": decision.reason,
         }
+        if wiki_meta is not None:
+            route_body["wiki"] = {
+                "used": wiki_meta.get("used"),
+                "gate": wiki_meta.get("gate"),
+                "queries": wiki_meta.get("queries"),
+                "sources": [
+                    {"title": x["title"], "url": x["url"], "score": x["score"]}
+                    for x in wiki_meta.get("passages") or []
+                ],
+            }
+            route_meta["x-router-wiki"] = str(len(route_body["wiki"]["sources"]))
     else:
         route_meta = {
             "x-router-model": _header_safe(requested),

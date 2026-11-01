@@ -8,7 +8,7 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low, so do not subtract one of them from a rescored number. All
-> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+> of these are v4 development numbers; claims come from `tasks_public_4401` test.
 
 *Last updated: 2026-09-28. Weeks 7–10 pack (glossary, router diagrams, v4/v5/composite tables): [`docs/weeks_7_10_takeaways.md`](weeks_7_10_takeaways.md). Composite v2: [`docs/week_12_composite_v2.md`](week_12_composite_v2.md).*
 
@@ -52,7 +52,7 @@ Code: `router/intent_rules.py`.
 
 | Layer | Path | Size | Role |
 |-------|------|-----:|------|
-| **Eval suite (authoritative for claims)** | `benchmarks/mixed_ua_v4_balanced.jsonl` | 192 (32×6) | What we actually score |
+| **Eval suite (authoritative for claims)** | `benchmarks/tasks_mixed_192.jsonl` | 192 (32×6) | What we actually score |
 | **Corpus warehouse** | `benchmarks/corpus/*.jsonl` | ≈14 644 | Source pool (ZNO, FLORES, UAlign, UA-Code) |
 | Older suites | `mixed_ua_v1`…`v3` | smaller / unbalanced | Historical; week-4 bake-off used v3 |
 
@@ -64,7 +64,7 @@ Full-corpus eval was deferred on purpose (time + imbalance + UA-Code unscored wi
 
 ## Headline comparison
 
-### A. Same suite — `mixed_ua_v4_balanced` (192×3, T=0)
+### A. Same suite — `tasks_mixed_192` (192×3, T=0)
 
 | System | Overall | p50 | chat | code | translate | instruct | knowledge | alignment |
 |--------|--------:|----:|-----:|-----:|----------:|---------:|----------:|----------:|

@@ -10,7 +10,7 @@ Policy (default --per-bucket 32):
 
 Usage:
   python scripts/benchmarks/build_balanced_suite.py --per-bucket 32 \\
-    --out benchmarks/mixed_ua_v4_balanced.jsonl
+    --out benchmarks/tasks_mixed_192.jsonl
 """
 
 from __future__ import annotations
@@ -19,10 +19,13 @@ import argparse
 import json
 import random
 from collections import defaultdict
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from dataset_headers import why_line  # noqa: E402
 BUCKETS = ("chat", "translate", "instruct", "knowledge", "code", "alignment")
 
 
@@ -84,13 +87,13 @@ def main() -> None:
     p.add_argument("--per-bucket", type=int, default=32)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--include-uacode", action="store_true", help="Allow UA-Code into code bucket")
-    p.add_argument("--out", type=Path, default=Path("benchmarks/mixed_ua_v4_balanced.jsonl"))
+    p.add_argument("--out", type=Path, default=Path("benchmarks/tasks_mixed_192.jsonl"))
     args = p.parse_args()
 
     # Prefer FULL corpora (thousands) when present; fall back to tiny samples/.
     corpus = ROOT / "benchmarks" / "corpus"
     paths = [
-        ROOT / "benchmarks/mixed_ua_v0.jsonl",
+        ROOT / "benchmarks/archive/mixed_ua_v0.jsonl",
         ROOT / "benchmarks/samples/chat_extra_v1.jsonl",
         ROOT / "benchmarks/samples/instruct_extra_v1.jsonl",
         ROOT / "benchmarks/samples/code_extra_v1.jsonl",
@@ -147,8 +150,9 @@ def main() -> None:
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8") as f:
+        f.write(why_line(args.out.name))
         f.write(
-            f"# mixed_ua balanced — {args.per_bucket}/bucket, seed={args.seed}; do not hand-edit\n"
+            f"# tasks_mixed_192 (balanced) — {args.per_bucket}/bucket, seed={args.seed}; do not hand-edit\n"
         )
         for row in out_rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")

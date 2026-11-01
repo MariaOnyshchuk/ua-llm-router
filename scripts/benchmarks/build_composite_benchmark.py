@@ -16,8 +16,8 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_OUT_V1 = ROOT / "benchmarks" / "mixed_ua_composite_v1.jsonl"
-DEFAULT_OUT_V2 = ROOT / "benchmarks" / "mixed_ua_composite_v2.jsonl"
+DEFAULT_OUT_V1 = ROOT / "benchmarks" / "archive" / "mixed_ua_composite_v1.jsonl"
+DEFAULT_OUT_V2 = ROOT / "benchmarks" / "archive" / "mixed_ua_composite_v2.jsonl"
 
 FAMILIES_V1 = ("translate_code", "knowledge_explain", "translate_knowledge_write")
 FAMILIES_V2 = (

@@ -1,0 +1,73 @@
+{
+  "kind": "mlp_nodes",
+  "router": "QualityArgmaxRouter (max-quality end, lambda = inf)",
+  "encoder": "e5",
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "encoder_revision": null,
+  "models": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "default": "aya",
+  "hyper_parameters": {
+    "hidden": [
+      128
+    ],
+    "alpha": 0.1
+  },
+  "cv_mse": 0.1554,
+  "grid": [
+    {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.1568
+    },
+    {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1554
+    },
+    {
+      "hp": {
+        "hidden": [
+          256,
+          64
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.157
+    },
+    {
+      "hp": {
+        "hidden": [
+          256,
+          64
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1564
+    }
+  ],
+  "train": {
+    "suite": "benchmarks/tasks_public_4401.jsonl",
+    "split": "dev",
+    "n_items": 2023,
+    "ids_sha256_16": "16f48c3c9adbad72",
+    "scores": "results/v7_pool/scores_specialists_detail.jsonl",
+    "n_v7_dev": 1423,
+    "extra_suite": "benchmarks/nodes_mixed_600_train.jsonl",
+    "extra_scores": "results/nodes_mixed_600_train/scores_all_detail.jsonl"
+  },
+  "sklearn": "1.9.1",
+  "git_commit": "b8f22cbc93260e909c3ca667279a2509f2f25dd3",
+  "trained_at": "2026-10-31T16:20:18+00:00"
+}

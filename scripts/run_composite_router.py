@@ -25,6 +25,25 @@ from router.planner import PLANNER_PROFILES, generate_plan  # noqa: E402
 DIRECT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "mamay12", "mamay27")
 DEFAULT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "router_direct", "oracle", "hybrid")
 ORCHESTRATED = frozenset({"router_direct", "oracle", *PLANNER_PROFILES})
+# Learned (RouterBench-style) routing, router/artifacts/{knn,mlp}:
+#   router_knn / router_mlp      one call, the learned router picks the model for the request;
+#   <plan>+knn / <plan>+mlp      plan from `oracle` or a planner profile, every step routed by the
+#                                learned router on the step's own prompt.
+LEARNED_PROFILES = ("knn", "mlp", "knn_nodes", "mlp_nodes")
+LEARNED_DIRECT = {f"router_{k}": k for k in LEARNED_PROFILES}
+
+
+def split_routing(system: str) -> tuple[str, str]:
+    """'oracle+knn' -> ('oracle', 'knn'); plain names keep the rules (v2)."""
+    base, _, routing = system.partition("+")
+    return base, routing or "v2"
+
+
+def known_system(system: str) -> bool:
+    if system in DIRECT_SYSTEMS or system in ORCHESTRATED or system in LEARNED_DIRECT:
+        return True
+    base, routing = split_routing(system)
+    return routing in LEARNED_PROFILES and (base == "oracle" or base in PLANNER_PROFILES)
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -55,11 +74,23 @@ def required_aliases(systems: list[str]) -> set[str]:
     for system in systems:
         if system in BACKENDS:
             required.add(system)
-        if system in {"router_direct", "oracle"} or system in PLANNER_PROFILES:
+        base, _ = split_routing(system)
+        if system in LEARNED_DIRECT or base in {"router_direct", "oracle"} or base in PLANNER_PROFILES:
             required.update({"mamay4", "lapa", "aya"})
         if system in {"hybrid_mamay12", "hybrid_gated_mamay12"}:
             required.add("mamay12")
     return required
+
+
+def as_plan_item(item: dict[str, Any]) -> dict[str, Any]:
+    """A single-skill node item (benchmarks/mixed_ua_nodes_{train,test}.jsonl) becomes a one-step plan, so the
+    same runner and scorer handle it. Its intent is the item's label (math is `chat`, as in graphs_mixed_100_dev)."""
+    if "oracle_plan" in item:
+        return item
+    step = {"id": "n1", "intent": item["label"], "depends_on": [], "prompt": item["prompt"],
+            "rubric": item["check"]}
+    return {**item, "family": f"node_{item['skill']}", "depth": 1, "final_step": "n1",
+            "oracle_plan": {"steps": [step]}}
 
 
 def balanced_limit(items: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
@@ -130,8 +161,8 @@ async def run_item(
             "gpu_seconds": hop.get("gpu_seconds") or 0.0,
             "direct": hop,
         }
-    elif system == "router_direct":
-        decision = route_intent(prompt)
+    elif system == "router_direct" or system in LEARNED_DIRECT:
+        decision = route_intent(prompt, profile=LEARNED_DIRECT.get(system, "v2"))
         hop = await caller(decision.model, prompt)
         execution = {
             "steps": [],
@@ -150,13 +181,14 @@ async def run_item(
                 },
             },
         }
-    elif system == "oracle":
+    elif split_routing(system)[0] == "oracle":
         plan = oracle
-        execution = await execute_plan(plan, caller)
-    elif system in PLANNER_PROFILES:
-        planner_profile = system
-        plan, planning = await generate_plan(prompt, caller, profile=system)
-        execution = await execute_plan(plan, caller)
+        execution = await execute_plan(plan, caller, profile=split_routing(system)[1])
+    elif split_routing(system)[0] in PLANNER_PROFILES:
+        base, routing = split_routing(system)
+        planner_profile = base
+        plan, planning = await generate_plan(prompt, caller, profile=base)
+        execution = await execute_plan(plan, caller, profile=routing)
     else:
         raise ValueError(f"unknown system: {system}")
 
@@ -219,7 +251,7 @@ async def run(args: argparse.Namespace) -> None:
     if not bench.is_absolute():
         bench = ROOT / bench
     items = filter_items(
-        load_jsonl(bench),
+        [as_plan_item(item) for item in load_jsonl(bench)],
         family=args.family,
         split=args.split,
         limit=args.limit,
@@ -228,8 +260,7 @@ async def run(args: argparse.Namespace) -> None:
         raise SystemExit("no items left after filters")
 
     systems = [x.strip() for x in args.systems.split(",") if x.strip()]
-    known = set(DIRECT_SYSTEMS) | ORCHESTRATED
-    unknown = set(systems) - known
+    unknown = {s for s in systems if not known_system(s)}
     if unknown:
         raise SystemExit(f"unknown systems: {sorted(unknown)}")
     if not args.skip_health:
@@ -242,8 +273,13 @@ async def run(args: argparse.Namespace) -> None:
 
     if "composite_v2" in bench.name:
         bench_tag = "v2"
-    elif bench.name.startswith("agentcoma_uk_"):
-        # e.g. agentcoma_uk_200_composite.jsonl -> agentcoma200
+    elif "composite_probe100" in bench.name:
+        bench_tag = "probe100"
+    elif bench.name.startswith(("graphs_mixed_", "nodes_mixed_")):
+        # graphs_mixed_100_dev, graphs_mixed_100_test, nodes_mixed_600_train, nodes_mixed_600_test
+        bench_tag = bench.stem
+    elif bench.name.startswith("graphs_agentcoma_"):
+        # e.g. graphs_agentcoma_200.jsonl -> agentcoma200
         bench_tag = "agentcoma" + bench.name.split("_")[2]
     else:
         bench_tag = "v1"
@@ -297,7 +333,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--bench",
-        default="benchmarks/mixed_ua_composite_v1.jsonl",
+        default="benchmarks/archive/mixed_ua_composite_v1.jsonl",
     )
     parser.add_argument("--systems", default=",".join(DEFAULT_SYSTEMS))
     parser.add_argument("--family", default="")

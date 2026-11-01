@@ -55,7 +55,7 @@ subtasks depend on one another:
 
 The diagnostic oracle uses a stored benchmark workflow but the exact same
 executor and specialists. This isolates planning errors from execution errors.
-See `benchmarks/mixed_ua_composite_v1.jsonl` and
+See `benchmarks/archive/mixed_ua_composite_v1.jsonl` and
 `docs/week_10_composite.md`.
 
 Paper axes for Methods: **when** (pre-generation), **what** (task/domain signals), **how** (rules → later classifier).

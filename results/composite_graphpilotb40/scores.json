@@ -1,0 +1,549 @@
+{
+  "systems": {
+    "hybrid_gated": {
+      "n": 40,
+      "repeats": 1,
+      "final_score_mean": 0.7444,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.575,
+      "stage_mean": 0.4448,
+      "all_stages_pass_rate": 0.2,
+      "plan_valid_rate": 0.95,
+      "plan_exact_match_rate": 0.15,
+      "intent_f1": 0.5349,
+      "fallback_rate": 0.05,
+      "workflow_errors": {
+        "wrong_intents_or_deps": 7,
+        "missing_steps": 23,
+        "fallback": 2,
+        "superfluous_steps": 2
+      },
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.325,
+      "latency_p50_ms": 16780.2,
+      "latency_avg_ms": 17247.7,
+      "gpu_seconds_per_item": 17.2477,
+      "by_family": {
+        "chain": {
+          "n": 12,
+          "final_score": 0.7222,
+          "final_success_rate": 0.5833,
+          "all_stages_pass_rate": 0.25,
+          "plan_exact_match_rate": 0.1667,
+          "intent_f1": 0.5861,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 6,
+            "wrong_intents_or_deps": 3,
+            "superfluous_steps": 1
+          },
+          "http_ok_rate": 1.0
+        },
+        "graph": {
+          "n": 17,
+          "final_score": 0.6242,
+          "final_success_rate": 0.3529,
+          "all_stages_pass_rate": 0.0588,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.4272,
+          "fallback_rate": 0.1176,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 4,
+            "missing_steps": 10,
+            "fallback": 2,
+            "superfluous_steps": 1
+          },
+          "http_ok_rate": 1.0
+        },
+        "parallel": {
+          "n": 7,
+          "final_score": 0.9286,
+          "final_success_rate": 0.8571,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.4429,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 7
+          },
+          "http_ok_rate": 1.0
+        },
+        "simple": {
+          "n": 4,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 1.0,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "pilot_b": {
+          "n": 40,
+          "final_score": 0.7444,
+          "final_success_rate": 0.575,
+          "all_stages_pass_rate": 0.2,
+          "plan_exact_match_rate": 0.15,
+          "intent_f1": 0.5349,
+          "fallback_rate": 0.05,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 7,
+            "missing_steps": 23,
+            "fallback": 2,
+            "superfluous_steps": 2
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {
+        "llm": {
+          "n": 22,
+          "final_score": 0.7437,
+          "final_success_rate": 0.5909,
+          "all_stages_pass_rate": 0.2273,
+          "plan_exact_match_rate": 0.1364,
+          "intent_f1": 0.4892,
+          "fallback_rate": 0.0909,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 7,
+            "missing_steps": 8,
+            "fallback": 2,
+            "superfluous_steps": 2
+          },
+          "http_ok_rate": 1.0
+        },
+        "rule": {
+          "n": 18,
+          "final_score": 0.7454,
+          "final_success_rate": 0.5556,
+          "all_stages_pass_rate": 0.1667,
+          "plan_exact_match_rate": 0.1667,
+          "intent_f1": 0.5907,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 15
+          },
+          "http_ok_rate": 1.0
+        }
+      }
+    },
+    "hybrid_gated_aya": {
+      "n": 40,
+      "repeats": 1,
+      "final_score_mean": 0.6811,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.475,
+      "stage_mean": 0.4149,
+      "all_stages_pass_rate": 0.125,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 0.15,
+      "intent_f1": 0.6088,
+      "fallback_rate": 0.0,
+      "workflow_errors": {
+        "superfluous_steps": 2,
+        "missing_steps": 30,
+        "wrong_intents_or_deps": 2
+      },
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.225,
+      "latency_p50_ms": 7548.8,
+      "latency_avg_ms": 12646.2,
+      "gpu_seconds_per_item": 12.6462,
+      "by_family": {
+        "chain": {
+          "n": 12,
+          "final_score": 0.6528,
+          "final_success_rate": 0.4167,
+          "all_stages_pass_rate": 0.1667,
+          "plan_exact_match_rate": 0.25,
+          "intent_f1": 0.6695,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 6,
+            "wrong_intents_or_deps": 2,
+            "superfluous_steps": 1
+          },
+          "http_ok_rate": 1.0
+        },
+        "graph": {
+          "n": 17,
+          "final_score": 0.583,
+          "final_success_rate": 0.2941,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.5776,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 17
+          },
+          "http_ok_rate": 1.0
+        },
+        "parallel": {
+          "n": 7,
+          "final_score": 0.9286,
+          "final_success_rate": 0.8571,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.5,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 7
+          },
+          "http_ok_rate": 1.0
+        },
+        "simple": {
+          "n": 4,
+          "final_score": 0.75,
+          "final_success_rate": 0.75,
+          "all_stages_pass_rate": 0.75,
+          "plan_exact_match_rate": 0.75,
+          "intent_f1": 0.75,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "superfluous_steps": 1
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "pilot_b": {
+          "n": 40,
+          "final_score": 0.6811,
+          "final_success_rate": 0.475,
+          "all_stages_pass_rate": 0.125,
+          "plan_exact_match_rate": 0.15,
+          "intent_f1": 0.6088,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "superfluous_steps": 2,
+            "missing_steps": 30,
+            "wrong_intents_or_deps": 2
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {
+        "llm": {
+          "n": 22,
+          "final_score": 0.6285,
+          "final_success_rate": 0.4091,
+          "all_stages_pass_rate": 0.0909,
+          "plan_exact_match_rate": 0.1364,
+          "intent_f1": 0.6236,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "superfluous_steps": 2,
+            "missing_steps": 15,
+            "wrong_intents_or_deps": 2
+          },
+          "http_ok_rate": 1.0
+        },
+        "rule": {
+          "n": 18,
+          "final_score": 0.7454,
+          "final_success_rate": 0.5556,
+          "all_stages_pass_rate": 0.1667,
+          "plan_exact_match_rate": 0.1667,
+          "intent_f1": 0.5907,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 15
+          },
+          "http_ok_rate": 1.0
+        }
+      }
+    },
+    "hybrid_gated_lapa": {
+      "n": 40,
+      "repeats": 1,
+      "final_score_mean": 0.6624,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.425,
+      "stage_mean": 0.4264,
+      "all_stages_pass_rate": 0.15,
+      "plan_valid_rate": 0.95,
+      "plan_exact_match_rate": 0.125,
+      "intent_f1": 0.5721,
+      "fallback_rate": 0.05,
+      "workflow_errors": {
+        "superfluous_steps": 1,
+        "missing_steps": 26,
+        "fallback": 2,
+        "wrong_intents_or_deps": 6
+      },
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.275,
+      "latency_p50_ms": 10011.5,
+      "latency_avg_ms": 14953.8,
+      "gpu_seconds_per_item": 14.9538,
+      "by_family": {
+        "chain": {
+          "n": 12,
+          "final_score": 0.6528,
+          "final_success_rate": 0.4167,
+          "all_stages_pass_rate": 0.1667,
+          "plan_exact_match_rate": 0.1667,
+          "intent_f1": 0.6167,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 7,
+            "wrong_intents_or_deps": 3
+          },
+          "http_ok_rate": 1.0
+        },
+        "graph": {
+          "n": 17,
+          "final_score": 0.4801,
+          "final_success_rate": 0.1176,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.5364,
+          "fallback_rate": 0.1176,
+          "workflow_errors": {
+            "missing_steps": 13,
+            "fallback": 2,
+            "wrong_intents_or_deps": 2
+          },
+          "http_ok_rate": 1.0
+        },
+        "parallel": {
+          "n": 7,
+          "final_score": 0.9286,
+          "final_success_rate": 0.8571,
+          "all_stages_pass_rate": 0.1429,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.481,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 1,
+            "missing_steps": 6
+          },
+          "http_ok_rate": 1.0
+        },
+        "simple": {
+          "n": 4,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.75,
+          "plan_exact_match_rate": 0.75,
+          "intent_f1": 0.75,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "superfluous_steps": 1
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "pilot_b": {
+          "n": 40,
+          "final_score": 0.6624,
+          "final_success_rate": 0.425,
+          "all_stages_pass_rate": 0.15,
+          "plan_exact_match_rate": 0.125,
+          "intent_f1": 0.5721,
+          "fallback_rate": 0.05,
+          "workflow_errors": {
+            "superfluous_steps": 1,
+            "missing_steps": 26,
+            "fallback": 2,
+            "wrong_intents_or_deps": 6
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {
+        "llm": {
+          "n": 22,
+          "final_score": 0.5944,
+          "final_success_rate": 0.3182,
+          "all_stages_pass_rate": 0.1364,
+          "plan_exact_match_rate": 0.0909,
+          "intent_f1": 0.5569,
+          "fallback_rate": 0.0909,
+          "workflow_errors": {
+            "superfluous_steps": 1,
+            "missing_steps": 11,
+            "fallback": 2,
+            "wrong_intents_or_deps": 6
+          },
+          "http_ok_rate": 1.0
+        },
+        "rule": {
+          "n": 18,
+          "final_score": 0.7454,
+          "final_success_rate": 0.5556,
+          "all_stages_pass_rate": 0.1667,
+          "plan_exact_match_rate": 0.1667,
+          "intent_f1": 0.5907,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 15
+          },
+          "http_ok_rate": 1.0
+        }
+      }
+    },
+    "oracle": {
+      "n": 40,
+      "repeats": 1,
+      "final_score_mean": 0.7846,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.625,
+      "stage_mean": 0.8467,
+      "all_stages_pass_rate": 0.625,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 1.0,
+      "intent_f1": 1.0,
+      "fallback_rate": 0.0,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.75,
+      "latency_p50_ms": 7032.8,
+      "latency_avg_ms": 10308.1,
+      "gpu_seconds_per_item": 10.3081,
+      "by_family": {
+        "chain": {
+          "n": 12,
+          "final_score": 0.75,
+          "final_success_rate": 0.6667,
+          "all_stages_pass_rate": 0.6667,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "graph": {
+          "n": 17,
+          "final_score": 0.6696,
+          "final_success_rate": 0.3529,
+          "all_stages_pass_rate": 0.3529,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "parallel": {
+          "n": 7,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 1.0,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "simple": {
+          "n": 4,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 1.0,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "pilot_b": {
+          "n": 40,
+          "final_score": 0.7846,
+          "final_success_rate": 0.625,
+          "all_stages_pass_rate": 0.625,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    },
+    "router_direct": {
+      "n": 40,
+      "repeats": 1,
+      "final_score_mean": 0.736,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.55,
+      "stage_mean": 0.736,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "fallback_rate": null,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 3941.3,
+      "latency_avg_ms": 8232.9,
+      "gpu_seconds_per_item": 8.2329,
+      "by_family": {
+        "chain": {
+          "n": 12,
+          "final_score": 0.7639,
+          "final_success_rate": 0.6667,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "graph": {
+          "n": 17,
+          "final_score": 0.5748,
+          "final_success_rate": 0.2353,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "parallel": {
+          "n": 7,
+          "final_score": 0.9286,
+          "final_success_rate": 0.8571,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "simple": {
+          "n": 4,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "pilot_b": {
+          "n": 40,
+          "final_score": 0.736,
+          "final_success_rate": 0.55,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    }
+  }
+}

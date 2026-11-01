@@ -1,0 +1,115 @@
+{
+  "bench": "mixed_ua_v7.jsonl",
+  "split": "dev",
+  "bucket": "knowledge",
+  "config": {
+    "lang": "uk",
+    "offline": false,
+    "max_queries": 6,
+    "hits_per_query": 3,
+    "max_pages": 6,
+    "page_chars": 30000,
+    "chunk_words": 120,
+    "top_k": 3,
+    "max_context_chars": 3000,
+    "min_coverage": 0.25,
+    "intro_boost": 1.3,
+    "max_stem_chars": 700,
+    "timeout": 15.0
+  },
+  "cache_files": 3026,
+  "cache_sha1": "e9f6b581bfe9d2945adb8f17d9e751b4022dffd6",
+  "api_calls": 15,
+  "by_source": {
+    "ALL": {
+      "n": 406,
+      "gate_pass": 289,
+      "used": 247,
+      "use_rate": 0.608,
+      "mcq_judged": 240,
+      "gold_mentioned_rate": 0.471,
+      "distractor_mentioned_rate": 0.409,
+      "items_with_errors": 0
+    },
+    "arc": {
+      "n": 100,
+      "gate_pass": 99,
+      "used": 88,
+      "use_rate": 0.88,
+      "mcq_judged": 88,
+      "gold_mentioned_rate": 0.477,
+      "distractor_mentioned_rate": 0.535,
+      "items_with_errors": 0
+    },
+    "belebele": {
+      "n": 83,
+      "gate_pass": 0,
+      "used": 0,
+      "use_rate": 0.0,
+      "mcq_judged": 0,
+      "gold_mentioned_rate": 0.0,
+      "distractor_mentioned_rate": 0.0,
+      "items_with_errors": 0
+    },
+    "know": {
+      "n": 8,
+      "gate_pass": 8,
+      "used": 7,
+      "use_rate": 0.875,
+      "mcq_judged": 0,
+      "gold_mentioned_rate": 0.0,
+      "distractor_mentioned_rate": 0.0,
+      "items_with_errors": 0
+    },
+    "mmlu": {
+      "n": 92,
+      "gate_pass": 81,
+      "used": 71,
+      "use_rate": 0.772,
+      "mcq_judged": 71,
+      "gold_mentioned_rate": 0.507,
+      "distractor_mentioned_rate": 0.413,
+      "items_with_errors": 0
+    },
+    "zno-geo": {
+      "n": 22,
+      "gate_pass": 21,
+      "used": 18,
+      "use_rate": 0.818,
+      "mcq_judged": 18,
+      "gold_mentioned_rate": 0.556,
+      "distractor_mentioned_rate": 0.444,
+      "items_with_errors": 0
+    },
+    "zno-his": {
+      "n": 45,
+      "gate_pass": 40,
+      "used": 32,
+      "use_rate": 0.711,
+      "mcq_judged": 32,
+      "gold_mentioned_rate": 0.531,
+      "distractor_mentioned_rate": 0.271,
+      "items_with_errors": 0
+    },
+    "zno-mat": {
+      "n": 5,
+      "gate_pass": 4,
+      "used": 4,
+      "use_rate": 0.8,
+      "mcq_judged": 4,
+      "gold_mentioned_rate": 0.0,
+      "distractor_mentioned_rate": 0.0,
+      "items_with_errors": 0
+    },
+    "zno-ukr": {
+      "n": 51,
+      "gate_pass": 36,
+      "used": 27,
+      "use_rate": 0.529,
+      "mcq_judged": 27,
+      "gold_mentioned_rate": 0.296,
+      "distractor_mentioned_rate": 0.188,
+      "items_with_errors": 0
+    }
+  }
+}

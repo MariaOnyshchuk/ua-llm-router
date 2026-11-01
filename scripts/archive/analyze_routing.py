@@ -109,7 +109,7 @@ def code_ab_from_detail(detail_path: Path) -> dict:
 
 
 def main() -> None:
-    bench = ROOT / "benchmarks" / "mixed_ua_v0.jsonl"
+    bench = ROOT / "benchmarks" / "archive" / "mixed_ua_v0.jsonl"
     detail = ROOT / "results" / "scores_small_vs_large_detail.jsonl"
 
     report = {"routing": routing_report(bench)}

@@ -10,8 +10,8 @@
 > `docs/figures/v6_selection_effect.png`). v6 therefore cannot show a routing
 > effect, and its gap to Mamay-12B (which was not used for selection) is biased
 > against the router. The file stays frozen for the record. The script is
-> fixed. Claims move to `mixed_ua_v7` (whole pool, no score-based selection;
-> `scripts/benchmarks/build_mixed_ua_v7.py`). The text below describes the
+> fixed. Claims move to `tasks_public_4401` (whole pool, no score-based selection;
+> `scripts/benchmarks/build_tasks_public_4401.py`). The text below describes the
 > intent, not what the file contains.
 
 Validate the **measuring instrument** before choosing a router architecture (tinyBenchmarks / IRT-inspired curation). Historical suites `mixed_ua_v3`–`v5` stay frozen. **Do not quote screening-pool means as thesis scores** — those items were drawn to *find* a suite, not to report quality.
@@ -28,7 +28,7 @@ with \(p=0.8\), \(\varepsilon=0.03\), \(z=1.96\) → **n\* = 683** per headline 
 
 **Instruct** cannot hit n\*: the warehouse only has 573 IFEval-UA items (327 kept). Report a wider CI there; do not pad with English IFEval.
 
-Frozen file: `benchmarks/mixed_ua_v6.jsonl` (seed 42). Meta: `benchmarks/mixed_ua_v6_meta.json`.
+Frozen file: `benchmarks/archive/mixed_ua_v6.jsonl` (seed 42). Meta: `benchmarks/archive/mixed_ua_v6_meta.json`.
 
 ## Headline vs appendix
 
@@ -66,23 +66,23 @@ python scripts/benchmarks/extract_full_corpora.py --only ifeval,belebele,mmlu,ar
 
 # 2. Screening draw (≤1200/bucket or the whole pool)
 python scripts/benchmarks/sample_screening_suite.py --per-bucket 1200 --seed 42 \
-  --out benchmarks/mixed_ua_v6_screen.jsonl
+  --out benchmarks/archive/mixed_ua_v6_screen.jsonl
 
 # 3. Cluster: one pass per model (not 3×)
 bash scripts/week_v6_eval_pipeline.sh screen
 
 # 4. Curate (exclude incomplete mamay12 screening)
 PYTHONPATH=. python scripts/benchmarks/curate_discriminative_suite.py \
-  --suite benchmarks/mixed_ua_v6_screen.jsonl \
+  --suite benchmarks/archive/mixed_ua_v6_screen.jsonl \
   --scores results/v6_screen/*_detail.jsonl \
   --systems mamay4 lapa aya \
-  --out benchmarks/mixed_ua_v6.jsonl --keep-appendix
+  --out benchmarks/archive/mixed_ua_v6.jsonl --keep-appendix
 
 # 5. Train live profiles (hold out v6 ids)
 PYTHONPATH=. python scripts/train_learned_router.py \
   --scores results/v6_screen/*_detail.jsonl \
-  --suite benchmarks/mixed_ua_v6_screen.jsonl \
-  --holdout benchmarks/mixed_ua_v6.jsonl \
+  --suite benchmarks/archive/mixed_ua_v6_screen.jsonl \
+  --holdout benchmarks/archive/mixed_ua_v6.jsonl \
   --encoder e5
 
 # 6. 3× bake-off on v6 (T=0, seed=42, max_tokens=1024)

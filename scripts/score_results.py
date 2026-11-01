@@ -37,7 +37,7 @@ def humaneval_fields(row: dict[str, Any]) -> dict[str, Any]:
         _HE_BY_ID = {}
         for path in [
             ROOT / "benchmarks/corpus/humaneval_code_en.jsonl",
-            ROOT / "benchmarks/mixed_ua_v5.jsonl",
+            ROOT / "benchmarks/archive/mixed_ua_v5.jsonl",
         ]:
             if not path.exists():
                 continue
@@ -64,8 +64,8 @@ def ifeval_fields(row: dict[str, Any]) -> dict[str, Any]:
         _IFEVAL_BY_ID = {}
         for path in [
             ROOT / "benchmarks/corpus/ifeval_ukr_instruct.jsonl",
-            ROOT / "benchmarks/mixed_ua_v6_screen.jsonl",
-            ROOT / "benchmarks/mixed_ua_v6.jsonl",
+            ROOT / "benchmarks/archive/mixed_ua_v6_screen.jsonl",
+            ROOT / "benchmarks/archive/mixed_ua_v6.jsonl",
         ]:
             if not path.exists():
                 continue

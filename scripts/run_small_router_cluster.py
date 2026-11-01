@@ -40,6 +40,7 @@ from router.intent_rules import BEST_BY_BUCKET, ROUTER_MODELS, route_intent  # n
 from scripts.alignment_prompt_variants import apply_alignment_variant  # noqa: E402
 from router.format_guard import apply as apply_format_guard  # noqa: E402
 from scripts.bucket_prompt_variants import apply_bucket_fewshot, parse_buckets  # noqa: E402
+from router.wiki_search import WikiClient, WikiConfig, wiki_augment  # noqa: E402
 
 # Pinned decoding — do not change between systems without bumping run tags.
 TEMPERATURE = 0.0
@@ -211,8 +212,12 @@ def run_system(
     align_prompt: str = "baseline",
     bucket_fewshot: frozenset[str] = frozenset(),
     format_guard: bool = False,
+    wiki: WikiClient | None = None,
     out_dir: Path | None = None,
 ) -> Path:
+    if wiki is not None:
+        # Wikipedia passages change the prompt, so it is a different system
+        name = f"{name}_wiki"
     if format_guard:
         # the guard changes answers, so it is a different system in file names and scores
         name = f"{name}_fg"
@@ -232,6 +237,8 @@ def run_system(
     escalate_count = 0
     ensemble_voted = 0
     ensemble_flipped = 0
+    wiki_used = 0
+    wiki_errors = 0
 
     with httpx.Client(timeout=180.0) as client, partial_out.open("w", encoding="utf-8") as fout:
         for i, item in enumerate(items, 1):
@@ -239,6 +246,19 @@ def run_system(
             # routing sees the item without examples; only the text sent to the model changes
             prompt = apply_bucket_fewshot(tagged, bucket_fewshot)["prompt"]
             alias, base, model, router_meta = pick_backend(tagged)
+            wiki_meta = None
+            if wiki is not None:
+                # the same rules-v2 gate for every system, so solo models and the router see
+                # the same passages; queries come from the item text without few-shot wrapping
+                gate_intent = route_intent(str(item.get("prompt") or "")).intent
+                prompt, wiki_meta = wiki_augment(
+                    prompt, gate_intent, wiki, query_prompt=str(item.get("prompt") or "")
+                )
+                wiki_meta.pop("config", None)
+                for passage in wiki_meta.get("passages") or []:
+                    passage.pop("text", None)  # the text is already in the prompt
+                wiki_used += bool(wiki_meta.get("used"))
+                wiki_errors += bool(wiki_meta.get("errors"))
             result = chat(client, base, model, prompt)
             cascade_meta = None
 
@@ -370,6 +390,7 @@ def run_system(
                 "router": router_meta,
                 "cascade": cascade_meta,
                 "ensemble": ensemble_meta,
+                "wiki": wiki_meta,
                 **result,
             }
             if format_guard:
@@ -431,6 +452,18 @@ def run_system(
             "vote_rate": round(ensemble_voted / max(1, len(items)), 4),
             "flipped": ensemble_flipped,
             "flip_rate": round(ensemble_flipped / max(1, ensemble_voted), 4),
+        },
+        "wiki_rag": None
+        if wiki is None
+        else {
+            "used": wiki_used,
+            "use_rate": round(wiki_used / max(1, len(items)), 4),
+            "items_with_errors": wiki_errors,
+            "offline": wiki.cfg.offline,
+            "cache_dir": str(wiki.cfg.cache_dir),
+            "api_calls": wiki.api_calls,
+            "cache_hits": wiki.cache_hits,
+            "config": {k: v for k, v in vars(wiki.cfg).items() if k != "cache_dir"},
         },
         "resource_protocol": {
             "note": (
@@ -507,7 +540,7 @@ def main() -> None:
     )
     p.add_argument(
         "--bench",
-        default="benchmarks/mixed_ua_v4_balanced.jsonl",
+        default="benchmarks/tasks_mixed_192.jsonl",
         help="JSONL suite (default: mixed_ua_v4_balanced)",
     )
     p.add_argument(
@@ -525,6 +558,23 @@ def main() -> None:
         action="store_true",
         help="Repair explicit surface constraints of the request in each answer (router/format_guard.py). "
         "The system name gets the suffix _fg; the model's own text is kept in content_raw.",
+    )
+    p.add_argument(
+        "--wiki-rag",
+        action="store_true",
+        help="Put Ukrainian Wikipedia passages in front of knowledge questions (router/wiki_search.py). "
+        "The system name gets the suffix _wiki.",
+    )
+    p.add_argument(
+        "--wiki-cache",
+        default=".cache/wiki",
+        help="Directory with cached Wikipedia API answers (default .cache/wiki).",
+    )
+    p.add_argument(
+        "--wiki-offline",
+        action="store_true",
+        help="Use only the cache; build it first with scripts/build_wiki_cache.py. Needed on nodes "
+        "without internet and for repeatable runs.",
     )
     p.add_argument(
         "--split",
@@ -707,6 +757,11 @@ def main() -> None:
             "bucket_fewshot": parse_buckets(args.bucket_fewshot),
             "format_guard": args.format_guard,
         }
+        if args.wiki_rag:
+            cache = Path(args.wiki_cache)
+            kw["wiki"] = WikiClient(
+                WikiConfig(cache_dir=cache if cache.is_absolute() else ROOT / cache, offline=args.wiki_offline)
+            )
         if args.out_dir:
             kw["out_dir"] = Path(args.out_dir)
             if not kw["out_dir"].is_absolute():

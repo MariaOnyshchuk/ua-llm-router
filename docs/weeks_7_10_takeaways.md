@@ -8,9 +8,9 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low, so do not subtract one of them from a rescored number. All
-> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+> of these are v4 development numbers; claims come from `tasks_public_4401` test.
 
-*Written 1 Sep 2026. Authoritative single-skill numbers are on* `mixed_ua_v4_balanced` *unless a table names another suite. Decode protocol:* `T=0`*,* `seed=42`*,* `max_tokens=256`*,* `--align-prompt fewshot`*, 3 repeats when marked* `×3`*.*
+*Written 1 Sep 2026. Authoritative single-skill numbers are on* `tasks_mixed_192` *unless a table names another suite. Decode protocol:* `T=0`*,* `seed=42`*,* `max_tokens=256`*,* `--align-prompt fewshot`*, 3 repeats when marked* `×3`*.*
 
 This note is the glossary + metrics pack for the second half of the experiments. The live product claim is still: **rules v2 + few-shot = 0.848 / p50 633 ms**, matching the gold-bucket oracle. Extra hops and 4-bit do not beat it. Week 9 numbers are **not scored yet**. Week 10 has plumbing and a 6-item smoke; **do not cite smoke as quality**.
 
@@ -97,7 +97,7 @@ Social UAlign items collapse at baseline (`1` → `2`). A short few-shot prefix 
 | --------------- | ----------------------------- | -------------- | ----------------------------------------------------- | ---------------------------------------------- |
 | v0              | `mixed_ua_v0.jsonl`           | 40             | hand-written smoke                                    | routing checks only                            |
 | v3              | `mixed_ua_v3.jsonl`           | ~182           | unbalanced; week-4 bake-off                           | specialist ranking **only**                    |
-| **v4 balanced** | `mixed_ua_v4_balanced.jsonl`  | **192 = 32×6** | chat, code, translate, instruct, knowledge, alignment | **authoritative single-skill**                 |
+| **v4 balanced** | `tasks_mixed_192.jsonl`  | **192 = 32×6** | chat, code, translate, instruct, knowledge, alignment | **authoritative single-skill**                 |
 | v5              | `mixed_ua_v5.jsonl`           | 224            | v4 + 32 English HumanEval                             | harder code mix; optional                      |
 | Composite v1    | `mixed_ua_composite_v1.jsonl` | 36             | 12+12+12 dependent workflows                          | skill chaining, not another mixed-bucket score |
 | Composite v2    | `mixed_ua_composite_v2.jsonl` | 200            | 5 families × train/dev/test                           | week-12 template selector; separate from v1    |

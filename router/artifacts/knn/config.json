@@ -1,13 +1,59 @@
 {
-  "default": "aya",
-  "encoder": "e5",
-  "encoder_dim": 1024,
-  "encoder_name": "intfloat/multilingual-e5-large",
   "kind": "knn",
-  "n_train": 1823,
-  "labels": [
-    "aya",
+  "router": "QualityArgmaxRouter (max-quality end, lambda = inf)",
+  "encoder": "e5",
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "encoder_revision": null,
+  "models": [
+    "mamay4",
     "lapa",
-    "mamay4"
-  ]
+    "aya"
+  ],
+  "default": "aya",
+  "hyper_parameters": {
+    "k": 40
+  },
+  "cv_mse": 0.1631,
+  "grid": [
+    {
+      "hp": {
+        "k": 5
+      },
+      "cv_mse": 0.1876
+    },
+    {
+      "hp": {
+        "k": 10
+      },
+      "cv_mse": 0.1685
+    },
+    {
+      "hp": {
+        "k": 20
+      },
+      "cv_mse": 0.164
+    },
+    {
+      "hp": {
+        "k": 40
+      },
+      "cv_mse": 0.1631
+    },
+    {
+      "hp": {
+        "k": 80
+      },
+      "cv_mse": 0.1654
+    }
+  ],
+  "train": {
+    "suite": "benchmarks/tasks_public_4401.jsonl",
+    "split": "dev",
+    "n_items": 1423,
+    "ids_sha256_16": "a7dbb177171bec63",
+    "scores": "results/v7_pool/scores_specialists_detail.jsonl"
+  },
+  "sklearn": "1.9.1",
+  "git_commit": "b8f22cbc93260e909c3ca667279a2509f2f25dd3",
+  "trained_at": "2026-10-30T14:06:04+00:00"
 }

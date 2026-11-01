@@ -1,6 +1,6 @@
 # Benchmark strategy
 
-Keep `benchmarks/mixed_ua_v0.jsonl` (40 hand-written items) as the cheap smoke / routing suite.
+Keep `benchmarks/archive/mixed_ua_v0.jsonl` (40 hand-written items) as the cheap smoke / routing suite.
 Extend **selectively** with Ukrainian-native public benchmarks for statistical weight on code and knowledge.
 
 ## Two categories
@@ -31,15 +31,15 @@ benchmarks/
   mixed_ua_v1.jsonl          # v0 ∪ 24 sampled ZNO items
   mixed_ua_v2.jsonl          # v1 ∪ 48 FLORES ∪ 48 UAlign (160)
   mixed_ua_v3.jsonl          # v2 ∪ 22 hand-written code items (182; code=30) — unbalanced
-  mixed_ua_v4_balanced.jsonl # **32 per bucket × 6 = 192** (historical claims)
+  tasks_mixed_192.jsonl # **32 per bucket × 6 = 192** (historical claims)
   mixed_ua_v6_screen.jsonl   # warehouse screening draw
   mixed_ua_v6.jsonl          # withdrawn 12 Oct 2026: selection was inverted (docs/mixed_ua_v6.md)
-  mixed_ua_v7.jsonl          # claim suite: whole pool, dev 1487 / test 2750
+  tasks_public_4401.jsonl          # claim suite: whole pool, dev 1487 / test 2750
   mixed_ua_composite_v1.jsonl  # 36 dependent workflows (historical)
   mixed_ua_composite_v2.jsonl  # 200 items, 5 families, train/dev/test
   agentcoma_uk_50*.jsonl       # AgentCoMa-UK 50 (source dev split) — local only, gitignored
-  agentcoma_uk_150_test_translated.jsonl  # +150 from source test split — local only
-  agentcoma_uk_200_merged.jsonl / agentcoma_uk_200_composite.jsonl  # 50 dev + 150 test — local only
+  graphs_agentcoma_150_test_source.jsonl  # +150 from source test split — local only
+  graphs_agentcoma_200_source.jsonl / graphs_agentcoma_200.jsonl  # 50 dev + 150 test — local only
   external_ua_v2.jsonl       # FLORES ∪ UAlign only (incremental run)
   samples/
     zno_knowledge_v1.jsonl
@@ -66,7 +66,7 @@ python scripts/benchmarks/sample_flores.py --n-per-direction 24
 python scripts/benchmarks/sample_ualign.py --n-per-config 24
 
 # Balanced suite (32/bucket)
-python scripts/benchmarks/build_balanced_suite.py --per-bucket 32 --out benchmarks/mixed_ua_v4_balanced.jsonl
+python scripts/benchmarks/build_balanced_suite.py --per-bucket 32 --out benchmarks/tasks_mixed_192.jsonl
 ```
 
 ## Scoring notes
@@ -85,11 +85,11 @@ python scripts/benchmarks/build_balanced_suite.py --per-bucket 32 --out benchmar
 - UAlign: sampled ✓
 - UA-Code-Bench: **imported** (32 easy) — not in scored v4 until judge
 - Hand-written chat/instruct/code expanded to fill **32/bucket**
-- **`mixed_ua_v4_balanced.jsonl`**: 192 = 32×6
+- **`tasks_mixed_192.jsonl`**: 192 = 32×6
 
 ## Composite v1 (September phase)
 
-`benchmarks/mixed_ua_composite_v1.jsonl` tests **dependent skills inside one
+`benchmarks/archive/mixed_ua_composite_v1.jsonl` tests **dependent skills inside one
 request**, rather than another mixture of single-skill rows:
 
 | Family | n | Stored workflow | Final deterministic check |
@@ -129,9 +129,220 @@ This suite is deliberately small and controlled. Its handcrafted prompts are
 inspired by HumanEval-, ZNO-, and FLORES-style tasks but must not be described
 as new samples from those public datasets.
 
+## Composite graphs_mixed_100_dev (28 Oct 2026)
+
+`benchmarks/graphs_mixed_100_dev.jsonl`, built by `scripts/benchmarks/build_graphs_mixed_100_dev.py` in the
+graph schema of the vault notes (classes, merge rule, value-dependency edges, gold for every node). Replaces
+probe-100 for composite work: probe-100 had only linear chains from the five composite v2 templates, and the
+template selector and the gold plan scored the same on 86 of its 100 items. Second build of the day, after
+review: fewer simple items, more task types, gold kinds.
+
+| Class | n | Shapes |
+|---|---:|---|
+| simple | 10 | one per task type: time, ZNO, search in notices, summary, classification, translate, code, instruct, math, alignment |
+| chain | 30 | 18 with two nodes, 12 with three |
+| graph | 30 | 13 joins, 10 forks, 7 four-node fork-then-join; 3 one-skill math graphs are shape controls |
+| parallel | 30 | 20 with two nodes, 10 with three; the gold plan ends with a step that only joins the parts |
+
+- Task types across items: time (17: durations with seconds, schedules, time zones, an invalid date, seconds to
+  days/hours, ordering times in mixed formats), ZNO (12 items: Ukrainian, history, geography), search in notices or
+  logs given in the request, summaries (Belebele passages), classification of items, word problems, extraction,
+  translation, code, alignment.
+- Sources: 19 items use GSM8K or ToT Arithmetic problems from STaD (ibm-research/STaD, Apache-2.0), translated with
+  the numbers kept; every STaD gold was checked against the item. ZNO items and Belebele passages are read by id
+  from `benchmarks/corpus/`, none of them in `tasks_public_4401`.
+- Gold kinds per node: exact 108, accepted 81, example 61. For `example` (open writing) the gold is only an
+  example; the check covers form and anchors, and `criteria` are written for the LLM judge (not calibrated yet).
+- Split: all 100 items are a development set (decided 28 Oct 2026). Claims will come from a separate composite
+  test set, built later with the same prompts and frozen before its first run.
+- Build-time checks: every node gold passes its own rubric, every final gold passes the final check, code golds pass
+  their tests, math is computed by Python, shapes match the class, prompts reference exactly their parents, and
+  all 100 gold plans pass `validate_plan`. New rubric types in `score_composite_results.py`: `has_number`,
+  `sentence_count`, `regex`, `any`.
+- Not done: review by a person, the G2–G4 teacher checks, judge calibration. Math (and time) nodes
+  run as `chat` (Aya) in the gold plan; who should get math is still open.
+- Viewer: `python scripts/benchmarks/render_composite_viewer.py benchmarks/graphs_mixed_100_dev.jsonl`.
+
+### First run (29 Oct 2026, JUPITER job 2574111, dev only)
+
+JSC JUPITER, one GH200 node, Mamay-4B, Lapa and Aya in bf16 on one card each, vLLM 0.25.1, T=0, seed=42,
+max_tokens=1024, one pass, all 100 items, HTTP 200 on all 500 rows. Dataset sha256 prefix 3f564ca75c3bd00c.
+Scored by the automatic rubrics (no LLM judge yet). Numbers from JUPITER are compared only with JUPITER runs.
+
+| System | All (100) | simple (10) | chain (30) | graph (30) | parallel (30) | Calls | p50, s |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| One call (`router_direct`) | 0.625 | 0.750 | 0.461 | 0.639 | 0.733 | 1.00 | 3.8 |
+| Gated planner, Mamay-4B | 0.627 | 0.750 | 0.478 | 0.661 | 0.700 | 1.61 | 6.4 |
+| Gated planner, Lapa | 0.632 | 0.750 | 0.522 | 0.633 | 0.700 | 1.61 | 6.5 |
+| Gated planner, Aya | 0.647 | 0.750 | 0.561 | 0.628 | 0.717 | 1.53 | 6.1 |
+| Gold graph (`oracle`) | 0.712 | 0.750 | 0.683 | 0.736 | 0.703 | 2.97 | 7.4 |
+
+Paired bootstrap, 95%:
+- Gold graph − one call: +0.087 [+0.020, +0.153]; on chain +0.222 [+0.094, +0.361]; on graph +0.097
+  [−0.039, +0.231] and on parallel −0.031 [−0.131, +0.061], not distinguishable.
+- Every gated planner − one call: not distinguishable (Mamay-4B +0.002, Lapa +0.007, Aya +0.022). Planner Aya on
+  chain: +0.100 [+0.006, +0.211].
+- Gold graph − planner Aya: +0.065 [−0.007, +0.138], not distinguishable.
+- Node scores under the gold graph by skill: translate 0.907, code 0.852, knowledge 0.833, math as chat 0.779,
+  instruct 0.706, alignment 0.529.
+
+Reading: decomposition pays off on chains. The planners split far fewer items than the gold graph (about 1.6
+calls against 3.0), so most of the gap to the gold graph is items the gate sends as one call.
+
+### Learned routers and single models (30 Oct 2026, JUPITER job 2596743, dev only)
+
+Same node, settings and dataset as job 2574111; HTTP 200 and a non-empty answer on all 900 rows. All 14
+systems were rescored together. kNN and MLP are RouterBench-style predictive routers
+(`scripts/train_routerbench_router.py`): e5-large embedding of the prompt, a regressor predicts the score of
+Mamay-4B, Lapa and Aya, the highest prediction wins. Trained on all of `tasks_public_4401` dev (1423 items, no math,
+no code, no composite items), so every graphs_mixed_100_dev prompt is outside their training distribution. kNN k=40,
+MLP one hidden layer of 128, alpha 0.1, both chosen by 5-fold CV. On plan steps they route by the step prompt
+and ignore the step's intent label. `+knn` / `+mlp` means the same plan with learned instead of rules v2 step
+routing.
+
+| System | All (100) | simple (10) | chain (30) | graph (30) | parallel (30) | Calls |
+|---|---:|---:|---:|---:|---:|---:|
+| One call, rules v2 (`router_direct`) | 0.625 | 0.750 | 0.461 | 0.639 | 0.733 | 1.00 |
+| One call, kNN (`router_knn`) | 0.676 | 0.850 | 0.622 | 0.692 | 0.656 | 1.00 |
+| One call, MLP (`router_mlp`) | 0.673 | 0.850 | 0.644 | 0.639 | 0.678 | 1.00 |
+| Mamay-4B only | 0.635 | 0.750 | 0.589 | 0.589 | 0.689 | 1.00 |
+| Lapa only | 0.643 | 0.725 | 0.594 | 0.658 | 0.650 | 1.00 |
+| Aya only | 0.628 | 0.750 | 0.472 | 0.594 | 0.778 | 1.00 |
+| Planner Aya, rules v2 steps | 0.647 | 0.750 | 0.561 | 0.628 | 0.717 | 1.53 |
+| Planner Aya, kNN steps | 0.607 | 0.850 | 0.600 | 0.511 | 0.628 | 1.53 |
+| Planner Aya, MLP steps | 0.650 | 0.850 | 0.622 | 0.606 | 0.656 | 1.54 |
+| Gold graph, rules v2 steps | 0.712 | 0.750 | 0.683 | 0.736 | 0.703 | 2.97 |
+| Gold graph, kNN steps | 0.649 | 0.850 | 0.617 | 0.675 | 0.589 | 2.97 |
+| Gold graph, MLP steps | 0.657 | 0.850 | 0.528 | 0.672 | 0.706 | 2.97 |
+
+Model choice on the 100 one-call requests: rules v2 Aya 63 / Lapa 20 / Mamay-4B 17; kNN Mamay-4B 50 / Lapa 33 /
+Aya 17; MLP Mamay-4B 66 / Aya 20 / Lapa 14.
+
+Paired bootstrap, 95% (10 000 resamples, seed 42):
+- One call, kNN − rules v2: +0.051 [−0.021, +0.123]; MLP − rules v2: +0.048 [−0.010, +0.108]. Not
+  distinguishable overall. On chain: kNN +0.161 [+0.006, +0.317], MLP +0.183 [+0.056, +0.317].
+- kNN − MLP: +0.003 [−0.042, +0.046], not distinguishable.
+- Rules v2 against each single model: not distinguishable (Mamay-4B +0.010, Lapa +0.018, Aya +0.003 over rules).
+  kNN against the best single model (Lapa): +0.033 [−0.031, +0.094]. MLP − Mamay-4B: +0.038 [+0.000, +0.082],
+  at the edge.
+- Gold graph, kNN steps − rules v2 steps: −0.062 [−0.127, +0.000]; MLP steps: −0.055 [−0.125, +0.012]. Not
+  distinguishable overall; MLP on chain −0.156 [−0.311, −0.006].
+- Planner Aya, kNN steps − rules v2 steps: −0.040 [−0.095, +0.015]; worse on graph −0.117 [−0.228, −0.011] and
+  parallel −0.089 [−0.189, −0.011]. MLP steps: +0.003, not distinguishable.
+- Gold graph with rules v2 steps − one call with kNN: +0.036 [−0.039, +0.109], not distinguishable.
+- The +0.100 on simple is one item out of ten.
+
+Node scores under the gold graph by skill (rules v2 / kNN / MLP): alignment 0.529 / 0.765 / 0.765 (17 nodes;
+rules send these to Lapa, both learned routers to Aya), math as chat 0.779 / 0.602 / 0.607 (61; rules Aya, learned
+mostly Mamay-4B or Lapa), instruct 0.706 / 0.642 / 0.658 (110), knowledge 0.833 / 0.792 / 0.758 (60), translate
+0.907 / 0.861 / 0.937 (33), code 0.852 / 0.852 / 0.840 (16).
+
+Reading:
+- On a whole composite request, rules v2 does no better than any one model, because it sends 63 of 100 requests
+  to Aya, the weakest model on chains. The learned routers send most requests to Mamay-4B or Lapa and gain on
+  chains. Overall the gain is not distinguishable.
+- On single-skill plan steps the rules with the intent label do better than the learned routers. The learned
+  routers lose most on math steps (v7 has no math, so they have no signal there) and on instruct steps. They
+  win on alignment steps, where Aya beats the Lapa choice in the rules table.
+- So learned routing helps where the rules table has no fitting row (a mixed request) and hurts where it has one
+  (a labelled single-skill step). These are dev numbers on 100 items; nothing here was tuned on graphs_mixed_100_test.
+
+Cost–quality view: `docs/figures/routerbench_panels_graphs_mixed_100_dev.png` (`scripts/analysis/plot_routerbench_panels.py`).
+It sweeps the kNN and MLP trade-off lambda * P_j − c_j over the one-call answers of the three models (c_j = mean
+latency on v7 dev). AIQ over the single-model latency range: Zero router 0.636, kNN 0.668, MLP 0.675. At lambda =
+inf the simulation picks the same model as the live runs on all 100 requests. Scores differ on 3 requests for
+kNN and 1 for MLP, because vLLM at T=0 is not bit-exact across runs.
+
+## Dataset file names (1 Nov 2026)
+
+Files are named `<unit>_<origin>_<number of tasks>[_<split>].jsonl`. Unit: `tasks` (one request, one skill), `graphs` (a request made of several nodes) or `nodes` (one step). Origin: `synthetic` (written by us), `public` (from existing datasets) or `mixed`. Each file starts with a `# why:` line kept in `scripts/benchmarks/dataset_headers.py`. Item ids and contents did not change, so every fingerprint is the same (graphs_mixed_100_test stays frozen at `e60df145df92437c`). Result files written before this date keep the old names in their file names and `*.meta.json`.
+
+| Old name | New name | Why |
+|---|---|---|
+| `mixed_ua_composite_graph100` (later `mixed_ua_compose_dev`) | `graphs_mixed_100_dev` | 100 graph tasks (250 nodes), all dev; written by us + STaD, ZNO, Belebele |
+| `mixed_ua_composite_test100` (later `mixed_ua_compose_test`) | `graphs_mixed_100_test` | same build, held out, frozen |
+| `mixed_ua_nodes_train` | `nodes_mixed_600_train` | 545 written + 40 ZNO + 15 UAlign; training labels for the learned routers |
+| — | `nodes_mixed_600_test` | planned: same composition, held out |
+| `mixed_ua_v7` | `tasks_public_4401` | claim suite, dev 1542 / test 2859; all public except 32 chat items |
+| `mixed_ua_v4_balanced` | `tasks_mixed_192` | development suite for wiring checks; hand-written + ZNO, FLORES, UAlign |
+| `intent_natural_v1` | `intent_requests_72` | diagnostic for intent detection |
+| `agentcoma_uk_200_composite`, `agentcoma_uk_50_composite` | `graphs_agentcoma_200`, `graphs_agentcoma_50_dev` | AgentCoMa-UK in composite form; gated, local only |
+| `agentcoma_uk_200_merged`, `agentcoma_uk_50items_merged`, `agentcoma_uk_150_test_translated` | `graphs_agentcoma_200_source`, `graphs_agentcoma_50_dev_source`, `graphs_agentcoma_150_test_source` | translated source items; gated, local only |
+| `mixed_ua_v0`–`v3`, `v5`, `v6`, `v6_screen`, `external_ua_v2`, `mixed_ua_composite_v1`, `v2`, `probe100` | same names in `benchmarks/archive/` | historical or withdrawn; names kept so old results still point at them |
+
+Builders renamed with them: `build_graphs_mixed_100_dev.py`, `build_graphs_mixed_100_test.py`, `build_nodes_mixed_600.py`, `build_tasks_public_4401.py`. The `pool_sha1` in `tasks_public_4401_meta.json` leaves out the `# why:` line of the pool, so it matches the value recorded on 12 Oct.
+
+## Node training set for the learned routers (31 Oct 2026)
+
+`benchmarks/nodes_mixed_600_train.jsonl`, built by `scripts/benchmarks/build_nodes_mixed_600.py` from item
+definitions in `scripts/benchmarks/nodes_train/`. 600 single-skill items written in the form of graphs_mixed_100_dev step
+prompts: 100 each for math, translate, instruct, knowledge, alignment and code. Only for training and
+cross-validating the kNN and MLP routers; graphs_mixed_100_dev stays the dev evaluation and graphs_mixed_100_test the test.
+
+- Why: the routers trained on `tasks_public_4401` dev had seen only four item types. 116 of the 250 graphs_mixed_100_dev step
+  prompts are less similar to v7 dev than 95% of v7 dev items are to each other (e5-large cosine to the nearest
+  item, threshold 0.865). With this set added, 23 are. By skill: math 44 → 5, knowledge 42 → 12, instruct 23 → 6,
+  code 5 → 0.
+- 218 items (36%) already contain a value an earlier step would produce (a chosen list, a number, an action to
+  judge, a translated sentence). v7 has none of these.
+- Sources: drafted by Claude following `scripts/benchmarks/prompts/node_train_generation.md`; 40 real ZNO items
+  (Ukrainian language, literature, history) and 15 real UAlign social items drawn at random (seed 42) from
+  `benchmarks/corpus/`. No MMLU, ARC or STaD.
+- Each item stores `skill`, `label` (the intent the planner gives such a step; math → chat), `subtype`, `form`,
+  `gold`, a `wrong` answer and a `check` in the rubric types of `scripts/score_composite_results.py`.
+- Build checks: every gold scores 1.0 on its check and every wrong answer below 1.0; math golds are computed
+  from the arithmetic; code golds pass their unit tests; no 10-word overlap with v7, graphs_mixed_100_dev or graphs_mixed_100_test after
+  removing shared instruction wording (the alignment scale, answer formats); no duplicate prompts.
+- Items are never selected using model scores. Fingerprint `4fffe04dc24736e6` (four code items that returned
+  tuples were changed to return lists on 31 Oct, because JSONL turns the expected tuples into lists and no answer
+  could pass). A teacher check (N2) and a person's review of the full set are not done yet.
+- Labels: Mamay-4B, Lapa and Aya each answered all 600 items once on JUPITER (job 2611271, T=0, seed 42,
+  max_tokens 1024), scored in `results/nodes_mixed_600_train/`: Mamay-4B 0.778, Lapa 0.785, Aya 0.793, best per
+  item 0.935; all three tie on 335 items. These are training labels, not results.
+
+### Test split: nodes_mixed_600_test (1 Nov 2026)
+
+`benchmarks/nodes_mixed_600_test.jsonl`, `build_nodes_mixed_600.py --split test`, items in
+`scripts/benchmarks/nodes_test/`. Held out for one comparison of the learned routers with rules v2, run once after
+the routers are frozen. Fingerprint `2dd49822418791a0`.
+
+- Same composition as train: 100 per skill, the same subtype × form counts, 40 ZNO and 15 UAlign social items
+  drawn at random (seed 42) from items not used in train, `tasks_public_4401` or the graph sets. Written alignment
+  ratings: 28 × 0, 28 × 1, 29 × 2.
+- Written fresh and worded differently from train: inside a skill no two written items share their first three
+  words, and no four-word phrase appears in more than three of them (the 0/1/2 scale and answer markers excepted).
+  Train repeats openers such as «Переклади англійською:» and «Напиши Python-функцію»; the test does not, so wording
+  alone does not route an item, for the rules or for kNN.
+- Extra build checks: no 10-word overlap with or copy of a train prompt; no written item closer than 0.95 (e5
+  cosine) to a train item of its skill. While writing, 22 drafts were replaced because they repeated a train task
+  in new words (for example the same problem with the same numbers, or `max_value` as `biggest`).
+- Decision rule fixed before the test: switch to the learned router if the lower end of the 95% paired bootstrap
+  interval of (learned − rules v2) is above −0.02. Rules v2 is scored twice: from the prompt text (its regexes)
+  and with the item's intent label, as on plan steps.
+
+## Composite graphs_mixed_100_test (28 Oct 2026)
+
+`benchmarks/graphs_mixed_100_test.jsonl`, built by `scripts/benchmarks/build_graphs_mixed_100_test.py` with the
+same prompts, helpers and build-time checks as graphs_mixed_100_dev. Held-out test set for composite claims.
+
+| Class | n | Shapes |
+|---|---:|---|
+| simple | 10 | one per task type |
+| chain | 30 | 20 with two nodes, 10 with three |
+| graph | 30 | 13 joins, 10 forks, 7 four-node fork-then-join; 3 one-skill math graphs are shape controls |
+| parallel | 30 | 18 with two nodes, 12 with three |
+
+- No overlap with graphs_mixed_100_dev or `tasks_public_4401` (requests, STaD problems, ZNO items, Belebele passages), checked at
+  build time. 34 STaD problems (16 GSM8K, 18 ToT Arithmetic; every gold checked against STaD), 20 ZNO items,
+  6 Belebele passages, the rest new.
+- Gold kinds per node: exact 113, accepted 76, example 60.
+- Written on 28 Oct 2026 before any graphs_mixed_100_dev result was seen. First build fingerprint `e60df145df92437c`.
+- Freeze rule: frozen at the commit that adds it; run once, after the router and planner are frozen; never
+  edited after a run. Not reviewed by a person yet.
+
 ## AgentCoMa-UK 200 (compositional commonsense + arithmetic)
 
-`agentcoma_uk_200_merged.jsonl` is a Ukrainian translation of 200 items from
+`graphs_agentcoma_200_source.jsonl` is a Ukrainian translation of 200 items from
 [AgentCoMa](https://huggingface.co/datasets/LisaAlaz/AgentCoMa) (gated; no
 reusable dataset license, so **every `agentcoma_uk_*` file stays local and is
 gitignored**; publish only prompt-free metrics). Each item chains one
@@ -165,8 +376,8 @@ answer marker (`Відповідь:`, `=`) — or the last number in the text �
 
 ```bash
 python scripts/benchmarks/build_agentcoma_benchmark.py \
-  --src benchmarks/agentcoma_uk_200_merged.jsonl \
-  --out benchmarks/agentcoma_uk_200_composite.jsonl
+  --src benchmarks/graphs_agentcoma_200_source.jsonl \
+  --out benchmarks/graphs_agentcoma_200.jsonl
 # lab, 3 GPUs (mamay4 / lapa / aya), pattern of eval_composite_v2_bakeoff:
 sbatch cluster/eval_agentcoma_200.sbatch            # SPLIT=dev (tuning)
 SPLIT=test sbatch cluster/eval_agentcoma_200.sbatch  # once, 3 repeats

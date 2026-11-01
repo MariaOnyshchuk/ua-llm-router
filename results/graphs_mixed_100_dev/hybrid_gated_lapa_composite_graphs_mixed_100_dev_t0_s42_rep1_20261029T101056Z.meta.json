@@ -1,0 +1,16 @@
+{
+  "system": "hybrid_gated_lapa",
+  "repeat": 1,
+  "bench": "/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/benchmarks/graphs_mixed_100_dev.jsonl",
+  "split_filter": null,
+  "n": 100,
+  "failures": 0,
+  "calls": 161,
+  "latency_ms_total": 942739.8,
+  "gpu_seconds_total": 942.7398,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 1024
+  }
+}

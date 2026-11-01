@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 from router.intent_rules import route_intent  # noqa: E402
 
-BENCH = ROOT / "benchmarks" / "mixed_ua_v4_balanced.jsonl"
+BENCH = ROOT / "benchmarks" / "tasks_mixed_192.jsonl"
 
 # Previously leaked; must be fixed before combo bake-offs.
 MUST_ROUTE = {

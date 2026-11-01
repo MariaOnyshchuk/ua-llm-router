@@ -1,0 +1,435 @@
+{
+  "systems": {
+    "hybrid_gated": {
+      "n": 100,
+      "repeats": 1,
+      "final_score_mean": 0.729,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.4,
+      "stage_mean": 0.438,
+      "all_stages_pass_rate": 0.07,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 0.23,
+      "intent_f1": 0.745,
+      "fallback_rate": 0.0,
+      "workflow_errors": {
+        "wrong_intents_or_deps": 29,
+        "missing_steps": 44,
+        "superfluous_steps": 4
+      },
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.63,
+      "latency_p50_ms": 9226.9,
+      "latency_avg_ms": 8895.4,
+      "gpu_seconds_per_item": 8.8954,
+      "by_family": {
+        "extract_classify_write": {
+          "n": 20,
+          "final_score": 0.67,
+          "final_success_rate": 0.05,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.4,
+          "intent_f1": 0.56,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 12
+          },
+          "http_ok_rate": 1.0
+        },
+        "knowledge_explain": {
+          "n": 20,
+          "final_score": 0.8625,
+          "final_success_rate": 0.65,
+          "all_stages_pass_rate": 0.05,
+          "plan_exact_match_rate": 0.5,
+          "intent_f1": 0.8333,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 10
+          },
+          "http_ok_rate": 1.0
+        },
+        "translate_code": {
+          "n": 20,
+          "final_score": 0.975,
+          "final_success_rate": 0.95,
+          "all_stages_pass_rate": 0.3,
+          "plan_exact_match_rate": 0.25,
+          "intent_f1": 0.7267,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 6,
+            "missing_steps": 5,
+            "superfluous_steps": 4
+          },
+          "http_ok_rate": 1.0
+        },
+        "translate_knowledge_write": {
+          "n": 20,
+          "final_score": 0.7625,
+          "final_success_rate": 0.35,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.855,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 13,
+            "missing_steps": 7
+          },
+          "http_ok_rate": 1.0
+        },
+        "translate_summarize_format": {
+          "n": 20,
+          "final_score": 0.375,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.75,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 10,
+            "missing_steps": 10
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "probe": {
+          "n": 100,
+          "final_score": 0.729,
+          "final_success_rate": 0.4,
+          "all_stages_pass_rate": 0.07,
+          "plan_exact_match_rate": 0.23,
+          "intent_f1": 0.745,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 29,
+            "missing_steps": 44,
+            "superfluous_steps": 4
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {
+        "llm": {
+          "n": 65,
+          "final_score": 0.7638,
+          "final_success_rate": 0.3846,
+          "all_stages_pass_rate": 0.1077,
+          "plan_exact_match_rate": 0.3538,
+          "intent_f1": 0.8769,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "wrong_intents_or_deps": 29,
+            "superfluous_steps": 4,
+            "missing_steps": 9
+          },
+          "http_ok_rate": 1.0
+        },
+        "rule": {
+          "n": 35,
+          "final_score": 0.6643,
+          "final_success_rate": 0.4286,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 0.0,
+          "intent_f1": 0.5,
+          "fallback_rate": 0.0,
+          "workflow_errors": {
+            "missing_steps": 35
+          },
+          "http_ok_rate": 1.0
+        }
+      }
+    },
+    "oracle": {
+      "n": 100,
+      "repeats": 1,
+      "final_score_mean": 0.7545,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.47,
+      "stage_mean": 0.8059,
+      "all_stages_pass_rate": 0.41,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 1.0,
+      "intent_f1": 1.0,
+      "fallback_rate": 0.0,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.6,
+      "latency_p50_ms": 4028.7,
+      "latency_avg_ms": 3703.8,
+      "gpu_seconds_per_item": 3.7038,
+      "by_family": {
+        "extract_classify_write": {
+          "n": 20,
+          "final_score": 0.76,
+          "final_success_rate": 0.2,
+          "all_stages_pass_rate": 0.2,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "knowledge_explain": {
+          "n": 20,
+          "final_score": 0.975,
+          "final_success_rate": 0.9,
+          "all_stages_pass_rate": 0.8,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_code": {
+          "n": 20,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.85,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_knowledge_write": {
+          "n": 20,
+          "final_score": 0.7875,
+          "final_success_rate": 0.25,
+          "all_stages_pass_rate": 0.2,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_summarize_format": {
+          "n": 20,
+          "final_score": 0.25,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "probe": {
+          "n": 100,
+          "final_score": 0.7545,
+          "final_success_rate": 0.47,
+          "all_stages_pass_rate": 0.41,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    },
+    "router_direct": {
+      "n": 100,
+      "repeats": 1,
+      "final_score_mean": 0.662,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.33,
+      "stage_mean": 0.662,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "fallback_rate": null,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1378.1,
+      "latency_avg_ms": 1576.8,
+      "gpu_seconds_per_item": 1.5768,
+      "by_family": {
+        "extract_classify_write": {
+          "n": 20,
+          "final_score": 0.66,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "knowledge_explain": {
+          "n": 20,
+          "final_score": 0.925,
+          "final_success_rate": 0.8,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_code": {
+          "n": 20,
+          "final_score": 0.875,
+          "final_success_rate": 0.75,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_knowledge_write": {
+          "n": 20,
+          "final_score": 0.575,
+          "final_success_rate": 0.1,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_summarize_format": {
+          "n": 20,
+          "final_score": 0.275,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "probe": {
+          "n": 100,
+          "final_score": 0.662,
+          "final_success_rate": 0.33,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    },
+    "template": {
+      "n": 100,
+      "repeats": 1,
+      "final_score_mean": 0.7465,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.48,
+      "stage_mean": 0.7526,
+      "all_stages_pass_rate": 0.37,
+      "plan_valid_rate": 1.0,
+      "plan_exact_match_rate": 0.95,
+      "intent_f1": 0.9833,
+      "fallback_rate": 0.05,
+      "workflow_errors": {
+        "fallback": 5
+      },
+      "http_ok_rate": 1.0,
+      "calls_per_item": 2.55,
+      "latency_p50_ms": 4087.3,
+      "latency_avg_ms": 3970.1,
+      "gpu_seconds_per_item": 3.9701,
+      "by_family": {
+        "extract_classify_write": {
+          "n": 20,
+          "final_score": 0.77,
+          "final_success_rate": 0.3,
+          "all_stages_pass_rate": 0.3,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "knowledge_explain": {
+          "n": 20,
+          "final_score": 0.9375,
+          "final_success_rate": 0.85,
+          "all_stages_pass_rate": 0.75,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_code": {
+          "n": 20,
+          "final_score": 1.0,
+          "final_success_rate": 1.0,
+          "all_stages_pass_rate": 0.6,
+          "plan_exact_match_rate": 0.75,
+          "intent_f1": 0.9167,
+          "fallback_rate": 0.25,
+          "workflow_errors": {
+            "fallback": 5
+          },
+          "http_ok_rate": 1.0
+        },
+        "translate_knowledge_write": {
+          "n": 20,
+          "final_score": 0.775,
+          "final_success_rate": 0.25,
+          "all_stages_pass_rate": 0.2,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "translate_summarize_format": {
+          "n": 20,
+          "final_score": 0.25,
+          "final_success_rate": 0.0,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": 1.0,
+          "intent_f1": 1.0,
+          "fallback_rate": 0.0,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "probe": {
+          "n": 100,
+          "final_score": 0.7465,
+          "final_success_rate": 0.48,
+          "all_stages_pass_rate": 0.37,
+          "plan_exact_match_rate": 0.95,
+          "intent_f1": 0.9833,
+          "fallback_rate": 0.05,
+          "workflow_errors": {
+            "fallback": 5
+          },
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {
+        "template": {
+          "n": 100,
+          "final_score": 0.7465,
+          "final_success_rate": 0.48,
+          "all_stages_pass_rate": 0.37,
+          "plan_exact_match_rate": 0.95,
+          "intent_f1": 0.9833,
+          "fallback_rate": 0.05,
+          "workflow_errors": {
+            "fallback": 5
+          },
+          "http_ok_rate": 1.0
+        }
+      }
+    }
+  }
+}

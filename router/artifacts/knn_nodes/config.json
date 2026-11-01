@@ -1,0 +1,62 @@
+{
+  "kind": "knn_nodes",
+  "router": "QualityArgmaxRouter (max-quality end, lambda = inf)",
+  "encoder": "e5",
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "encoder_revision": null,
+  "models": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "default": "aya",
+  "hyper_parameters": {
+    "k": 20
+  },
+  "cv_mse": 0.1528,
+  "grid": [
+    {
+      "hp": {
+        "k": 5
+      },
+      "cv_mse": 0.171
+    },
+    {
+      "hp": {
+        "k": 10
+      },
+      "cv_mse": 0.155
+    },
+    {
+      "hp": {
+        "k": 20
+      },
+      "cv_mse": 0.1528
+    },
+    {
+      "hp": {
+        "k": 40
+      },
+      "cv_mse": 0.1531
+    },
+    {
+      "hp": {
+        "k": 80
+      },
+      "cv_mse": 0.1562
+    }
+  ],
+  "train": {
+    "suite": "benchmarks/tasks_public_4401.jsonl",
+    "split": "dev",
+    "n_items": 2023,
+    "ids_sha256_16": "16f48c3c9adbad72",
+    "scores": "results/v7_pool/scores_specialists_detail.jsonl",
+    "n_v7_dev": 1423,
+    "extra_suite": "benchmarks/nodes_mixed_600_train.jsonl",
+    "extra_scores": "results/nodes_mixed_600_train/scores_all_detail.jsonl"
+  },
+  "sklearn": "1.9.1",
+  "git_commit": "b8f22cbc93260e909c3ca667279a2509f2f25dd3",
+  "trained_at": "2026-10-31T16:20:08+00:00"
+}

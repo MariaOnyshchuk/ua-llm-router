@@ -29,7 +29,7 @@ sbatch cluster/serve_aya.sbatch        # :8005
 
 # matrix router on balanced suite
 PYTHONPATH=. .venv/bin/python scripts/run_small_router_cluster.py router_matrix \
-  --bench benchmarks/mixed_ua_v4_balanced.jsonl --repeats 3
+  --bench benchmarks/tasks_mixed_192.jsonl --repeats 3
 ```
 
 Compare against single models on the same suite: `mamay4`, `lapa`, `aya`, `qwen7`.

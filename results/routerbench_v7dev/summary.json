@@ -1,0 +1,292 @@
+{
+  "what": "RouterBench-style predictive routers (kNN, MLP) on mixed_ua_v7 dev, offline from pool scores",
+  "split": "dev",
+  "n_items": 1423,
+  "n_per_bucket": {
+    "knowledge": 406,
+    "translate": 405,
+    "alignment": 400,
+    "instruct": 212
+  },
+  "encoder": "intfloat/multilingual-e5-large",
+  "folds": 5,
+  "seed": 42,
+  "git_commit": "15ed5c380f766c401fc1e79b66a2f2955786783f",
+  "cost": "latency of the chosen model, seconds per request (screening runs, 4 Sep 2026)",
+  "quality": "macro mean over knowledge, translate, alignment, instruct",
+  "cost_range": [
+    2.1093,
+    3.1793
+  ],
+  "points": {
+    "mamay4": {
+      "cost_s": 3.1562,
+      "macro": 0.6322
+    },
+    "lapa": {
+      "cost_s": 3.1793,
+      "macro": 0.6105
+    },
+    "aya": {
+      "cost_s": 2.1093,
+      "macro": 0.6501
+    },
+    "rules_v2_sim": {
+      "cost_s": 2.1815,
+      "macro": 0.6888
+    },
+    "bucket_oracle": {
+      "cost_s": 2.9828,
+      "macro": 0.7036
+    },
+    "item_oracle": {
+      "cost_s": 1.9966,
+      "macro": 0.7827
+    }
+  },
+  "aiq": {
+    "zero_router": 0.6501,
+    "knn": 0.6856,
+    "mlp": 0.6902,
+    "rules_v2_sim + singles": 0.6875,
+    "bucket_oracle + singles": 0.6818
+  },
+  "max_quality_end": {
+    "knn": {
+      "cost_s": 3.0554,
+      "macro": 0.6956
+    },
+    "mlp": {
+      "cost_s": 2.958,
+      "macro": 0.7016
+    }
+  },
+  "comparisons_macro": {
+    "knn_max_quality - aya": {
+      "diff": 0.0454,
+      "ci95": [
+        0.0266,
+        0.0647
+      ],
+      "distinguishable": true
+    },
+    "knn_max_quality - rules_v2_sim": {
+      "diff": 0.0068,
+      "ci95": [
+        -0.008,
+        0.0215
+      ],
+      "distinguishable": false
+    },
+    "knn_max_quality - bucket_oracle": {
+      "diff": -0.0081,
+      "ci95": [
+        -0.0188,
+        0.0025
+      ],
+      "distinguishable": false
+    },
+    "mlp_max_quality - aya": {
+      "diff": 0.0515,
+      "ci95": [
+        0.0327,
+        0.07
+      ],
+      "distinguishable": true
+    },
+    "mlp_max_quality - rules_v2_sim": {
+      "diff": 0.0128,
+      "ci95": [
+        -0.0018,
+        0.0275
+      ],
+      "distinguishable": false
+    },
+    "mlp_max_quality - bucket_oracle": {
+      "diff": -0.002,
+      "ci95": [
+        -0.0139,
+        0.0098
+      ],
+      "distinguishable": false
+    },
+    "rules_v2_sim - aya": {
+      "diff": 0.0387,
+      "ci95": [
+        0.0204,
+        0.0567
+      ],
+      "distinguishable": true
+    }
+  },
+  "per_bucket": {
+    "mamay4": {
+      "knowledge": 0.5591,
+      "translate": 0.6737,
+      "alignment": 0.62,
+      "instruct": 0.6761,
+      "share": {
+        "mamay4": 1.0,
+        "lapa": 0.0,
+        "aya": 0.0
+      }
+    },
+    "lapa": {
+      "knowledge": 0.7488,
+      "translate": 0.4404,
+      "alignment": 0.7025,
+      "instruct": 0.5503,
+      "share": {
+        "mamay4": 0.0,
+        "lapa": 1.0,
+        "aya": 0.0
+      }
+    },
+    "aya": {
+      "knowledge": 0.6305,
+      "translate": 0.6872,
+      "alignment": 0.6775,
+      "instruct": 0.6053,
+      "share": {
+        "mamay4": 0.0,
+        "lapa": 0.0,
+        "aya": 1.0
+      }
+    },
+    "rules_v2_sim": {
+      "knowledge": 0.7389,
+      "translate": 0.6872,
+      "alignment": 0.7025,
+      "instruct": 0.6266,
+      "share": {
+        "mamay4": 0.06,
+        "lapa": 0.566,
+        "aya": 0.374
+      }
+    },
+    "bucket_oracle": {
+      "knowledge": 0.7488,
+      "translate": 0.6872,
+      "alignment": 0.7025,
+      "instruct": 0.6761,
+      "share": {
+        "mamay4": 0.149,
+        "lapa": 0.566,
+        "aya": 0.285
+      }
+    },
+    "item_oracle": {
+      "knowledge": 0.8325,
+      "translate": 0.7246,
+      "alignment": 0.7875,
+      "instruct": 0.7862,
+      "share": {
+        "mamay4": 0.405,
+        "lapa": 0.26,
+        "aya": 0.335
+      }
+    },
+    "knn_max_quality": {
+      "knowledge": 0.7488,
+      "translate": 0.6888,
+      "alignment": 0.7,
+      "instruct": 0.6447,
+      "share": {
+        "mamay4": 0.264,
+        "lapa": 0.41,
+        "aya": 0.327
+      }
+    },
+    "mlp_max_quality": {
+      "knowledge": 0.7414,
+      "translate": 0.6832,
+      "alignment": 0.705,
+      "instruct": 0.6769,
+      "share": {
+        "mamay4": 0.185,
+        "lapa": 0.406,
+        "aya": 0.409
+      }
+    }
+  },
+  "prediction_mse": {
+    "knn": {
+      "mamay4": 0.1704,
+      "lapa": 0.161,
+      "aya": 0.1587
+    },
+    "mlp": {
+      "mamay4": 0.1722,
+      "lapa": 0.1641,
+      "aya": 0.1614
+    },
+    "baseline_predict_mean": {
+      "mamay4": 0.178,
+      "lapa": 0.1891,
+      "aya": 0.1718
+    }
+  },
+  "hyper_parameters_per_fold": {
+    "knn": [
+      {
+        "k": 40,
+        "inner_mse": 0.1688
+      },
+      {
+        "k": 40,
+        "inner_mse": 0.1656
+      },
+      {
+        "k": 40,
+        "inner_mse": 0.1658
+      },
+      {
+        "k": 40,
+        "inner_mse": 0.1657
+      },
+      {
+        "k": 80,
+        "inner_mse": 0.1691
+      }
+    ],
+    "mlp": [
+      {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1,
+        "inner_mse": 0.1715
+      },
+      {
+        "hidden": [
+          256,
+          64
+        ],
+        "alpha": 0.1,
+        "inner_mse": 0.1663
+      },
+      {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1,
+        "inner_mse": 0.1692
+      },
+      {
+        "hidden": [
+          256,
+          64
+        ],
+        "alpha": 0.1,
+        "inner_mse": 0.1667
+      },
+      {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1,
+        "inner_mse": 0.1736
+      }
+    ]
+  }
+}

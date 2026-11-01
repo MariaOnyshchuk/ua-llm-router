@@ -176,12 +176,38 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "blurb": "Mamay-4B classifies every request; rules only if the call fails",
         "llm_only": "mamay4",
     },
+    # RouterBench-style predictive routers trained on mixed_ua_v7 dev
+    # (scripts/train_routerbench_router.py). They route by the prompt text only, so on a
+    # plan step they ignore the planner's intent label.
     "knn": {
         "label": "Learned kNN",
         "remap": {},
         "default": "aya",
-        "blurb": "multilingual embedding kNN (Hybrid-LLM-style)",
+        "blurb": "e5 embedding kNN predicts each model's score; highest wins",
         "learned": "knn",
+    },
+    "mlp": {
+        "label": "Learned MLP",
+        "remap": {},
+        "default": "aya",
+        "blurb": "e5 embedding MLP predicts each model's score; highest wins",
+        "learned": "mlp",
+    },
+    # The same routers trained on v7 dev plus the node training set
+    # (benchmarks/nodes_mixed_600_train.jsonl: math, code and the other step types of graphs_mixed_100_dev).
+    "knn_nodes": {
+        "label": "Learned kNN (+ nodes)",
+        "remap": {},
+        "default": "aya",
+        "blurb": "kNN trained on v7 dev and the node training set",
+        "learned": "knn_nodes",
+    },
+    "mlp_nodes": {
+        "label": "Learned MLP (+ nodes)",
+        "remap": {},
+        "default": "aya",
+        "blurb": "MLP trained on v7 dev and the node training set",
+        "learned": "mlp_nodes",
     },
     "clf": {
         "label": "Learned classifier",
@@ -227,7 +253,7 @@ def route_intent(
     remap = spec["remap"] if isinstance(spec["remap"], dict) else {}
     hinted = (intent_hint or "").strip().lower()
     learned_kind = spec.get("learned") if isinstance(spec.get("learned"), str) else None
-    if learned_kind and not hinted:
+    if learned_kind:
         from router.learned import route_learned
 
         return route_learned(text, kind=learned_kind, default=fallback, pool=pool)

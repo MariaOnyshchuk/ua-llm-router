@@ -62,7 +62,7 @@ fi
 
 cd "${ROOT}"
 PYTHONPATH=. python -u scripts/run_planner_grid.py \
-  --bench benchmarks/agentcoma_uk_50_composite.jsonl \
+  --bench benchmarks/graphs_agentcoma_50_dev.jsonl \
   --models mamay4 \
   --out results/tables/a2_agentcoma_mamay4.csv \
   --save-plans results/a2_agentcoma

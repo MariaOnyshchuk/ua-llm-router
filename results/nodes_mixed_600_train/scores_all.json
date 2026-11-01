@@ -1,0 +1,307 @@
+{
+  "systems": {
+    "aya": {
+      "n": 600,
+      "repeats": 1,
+      "final_score_mean": 0.7934,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.7383,
+      "stage_mean": 0.7934,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "fallback_rate": null,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1185.9,
+      "latency_avg_ms": 1726.4,
+      "gpu_seconds_per_item": 1.7264,
+      "by_family": {
+        "node_alignment": {
+          "n": 100,
+          "final_score": 0.775,
+          "final_success_rate": 0.73,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_code": {
+          "n": 100,
+          "final_score": 0.8092,
+          "final_success_rate": 0.74,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_instruct": {
+          "n": 100,
+          "final_score": 0.8092,
+          "final_success_rate": 0.72,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_knowledge": {
+          "n": 100,
+          "final_score": 0.67,
+          "final_success_rate": 0.61,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_math": {
+          "n": 100,
+          "final_score": 0.74,
+          "final_success_rate": 0.74,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_translate": {
+          "n": 100,
+          "final_score": 0.9572,
+          "final_success_rate": 0.89,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "train": {
+          "n": 600,
+          "final_score": 0.7934,
+          "final_success_rate": 0.7383,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    },
+    "lapa": {
+      "n": 600,
+      "repeats": 1,
+      "final_score_mean": 0.7853,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.7267,
+      "stage_mean": 0.7853,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "fallback_rate": null,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1849.5,
+      "latency_avg_ms": 6977.1,
+      "gpu_seconds_per_item": 6.9771,
+      "by_family": {
+        "node_alignment": {
+          "n": 100,
+          "final_score": 0.855,
+          "final_success_rate": 0.81,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_code": {
+          "n": 100,
+          "final_score": 0.7495,
+          "final_success_rate": 0.68,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_instruct": {
+          "n": 100,
+          "final_score": 0.8417,
+          "final_success_rate": 0.68,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_knowledge": {
+          "n": 100,
+          "final_score": 0.7783,
+          "final_success_rate": 0.76,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_math": {
+          "n": 100,
+          "final_score": 0.85,
+          "final_success_rate": 0.85,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_translate": {
+          "n": 100,
+          "final_score": 0.6375,
+          "final_success_rate": 0.58,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "train": {
+          "n": 600,
+          "final_score": 0.7853,
+          "final_success_rate": 0.7267,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    },
+    "mamay4": {
+      "n": 600,
+      "repeats": 1,
+      "final_score_mean": 0.7775,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.7233,
+      "stage_mean": 0.7775,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "fallback_rate": null,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 1830.9,
+      "latency_avg_ms": 5588.5,
+      "gpu_seconds_per_item": 5.5885,
+      "by_family": {
+        "node_alignment": {
+          "n": 100,
+          "final_score": 0.575,
+          "final_success_rate": 0.51,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_code": {
+          "n": 100,
+          "final_score": 0.8822,
+          "final_success_rate": 0.83,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_instruct": {
+          "n": 100,
+          "final_score": 0.8525,
+          "final_success_rate": 0.74,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_knowledge": {
+          "n": 100,
+          "final_score": 0.6396,
+          "final_success_rate": 0.6,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_math": {
+          "n": 100,
+          "final_score": 0.75,
+          "final_success_rate": 0.75,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "node_translate": {
+          "n": 100,
+          "final_score": 0.9658,
+          "final_success_rate": 0.91,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "train": {
+          "n": 600,
+          "final_score": 0.7775,
+          "final_success_rate": 0.7233,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    }
+  }
+}

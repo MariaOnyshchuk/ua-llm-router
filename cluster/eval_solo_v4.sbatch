@@ -106,7 +106,7 @@ fi
 
 cd "${ROOT}"
 python scripts/run_small_router_cluster.py --mode "${MODE}" \
-  --bench benchmarks/mixed_ua_v4_balanced.jsonl \
+  --bench benchmarks/tasks_mixed_192.jsonl \
   --align-prompt "${ALIGN_PROMPT}" \
   --bucket-fewshot "${BUCKET_FEWSHOT}" \
   --repeats "${REPEATS}" \

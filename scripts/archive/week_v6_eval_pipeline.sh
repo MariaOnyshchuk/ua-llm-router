@@ -18,8 +18,8 @@ cd "$ROOT"
 source .venv/bin/activate
 
 PHASE="${1:-screen}"
-SCREEN="benchmarks/mixed_ua_v6_screen.jsonl"
-V6="benchmarks/mixed_ua_v6.jsonl"
+SCREEN="benchmarks/archive/mixed_ua_v6_screen.jsonl"
+V6="benchmarks/archive/mixed_ua_v6.jsonl"
 # IFEval constraints often need more than 256 tokens; pin it in run tags.
 MAX_TOKENS="${MAX_TOKENS:-1024}"
 

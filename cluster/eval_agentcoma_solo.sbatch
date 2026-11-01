@@ -51,8 +51,8 @@ esac
 QUANT_ARGS=()
 [ -n "${QUANT}" ] && QUANT_ARGS=(--quantization "${QUANT}")
 
-COMPOSITE="${ROOT}/benchmarks/agentcoma_uk_200_composite.jsonl"
-MERGED="${ROOT}/benchmarks/agentcoma_uk_200_merged.jsonl"
+COMPOSITE="${ROOT}/benchmarks/graphs_agentcoma_200.jsonl"
+MERGED="${ROOT}/benchmarks/graphs_agentcoma_200_source.jsonl"
 COMP_DIR="${ROOT}/results/week_13_agentcoma_200_${SPLIT}"
 STEP_DIR="${ROOT}/results/week_13_agentcoma_steps/${SPLIT}"
 mkdir -p "${ROOT}/logs" "${COMP_DIR}" "${STEP_DIR}"

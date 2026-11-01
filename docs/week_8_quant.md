@@ -8,7 +8,7 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low. All of these are v4 development numbers; claims come from
-> `mixed_ua_v7` test.
+> `tasks_public_4401` test.
 
 *31 Aug 2026. Same product router (rules v2 + few-shot), same suite (`mixed_ua_v4` 192), T=0, seed=42, max_tokens=256, **1 repeat**.*
 

@@ -78,7 +78,7 @@ run_model() {
   local alias="$1"
   local out_csv="${ROOT}/results/tables/a2_planner_grid_${alias}.csv"
   PYTHONPATH=. python -u scripts/run_planner_grid.py \
-    --bench benchmarks/mixed_ua_composite_v1.jsonl \
+    --bench benchmarks/archive/mixed_ua_composite_v1.jsonl \
     --models "${alias}" \
     --out "${out_csv}" \
     --save-plans results/a2_planner_grid

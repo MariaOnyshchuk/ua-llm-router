@@ -6,7 +6,7 @@ UA-Code stays unscored (no Eolymp judge). These rows have unit tests.
 
 Usage:
   python scripts/benchmarks/import_english_code.py
-  python scripts/benchmarks/import_english_code.py --append-to-v4 32 --out-suite benchmarks/mixed_ua_v5.jsonl
+  python scripts/benchmarks/import_english_code.py --append-to-v4 32 --out-suite benchmarks/archive/mixed_ua_v5.jsonl
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def main() -> None:
     p.add_argument("--out-corpus", type=Path, default=ROOT / "benchmarks/corpus/humaneval_code_en.jsonl")
     p.add_argument("--append-to-v4", type=int, default=32, help="How many HumanEval items to add on top of v4")
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--out-suite", type=Path, default=ROOT / "benchmarks/mixed_ua_v5.jsonl")
+    p.add_argument("--out-suite", type=Path, default=ROOT / "benchmarks/archive/mixed_ua_v5.jsonl")
     args = p.parse_args()
 
     try:
@@ -70,7 +70,7 @@ def main() -> None:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
-    v4 = ROOT / "benchmarks/mixed_ua_v4_balanced.jsonl"
+    v4 = ROOT / "benchmarks/tasks_mixed_192.jsonl"
     v4_rows = []
     for line in v4.read_text(encoding="utf-8").splitlines():
         line = line.strip()

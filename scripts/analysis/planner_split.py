@@ -130,7 +130,7 @@ def print_table(summary: dict[str, Any], label: str) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--bench", default="benchmarks/mixed_ua_v6.jsonl")
+    p.add_argument("--bench", default="benchmarks/archive/mixed_ua_v6.jsonl")
     p.add_argument("--profile", default="hybrid")
     p.add_argument("--n-per-bucket", type=int, default=100, help="0 = every item")
     p.add_argument("--seed", type=int, default=42)

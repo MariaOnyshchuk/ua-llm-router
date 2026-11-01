@@ -13,7 +13,7 @@ per-bucket winner. Combinations are a *consequence* of the matrix, not a startin
 | L | Lapa-12B-Instruct | 8001 | **needed** (esp. translate) |
 | — | Aya-101 / Mistral-7B / Llama-8B | — | later / footnote only |
 
-Suite: `benchmarks/mixed_ua_v3.jsonl` (182). Decoding: `T=0`, `seed=42`, ideally 3×.
+Suite: `benchmarks/archive/mixed_ua_v3.jsonl` (182). Decoding: `T=0`, `seed=42`, ideally 3×.
 
 Fair VRAM: prefer **one live model at a time** when collecting `peak_vram_gb`.
 Quality bake-off can run with several GPUs occupied — quality is the decision driver.

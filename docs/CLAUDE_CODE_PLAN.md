@@ -8,7 +8,7 @@ Find out how good the router (Mamay-4B, Lapa-12B, Aya-8B behind rules) is compar
 
 ## Ground rules
 
-- Use only existing benchmarks. Do not create synthetic benchmarks. Single skills: `benchmarks/mixed_ua_v7.jsonl` (4237: dev 1487 for tuning, test 2750 for claims, run once after the router is frozen). `mixed_ua_v6` (2414) is withdrawn since 12 Oct 2026: its item selection was inverted, see `docs/mixed_ua_v6.md`; do not cite v6 numbers. Composite tasks: AgentCoMa-UK, `benchmarks/agentcoma_uk_200_*.jsonl` (50 dev + 150 test, local only, never commit or publish prompts). `mixed_ua_v4_balanced` (192) is for wiring checks only.
+- Use only existing benchmarks. Do not create synthetic benchmarks. Single skills: `benchmarks/tasks_public_4401.jsonl` (4237: dev 1487 for tuning, test 2750 for claims, run once after the router is frozen). `mixed_ua_v6` (2414) is withdrawn since 12 Oct 2026: its item selection was inverted, see `docs/mixed_ua_v6.md`; do not cite v6 numbers. Composite tasks: AgentCoMa-UK, `benchmarks/agentcoma_uk_200_*.jsonl` (50 dev + 150 test, local only, never commit or publish prompts). `tasks_mixed_192` (192) is for wiring checks only.
 - One run per experiment is fine (T=0, seed=42). Every claimed difference has a paired bootstrap 95% interval (`scripts/analysis/bootstrap_compare.py`). If the interval contains 0, write "not distinguishable".
 - Tune on dev only. Freeze the routing table, prompts and few-shot examples, write the commit hash in the ledger, then run test once.
 - Metrics always go in tables. Plain direct language. Answer the user in Ukrainian or English, never Russian.
@@ -33,7 +33,7 @@ Systems: mamay4, lapa, aya, mamay12, mamay27 (FP8), router rules v2. On AgentCoM
 | v7 | dev 1487 for tuning; test 2750 once, after freeze | all six | `cluster/eval_v6_solo.sbatch`, `cluster/eval_v6_router.sbatch` with the v7 file (the job names still say v6) |
 | AgentCoMa-UK | dev 50 first, test 150 once | all six plus oracle and template | `cluster/eval_agentcoma_200.sbatch` (add the solo systems; they are missing) |
 
-Also run the AgentCoMa step questions alone (`question_commonsense_uk`, `question_math_uk` in `agentcoma_uk_200_merged.jsonl`) for every model, so the compositional gap can be computed: share of tasks where both steps are right alone minus share of composite answers that are right.
+Also run the AgentCoMa step questions alone (`question_commonsense_uk`, `question_math_uk` in `graphs_agentcoma_200_source.jsonl`) for every model, so the compositional gap can be computed: share of tasks where both steps are right alone minus share of composite answers that are right.
 
 Done when: one table per benchmark with score, 95% interval, p50 and p95 latency, GPU-seconds per prompt, for every system, and the reference row (largest single model) marked.
 

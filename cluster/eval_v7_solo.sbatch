@@ -13,9 +13,10 @@
 #
 #   sbatch --job-name=v7-mamay12 --export=ALL,ALIAS=mamay12 cluster/eval_v7_solo.sbatch              # dev
 #   sbatch --job-name=v7-mamay12 --export=ALL,ALIAS=mamay12,SPLIT=test cluster/eval_v7_solo.sbatch
+#   sbatch --export=ALL,ALIAS=mamay12,WIKI=1 cluster/eval_v7_solo.sbatch   # knowledge + Wikipedia
 #   (ALIAS = mamay4 | lapa | aya | mamay12 | mamay27 (FP8) | qwen7)
 #
-# Needs benchmarks/mixed_ua_v7.jsonl and the current scripts/run_small_router_cluster.py on the
+# Needs benchmarks/tasks_public_4401.jsonl and the current scripts/run_small_router_cluster.py on the
 # lab (scp + checksum). Writes results/v7_<split>_solos/. Not yet run: try SPLIT=dev first.
 
 set -euo pipefail
@@ -31,8 +32,21 @@ export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
 export HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
 SPLIT="${SPLIT:-dev}"
 MAX_TOKENS="${MAX_TOKENS:-1024}"
-BENCH="${BENCH:-benchmarks/mixed_ua_v7.jsonl}"
+BENCH="${BENCH:-benchmarks/tasks_public_4401.jsonl}"
 OUT_DIR="${ROOT}/results/v7_${SPLIT}_solos"
+# WIKI=1: knowledge bucket only, Wikipedia passages from the cache in .cache/wiki (no internet needed).
+WIKI="${WIKI:-0}"
+WIKI_ARGS=()
+SYSTEM_SUFFIX=""
+if [[ "${WIKI}" == "1" ]]; then
+  WIKI_ARGS=(--wiki-rag --wiki-offline --bucket knowledge)
+  SYSTEM_SUFFIX="_wiki"
+  OUT_DIR="${ROOT}/results/v7_${SPLIT}_wiki"
+  if [[ ! -d "${ROOT}/.cache/wiki" ]]; then
+    echo "[v7-solo] WIKI=1 but ${ROOT}/.cache/wiki is missing; copy the cache first" >&2
+    exit 1
+  fi
+fi
 mkdir -p "${ROOT}/logs" "${OUT_DIR}"
 if [[ ! -f "${ROOT}/${BENCH}" ]]; then
   echo "[v7-solo] missing ${BENCH}; scp it from the laptop first" >&2
@@ -40,6 +54,7 @@ if [[ ! -f "${ROOT}/${BENCH}" ]]; then
 fi
 
 ALIAS="${ALIAS:-mamay12}"
+SYSTEM="${ALIAS}${SYSTEM_SUFFIX}"
 GPU_MEMORY_UTILIZATION="${GPU_MEMORY_UTILIZATION:-0.90}"
 export VLLM_USE_FLASHINFER_SAMPLER=0
 
@@ -125,7 +140,7 @@ fi
 
 cd "${ROOT}"
 python scripts/run_small_router_cluster.py --mode "${ALIAS}" --bench "${BENCH}" --split "${SPLIT}" \
-  --repeats 1 --max-tokens "${MAX_TOKENS}" --out-dir "${OUT_DIR}"
-python scripts/score_results.py "${OUT_DIR}/${ALIAS}"_mixed_ua_v7_"${SPLIT}"_*.jsonl \
-  --out "${OUT_DIR}/scores_${ALIAS}.json"
+  --repeats 1 --max-tokens "${MAX_TOKENS}" --out-dir "${OUT_DIR}" "${WIKI_ARGS[@]}"
+python scripts/score_results.py "${OUT_DIR}/${SYSTEM}"_mixed_ua_v7_"${SPLIT}"_*.jsonl \
+  --out "${OUT_DIR}/scores_${SYSTEM}.json"
 echo "[v7-solo] finished ${ALIAS} ${SPLIT}"

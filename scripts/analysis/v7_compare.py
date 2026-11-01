@@ -86,7 +86,7 @@ def compare(a: dict[str, float], b: dict[str, float], bucket_of: dict[str, str],
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--bench", default="benchmarks/mixed_ua_v7.jsonl")
+    p.add_argument("--bench", default="benchmarks/tasks_public_4401.jsonl")
     p.add_argument("--split", default="dev", choices=("dev", "test"))
     p.add_argument("--a", required=True, help="item-level scores of system A")
     p.add_argument("--b", required=True, help="item-level scores of system B")

@@ -394,8 +394,8 @@ def v6_screen() -> None:
     ]
     write_csv(OUT / "v6_screen_not_for_claims.csv", rows, fields)
 
-    screen_items = load_jsonl(ROOT / "benchmarks/mixed_ua_v6_screen.jsonl")
-    v6_items = load_jsonl(ROOT / "benchmarks/mixed_ua_v6.jsonl")
+    screen_items = load_jsonl(ROOT / "benchmarks/archive/mixed_ua_v6_screen.jsonl")
+    v6_items = load_jsonl(ROOT / "benchmarks/archive/mixed_ua_v6.jsonl")
     detail = load_screen_detail()
     cite_preview = (
         "NO — screening pass sliced to frozen mixed_ua_v6 ids; official 3× bake-off not scored yet"

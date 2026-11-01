@@ -127,7 +127,7 @@ lab); the earlier screening pass for that model had failed with HTTP 0.
 
 ### 2. The stored AgentCoMa oracle plan is broken
 
-In `benchmarks/agentcoma_uk_200_composite.jsonl` the first oracle step
+In `benchmarks/graphs_agentcoma_200.jsonl` the first oracle step
 ("filter") does not contain the task text, and the second step asks for "only
 the number, no explanation". The filter model answers about an invented class
 of students on every item. Source: `scripts/benchmarks/build_agentcoma_benchmark.py`.
@@ -163,7 +163,7 @@ against a plan that cannot work.
 
 | # | Step | Output | Needs |
 |---|---|---|---|
-| 1 | Fix the curation script; build v7 as a stratified random sample of the pool, split dev/test; state that v6 is withdrawn and why | `benchmarks/mixed_ua_v7.jsonl`, note in `docs/mixed_ua_v6.md` | decision |
+| 1 | Fix the curation script; build v7 as a stratified random sample of the pool, split dev/test; state that v6 is withdrawn and why | `benchmarks/tasks_public_4401.jsonl`, note in `docs/mixed_ua_v6.md` | decision |
 | 2 | Rescore screening runs with the current scorer; finish Mamay-12B on the pool; run router rules v2 on the pool | scores for 5 systems on the same items | ~5 h GPU, running |
 | 3 | Router vs Mamay-12B on v7 test with intervals; route oracle; routing accuracy | the main thesis table | step 2 |
 | 4 | Fix the AgentCoMa oracle plan, rebuild, rerun oracle on dev | valid planning ceiling | decision |
@@ -178,9 +178,9 @@ against a plan that cannot work.
 
 This section replaces the numbers above where they differ.
 
-### mixed_ua_v7
+### tasks_public_4401
 
-`scripts/benchmarks/build_mixed_ua_v7.py`: every one of the 4237 pool items,
+`scripts/benchmarks/build_tasks_public_4401.py`: every one of the 4237 pool items,
 no score-based selection, random split inside bucket and source (seed 42,
 sha1 `9f7145b626b2`). The 128 items shared with v4 are forced into dev. Items
 that share text stay in one split (both directions of a FLORES or WMT-22
@@ -505,7 +505,7 @@ Fixing the scorer is required before the test runs, and by the rule in
 
 `results/analysis/intent_natural_eval.json`, script
 `scripts/analysis/intent_natural_eval.py`. Two sets: 72 hand-written requests
-in everyday Ukrainian (`benchmarks/intent_natural_v1.jsonl`, 12 per intent,
+in everyday Ukrainian (`benchmarks/intent_requests_72.jsonl`, 12 per intent,
 written in one sitting, routing diagnostics only) and 264 v7 dev items in
 benchmark wording. "Right model" counts an intent error that still lands on
 the right specialist as correct.
@@ -534,7 +534,7 @@ The hybrid is available as rules profile `v2_llm` (rules v2 unchanged).
 The three wrong checks in `scripts/ifeval_check.py` are fixed (bullet lists
 registered under the right id and counted exactly; placeholders in any script;
 `repeat_prompt` compared with `prompt_to_repeat`), with a test. Only
-`mixed_ua_v6` (withdrawn) and `mixed_ua_v7` contain IFEval items, so no v4 run
+`mixed_ua_v6` (withdrawn) and `tasks_public_4401` contain IFEval items, so no v4 run
 is affected. Rescored: the three specialists on the pool, the dev router run,
 the dev bucket few-shot run and Mamay-12B on dev. **Every instruct and macro
 number above this section is from before the fix; use the tables below.**
@@ -815,6 +815,124 @@ in 27 of 4237 Mamay-4B answers, 36 of 4237 for Lapa, 2 for Aya and 9 for Mamay-1
 The planner budget also matters: with 256 tokens a plan for a long request is cut and the
 router falls back to one call. The page now shows that fallback instead of hiding it.
 
+## Composite probe-100: 100 new requests, four wordings (26 Oct, live, bf16)
+
+Not for claims; a probe of planning and step execution. `benchmarks/archive/mixed_ua_composite_probe100.jsonl`
+(`scripts/benchmarks/build_composite_probe100.py`): the five composite v2 families, 20 new items
+each, no source shared with v2, same step structure and rubrics. Each family has four wordings,
+five items each: A = the v2 wording, B = two task verbs, C = sequence words («спершу … потім»),
+D = the parts named as nouns, no sequence word. Job `cluster/eval_composite_probe100.sbatch`
+(1309): three specialists in bf16, one per card (Mamay-4B at 0.55 because Slurm placed it on card
+0, which another user holds), T=0, seed 42, max_tokens 1024, one run, no serving failures.
+Scores: `results/composite_probe100/`; raw rows local in `logs/composite_probe100/`.
+
+| System | Final | Calls/item | s/item |
+|---|---:|---:|---:|
+| router one call (`router_direct`) | 0.662 | 1.0 | 1.6 |
+| fixed templates (`template`) | 0.747 | 2.55 | 4.0 |
+| gate + Mamay-4B planner (`hybrid_gated`) | 0.729 | 2.63 | 8.9 |
+| gold plan (`oracle`) | 0.755 | 2.6 | 3.7 |
+
+Paired bootstrap, 100 items: template − one call +0.084 [+0.045, +0.125]; hybrid_gated − one call
++0.067 [+0.029, +0.108]; hybrid_gated − template −0.018 [−0.061, +0.026], not distinguishable;
+hybrid_gated − oracle −0.025 [−0.068, +0.016], not distinguishable.
+
+By wording (final): hybrid_gated A 0.820, B 0.758, C 0.678, D 0.660; template A 0.788, B 0.722,
+C 0.726, D 0.750. The gate sent all 25 D requests and 13 of 25 B requests to one call, because the
+request has no sequence word and no two listed task verbs. On D, hybrid_gated equals the one-call
+router and is below template, −0.090 [−0.168, −0.018]. The template selector missed the five
+translate-code B requests (one call).
+
+What the planner did wrong, seen in the step traces:
+
+- The planner drops the data from the first step. In 5 of 5 extract-classify C requests the first
+  step reads «Витягни з оголошення subject і number.» without the notice, and Lapa answers
+  «subject: mathematics, number: 1» each time. In knowledge-explain the first step often keeps
+  the question without the options, so Lapa answers with a name instead of a letter (once wrong).
+- For C wordings the planner sometimes copies the whole request into the first step. In 4
+  translate-code items Aya then writes the code in the "translate" step and the translation is lost.
+- The last step gets the whole user request, so it often repairs these errors; the final score of
+  plans with and without the data in step one is about the same.
+
+What the rubrics show regardless of the router: translate-summarize-format scores 0.25 even with
+the gold plan, because its JSON check wants the English values of the source (`next Monday`,
+`run`) and the models write Ukrainian ones (`понеділок`). Extract-classify `subject` is also an
+exact string match. Translation errors seen: "trolleybus" → «трамвай-автобус», "ASCII" →
+«азійські». Per intent in the gold plan: code (Mamay-4B) 1.00, translate (Aya) 0.85, knowledge
+(Lapa) 0.75, instruct (Mamay-4B) 0.73.
+
+## First plan step gets the request data (26 Oct, composite v2 dev, live, bf16)
+
+Fix for the probe-100 finding above. `router/planner.py`: a plan step with no inputs (not the
+last step) now gets the request's data when its prompt lacks it, under «Дані із запиту:». The
+data is the text after the first blank line of the request, or the answer options when there is
+no blank line; it counts as present when every line of it, without a leading label such as
+«Source:», is already in the step. Steps that work on an earlier result do not get it.
+`PLANNER_REQUEST_DATA=0` turns it off. Tests: `tests/test_composite_router.py` (three new).
+
+Job `cluster/eval_composite_v2_dev_request_data.sbatch` (1310): composite v2 dev (60),
+`hybrid_gated` with and without the fix in one job, same serving, T=0, seed 42, max_tokens 1024.
+Scores: `results/composite_v2_dev_request_data/`.
+
+| Dev, 60 | Final |
+|---|---:|
+| one call (`router_direct`) | 0.618 |
+| `hybrid_gated` without the fix | 0.661 |
+| `hybrid_gated` with the fix | 0.677 |
+
+With − without: +0.016 [0.000, +0.038], not distinguishable. The data was added in 6 of 60
+items, all knowledge-explain, where the first step had the question without its options. There
+the first step now answers with the option (cv2-ke-dev-001: «Вергілій» → «А Іван Котляревський»;
+-005: «O» → «А»); first-step score in this family 0.50 → 0.75. The final score of these 6 items
+is the same with and without the fix (0.958), because the last step sees the whole request and
+already repaired them. The three items whose final score changed (ecw-005, tc-010, tsf-005)
+were not touched by the fix.
+
+The two runs are not repeatable: with identical planner prompts at T=0, the planner's text was
+the same in 40 of 60 items, and the final text differed in 13 items that the fix did not touch.
+So a difference of 0.02 on 60 dev items is within run-to-run variation. Kept: it removes a
+failure seen in step traces (extract-classify C wording in probe-100: 5 of 5 first steps without
+the notice) at no cost.
+
+## Wikipedia retrieval for knowledge questions (26 Oct, dev, no model yet)
+
+Small models miss facts they were not trained on. Instead of fine-tuning, `router/wiki_search.py`
+puts paragraphs from Ukrainian Wikipedia in front of knowledge questions. Off by default.
+
+- Gate: rules-v2 intent `knowledge`, no passage in the prompt (Belebele and "Прочитайте текст"
+  items are skipped), no arithmetic signs. The same gate is used for every system, solo or router.
+- Queries: short noun phrases from the question and from each short option (pymorphy3 with the
+  Ukrainian dictionary). Wikipedia search requires every word, so full questions find almost
+  nothing; two to four words work.
+- Pages: MediaWiki API, the best hit of each query first, at most 6 pages. Paragraphs of about
+  120 words, reference sections dropped, BM25 on lemmas, the opening paragraph of a page slightly
+  preferred; a paragraph must contain at least a quarter of the question's lemmas. At most three
+  paragraphs, 3000 characters. The prompt itself is not changed; the passages come before it.
+- Every API answer is cached in `.cache/wiki/` (not in git). `scripts/build_wiki_cache.py`
+  fills it on the laptop; the cluster runs with `--wiki-offline`, so a run is repeatable and needs
+  no internet. Dev cache: 3026 answers, 51 MB, sha1 `e9f6b581`.
+
+Retrieval check on the 406 dev knowledge items, without a model
+(`results/wiki_rag/retrieval_mixed_ua_v7_dev.json`). An option counts as "mentioned" when at
+least half of its lemmas occur in the passages. Option queries fetch pages about every option,
+so wrong options get mentioned too; what matters is the gap.
+
+| Source | n | passages used | correct option mentioned | wrong options mentioned |
+|---|---|---|---|---|
+| ZNO history | 45 | 32 | 0.53 | 0.27 |
+| ZNO geography | 22 | 18 | 0.56 | 0.44 |
+| ZNO Ukrainian | 51 | 27 | 0.30 | 0.19 |
+| MMLU | 92 | 71 | 0.51 | 0.41 |
+| ARC | 100 | 88 | 0.48 | 0.54 |
+| Belebele | 83 | 0 | (passage given) | |
+
+The passages point at the answer for ZNO history, weakly for geography and MMLU, and not for ARC
+(grade-school reasoning). 4 of 5 ZNO maths items pass the gate and get passages they do not need.
+This is not a model score. Next: `WIKI=1` runs of `cluster/eval_v7_router.sbatch` and
+`cluster/eval_v7_solo.sbatch` (Mamay-12B) on dev knowledge, compared with the plain dev runs by
+paired bootstrap per source. Retrieval is not part of the frozen router; if kept, it is a separate,
+labelled run on test.
+
 ## Ready to freeze (13 Oct)
 
 Nothing in this section has been run. The test splits are untouched.
@@ -903,8 +1021,8 @@ checksums before any run:
 | `scripts/run_small_router_cluster.py` | new `--split` and `--format-guard` options |
 | `router/format_guard.py` | the format guard |
 | `cluster/eval_v7_solo.sbatch`, `cluster/eval_v7_router.sbatch`, `cluster/eval_agentcoma_200.sbatch`, `cluster/eval_agentcoma_solo.sbatch` | new and changed jobs |
-| `benchmarks/mixed_ua_v7.jsonl` | claim suite (only the dev file is on the lab) |
-| `benchmarks/agentcoma_uk_200_composite.jsonl` | rebuilt with the fixed oracle plan; local only, never in git |
+| `benchmarks/tasks_public_4401.jsonl` | claim suite (only the dev file is on the lab) |
+| `benchmarks/graphs_agentcoma_200.jsonl` | rebuilt with the fixed oracle plan; local only, never in git |
 | `scripts/build_progress_ledger.py`, `tests/` | not needed for the runs |
 
 Before submitting: `squeue -u $USER` and `nvidia-smi`. On 10–12 Oct card 0 was

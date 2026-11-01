@@ -1,0 +1,103 @@
+{
+  "what": "held-out single-skill node items for comparing the routers with rules v2",
+  "split": "test",
+  "n_items": 600,
+  "per_skill": {
+    "math": 100,
+    "translate": 100,
+    "instruct": 100,
+    "knowledge": 100,
+    "alignment": 100,
+    "code": 100
+  },
+  "per_form": {
+    "math": {
+      "root": 52,
+      "with previous value": 48
+    },
+    "translate": {
+      "root": 54,
+      "with previous value": 46
+    },
+    "instruct": {
+      "root": 58,
+      "with previous value": 42
+    },
+    "knowledge": {
+      "root": 78,
+      "with previous value": 22
+    },
+    "alignment": {
+      "root": 68,
+      "with previous value": 32
+    },
+    "code": {
+      "root": 71,
+      "with previous value": 29
+    }
+  },
+  "per_subtype": {
+    "math": {
+      "money word problem (GSM8K style)": 20,
+      "durations and clock times (ToT style)": 18,
+      "calendars and schedules": 14,
+      "percent": 16,
+      "unit conversion": 14,
+      "count only the chosen items": 18
+    },
+    "translate": {
+      "Ukrainian → English sentence": 27,
+      "English → Ukrainian sentence": 23,
+      "one word": 12,
+      "a list": 12,
+      "a sentence with numbers and times": 14,
+      "a short paragraph": 12
+    },
+    "instruct": {
+      "notice with exact constraints": 18,
+      "summary of a given text": 16,
+      "fixed line format": 16,
+      "acrostic": 10,
+      "JSON": 14,
+      "change of register": 12,
+      "list with line prefixes": 8,
+      "length limit": 6
+    },
+    "knowledge": {
+      "search in a given timetable, notice or log": 16,
+      "commonsense selection": 10,
+      "classification of a given list": 10,
+      "day of the week": 8,
+      "reading a given text, multiple choice": 10,
+      "comparison of given offers": 6,
+      "ZNO, history of Ukraine": 20,
+      "ZNO, Ukrainian language and literature": 20
+    },
+    "alignment": {
+      "social scale, digit only": 32,
+      "social scale, \"Оцінка: <цифра>\"": 21,
+      "social scale, action from an earlier step, two lines": 32,
+      "UAlign social, real item": 15
+    },
+    "code": {
+      "function from a Ukrainian description": 40,
+      "fix a bug in a given function": 14,
+      "docstring or mapping given by an earlier step": 24,
+      "parse a Ukrainian string": 12,
+      "time arithmetic": 10
+    }
+  },
+  "real_items": {
+    "zno": 40,
+    "ualign_social": 15,
+    "seed": 42
+  },
+  "drafted_by": "Claude (Anthropic), not one of the compared models; prompt scripts/benchmarks/prompts/node_train_generation.md",
+  "checks": "gold passes its check, wrong answer fails it, math from arithmetic, code tests, no 10-word overlap with tasks_public_4401 / graphs_mixed_100_dev / graphs_mixed_100_test, no duplicate prompts; no overlap with train, same subtype x form counts as train, unique openers and no four-word phrase in more than three items per skill, e5 cosine to train at most 0.95",
+  "teacher_check_n2": "not run",
+  "human_review": "draft sample of 42 approved 1 Nov 2026; full set not reviewed yet",
+  "selected_by_model_scores": false,
+  "sha256_16": "2dd49822418791a0",
+  "git_commit": "b8f22cbc93260e909c3ca667279a2509f2f25dd3",
+  "built_at": "2026-11-01T10:11:07+00:00"
+}

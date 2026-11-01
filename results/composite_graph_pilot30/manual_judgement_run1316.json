@@ -1,0 +1,458 @@
+{
+ "_about": "Manual judgement of run 1316 (graph pilot, first 30 items, 5 systems), done by Claude on 27 Oct 2026 by reading every final answer against the per-item criteria written before reading. Each criterion is scored 1, 0.5 or 0; the item score is their mean. Code criteria use the unit-test result. No keyword rubric is used. gp-c-09 is excluded: its wording in this run was ambiguous (pieces or kinds). Systems: rd = one call (rules v2), mg = gated planner Mamay-4B, la = planner Lapa, ay = planner Aya, or = gold graph. Run 1317 produced identical answers for all 150 (system, item) pairs, so these judgements apply to run 1317 too.",
+ "criteria_file": "written 27 Oct before reading; same list as in the session scratch file judge_criteria.json",
+ "items": {
+  "gp-s-01": {
+   "all": [
+    1,
+    "correct translation"
+   ]
+  },
+  "gp-s-02": {
+   "all": [
+    1,
+    "4 tips, hyphen lines, no commas"
+   ]
+  },
+  "gp-s-03": {
+   "all": [
+    1,
+    "49"
+   ]
+  },
+  "gp-s-04": {
+   "all": [
+    1,
+    "10"
+   ]
+  },
+  "gp-s-05": {
+   "all": [
+    1,
+    "ні, one word"
+   ]
+  },
+  "gp-s-06": {
+   "all": [
+    1,
+    "correct translation"
+   ]
+  },
+  "gp-s-07": {
+   "all": [
+    1,
+    "tests pass, code only"
+   ]
+  },
+  "gp-s-08": {
+   "all": [
+    1,
+    "names the water bottle"
+   ]
+  },
+  "gp-c-01": {
+   "rd": [
+    0.33,
+    "kept the laptop; 16.3 kg instead of 14.3; JSON with extra text"
+   ],
+   "mg": [
+    0.33,
+    "same answer as one call"
+   ],
+   "la": [
+    0.33,
+    "same answer as one call"
+   ],
+   "ay": [
+    0.33,
+    "same answer as one call"
+   ],
+   "or": [
+    0.17,
+    "kept iron and laptop; 17.5 kg; JSON with extra text"
+   ]
+  },
+  "gp-c-02": {
+   "rd": [
+    0.67,
+    "train correct; 10 500 = forgot the 2 teachers"
+   ],
+   "mg": [
+    0.67,
+    "same"
+   ],
+   "la": [
+    0.67,
+    "same"
+   ],
+   "ay": [
+    0.67,
+    "same"
+   ],
+   "or": [
+    1,
+    "train, 11 340, two lines"
+   ]
+  },
+  "gp-c-03": {
+   "rd": [
+    0.5,
+    "6 300 correct, but written in Ukrainian and from the rental company's side"
+   ],
+   "mg": [
+    1,
+    "English confirmation, 6 300"
+   ],
+   "la": [
+    1,
+    "English confirmation, 6 300"
+   ],
+   "ay": [
+    0.67,
+    "English confirmation, but total 4 050 (wrong)"
+   ],
+   "or": [
+    0.83,
+    "6 300 in English, but written from the rental company's side"
+   ]
+  },
+  "gp-c-04": {
+   "rd": [
+    1,
+    "«Знання — це сила», two sentences, the first starts with it"
+   ],
+   "mg": [
+    0.83,
+    "translation as its own sentence, the two explanation sentences do not start with it"
+   ],
+   "la": [
+    0.83,
+    "same as Mamay-4B"
+   ],
+   "ay": [
+    0.83,
+    "same as Mamay-4B"
+   ],
+   "or": [
+    1,
+    "two sentences, first starts with «Знання — це сила»"
+   ]
+  },
+  "gp-c-05": {
+   "rd": [
+    0.83,
+    "143, 09:55; narration around the sentence"
+   ],
+   "mg": [
+    0.83,
+    "143, 09:55; narration around the sentence"
+   ],
+   "la": [
+    0.83,
+    "same"
+   ],
+   "ay": [
+    0.83,
+    "same"
+   ],
+   "or": [
+    1,
+    "one clean sentence"
+   ]
+  },
+  "gp-c-06": {
+   "rd": [
+    0.5,
+    "code returns capitalised days, tests fail"
+   ],
+   "mg": [
+    1,
+    "lowercase, tests pass"
+   ],
+   "la": [
+    1,
+    "lowercase, tests pass"
+   ],
+   "ay": [
+    1,
+    "lowercase, tests pass"
+   ],
+   "or": [
+    0.5,
+    "capitalised days although the node prompt now says «малими літерами» (run 1317)"
+   ]
+  },
+  "gp-c-07": {
+   "rd": [
+    0.83,
+    "paint + cement, 56 kg; text before the sentence"
+   ],
+   "mg": [
+    0.17,
+    "100 kg, materials not named"
+   ],
+   "la": [
+    0.5,
+    "cement only, 50 kg"
+   ],
+   "ay": [
+    0.17,
+    "added sugar and biscuits, 65.5 kg"
+   ],
+   "or": [
+    0.33,
+    "61.5 kg = sugar and biscuits added"
+   ]
+  },
+  "gp-c-08": {
+   "rd": [
+    0.5,
+    "405 / 2 = 202.5: wrong sum (395)"
+   ],
+   "mg": [
+    1,
+    "395 / 2 = 197.5"
+   ],
+   "la": [
+    0.5,
+    "202.5, wrong sum"
+   ],
+   "ay": [
+    0.5,
+    "«з тебе 395»: forgot to halve"
+   ],
+   "or": [
+    1,
+    "197.5 in a message"
+   ]
+  },
+  "gp-c-09": {
+   "all": [
+    null,
+    "excluded: ambiguous wording in this run (3 kinds or 4 pieces)"
+   ]
+  },
+  "gp-c-10": {
+   "rd": [
+    0.83,
+    "left earbud, exchange offered, but 4 sentences instead of 2"
+   ],
+   "mg": [
+    0.83,
+    "same, letter format longer than 2 sentences"
+   ],
+   "la": [
+    0.83,
+    "same"
+   ],
+   "ay": [
+    0.83,
+    "same"
+   ],
+   "or": [
+    0.83,
+    "same, 4 sentences"
+   ]
+  },
+  "gp-g-01": {
+   "rd": [
+    0.83,
+    "Petro, 8 hours; format not as asked"
+   ],
+   "mg": [
+    0.83,
+    "same"
+   ],
+   "la": [
+    0.83,
+    "same"
+   ],
+   "ay": [
+    0.83,
+    "same"
+   ],
+   "or": [
+    0.67,
+    "says Olena (wrong) though difference 8; nonsense about age"
+   ]
+  },
+  "gp-g-02": {
+   "all": [
+    1,
+    "480, 220, 630 in the requested lines"
+   ]
+  },
+  "gp-g-03": {
+   "rd": [
+    0.83,
+    "translation + suits; split into two blocks instead of one message"
+   ],
+   "mg": [
+    0.83,
+    "same"
+   ],
+   "la": [
+    0.83,
+    "same"
+   ],
+   "ay": [
+    0.83,
+    "same"
+   ],
+   "or": [
+    0.83,
+    "one message with the content, but written as if the writer is the free friend"
+   ]
+  },
+  "gp-g-04": {
+   "rd": [
+    0.33,
+    "computes 60 but names Kolosok 62 as cheaper"
+   ],
+   "mg": [
+    0.33,
+    "same"
+   ],
+   "la": [
+    0.33,
+    "same"
+   ],
+   "ay": [
+    0.33,
+    "same"
+   ],
+   "or": [
+    0.67,
+    "Zernyatko, but 6 UAH/kg (54 / 0.9 wrong)"
+   ]
+  },
+  "gp-g-05": {
+   "rd": [
+    0.83,
+    "Serhiy, 1.5 km; several sentences instead of one"
+   ],
+   "mg": [
+    0.83,
+    "same"
+   ],
+   "la": [
+    0.83,
+    "same"
+   ],
+   "ay": [
+    0.83,
+    "same"
+   ],
+   "or": [
+    0.5,
+    "Serhiy, but 29 km and 10.5 km (sums wrong)"
+   ]
+  },
+  "gp-g-06": {
+   "rd": [
+    0.83,
+    "Sonyachna 229; extra line for Lypova"
+   ],
+   "mg": [
+    0.83,
+    "Sonyachna 229; long answer"
+   ],
+   "la": [
+    0.83,
+    "same"
+   ],
+   "ay": [
+    0.83,
+    "same"
+   ],
+   "or": [
+    0.33,
+    "Lypova 257: wrong choice"
+   ]
+  },
+  "gp-p-01": {
+   "rd": [
+    1,
+    "translation and working code"
+   ],
+   "mg": [
+    1,
+    "translation and working code"
+   ],
+   "la": [
+    1,
+    "translation and working code"
+   ],
+   "ay": [
+    1,
+    "translation and working code"
+   ],
+   "or": [
+    0.75,
+    "translation turned the Latin vowels into Cyrillic а е і о у; code works"
+   ]
+  },
+  "gp-p-02": {
+   "all": [
+    1,
+    "Thank you for the quick delivery; 255"
+   ]
+  },
+  "gp-p-03": {
+   "all": [
+    1,
+    "Thursday 15:00 room 204; is_even works"
+   ]
+  },
+  "gp-p-04": {
+   "rd": [
+    0.75,
+    "headline 7 words (limit 6); 9 000"
+   ],
+   "mg": [
+    1,
+    "4-word headline; 9 000"
+   ],
+   "la": [
+    1,
+    "4-word headline; 9 000"
+   ],
+   "ay": [
+    1,
+    "4-word headline; 9 000"
+   ],
+   "or": [
+    1,
+    "headline; 9 000"
+   ]
+  },
+  "gp-p-05": {
+   "rd": [
+    0.5,
+    "5 400 seconds (wrong); function works"
+   ],
+   "mg": [
+    0.5,
+    "same"
+   ],
+   "la": [
+    0.5,
+    "same"
+   ],
+   "ay": [
+    0.5,
+    "same"
+   ],
+   "or": [
+    1,
+    "10 800; function works"
+   ]
+  },
+  "gp-p-06": {
+   "all": [
+    1,
+    "translation and three hashtags"
+   ]
+  }
+ }
+}

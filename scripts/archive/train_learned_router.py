@@ -5,8 +5,8 @@ Labels = argmax quality across specialists. Hold out mixed_ua_v6 ids to avoid le
 
   PYTHONPATH=. python scripts/train_learned_router.py \\
     --scores results/v6_screen/*_detail.jsonl \\
-    --suite benchmarks/mixed_ua_v6_screen.jsonl \\
-    --holdout benchmarks/mixed_ua_v6.jsonl \\
+    --suite benchmarks/archive/mixed_ua_v6_screen.jsonl \\
+    --holdout benchmarks/archive/mixed_ua_v6.jsonl \\
     --encoder hash
 """
 

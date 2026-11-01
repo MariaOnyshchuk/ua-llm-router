@@ -251,7 +251,7 @@ def main() -> None:
         help="OpenAI-compatible base URL (OpenRouter / Azure / local gateway all work)",
     )
     p.add_argument("--api-key-env", default="OPENAI_API_KEY")
-    p.add_argument("--bench", default="benchmarks/mixed_ua_v4_balanced.jsonl")
+    p.add_argument("--bench", default="benchmarks/tasks_mixed_192.jsonl")
     p.add_argument("--bucket", default="", help="Optional bucket filter, comma-separated")
     p.add_argument("--id-prefix", default="", help="Optional id prefix filter")
     p.add_argument("--limit", type=int, default=0, help="Only first N items (smoke test)")

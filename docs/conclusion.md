@@ -8,9 +8,9 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low, so do not subtract one of them from a rescored number. All
-> of these are v4 development numbers; claims come from `mixed_ua_v7` test.
+> of these are v4 development numbers; claims come from `tasks_public_4401` test.
 
-*Empirical line, `mixed_ua_v4_balanced` 192 items, T=0, seed=42, max_tokens=256.*
+*Empirical line, `tasks_mixed_192` 192 items, T=0, seed=42, max_tokens=256.*
 
 ## Claim
 

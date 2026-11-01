@@ -30,7 +30,7 @@ CORPUS_FILES = (
 )
 
 HAND_FILES = (
-    ROOT / "benchmarks/mixed_ua_v0.jsonl",
+    ROOT / "benchmarks/archive/mixed_ua_v0.jsonl",
     ROOT / "benchmarks/samples/chat_extra_v1.jsonl",
     ROOT / "benchmarks/samples/instruct_extra_v1.jsonl",
     ROOT / "benchmarks/samples/code_extra_v1.jsonl",
@@ -96,7 +96,7 @@ def main() -> None:
     p.add_argument(
         "--out",
         type=Path,
-        default=ROOT / "benchmarks" / "mixed_ua_v6_screen.jsonl",
+        default=ROOT / "benchmarks" / "archive" / "mixed_ua_v6_screen.jsonl",
     )
     args = p.parse_args()
 

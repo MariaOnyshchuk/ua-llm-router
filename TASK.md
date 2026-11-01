@@ -61,9 +61,9 @@ submit the test runs herself.
    lines). If it has a `prompt`, `content`, `answer` or `messages` field, do
    not add it; add its path to `.gitignore` instead. Never add anything under
    `logs/`, `hf_eval/`, `benchmarks/agentcoma_*` or `results/a2_*`.
-   **One exception:** `benchmarks/mixed_ua_v7.jsonl` and
-   `benchmarks/mixed_ua_v7_meta.json` are the claim suite and must be
-   committed, like `mixed_ua_v4_balanced.jsonl` and `mixed_ua_v6.jsonl` already
+   **One exception:** `benchmarks/tasks_public_4401.jsonl` and
+   `benchmarks/tasks_public_4401_meta.json` are the claim suite and must be
+   committed, like `tasks_mixed_192.jsonl` and `mixed_ua_v6.jsonl` already
    are. Do not put them in `.gitignore`.
 
 ## Do not
@@ -71,11 +71,11 @@ submit the test runs herself.
 - No cluster: no `ssh`, `scp`, `rsync`, `sbatch`, `squeue` to `ucu-lab-2240`.
   No live model calls of any kind.
 - Do not read, score or summarise the **test** split of
-  `benchmarks/mixed_ua_v7.jsonl` or the AgentCoMa-UK test 150. Dev only.
+  `benchmarks/tasks_public_4401.jsonl` or the AgentCoMa-UK test 150. Dev only.
   Some score files cover the whole pool, test items included:
   `results/v7_pool/scores_specialists_detail.jsonl` (item rows) and
   `results/v7_pool/scores_specialists.json` (whole-pool means). From the first,
-  use only rows whose id has `"split": "dev"` in `benchmarks/mixed_ua_v7.jsonl`;
+  use only rows whose id has `"split": "dev"` in `benchmarks/tasks_public_4401.jsonl`;
   filter before computing anything. Do not open, quote or cite the second.
   Both may be committed as they are.
 - Mamay-12B is a reference baseline only. Maria decided on 12 Oct not to add it
@@ -86,7 +86,7 @@ submit the test runs herself.
 - No paid API calls.
 - Do not delete or overwrite result files, benchmarks, or anything in `logs/`.
 - Do not edit `scripts/score_results.py`, `benchmarks/*.jsonl`, or
-  `benchmarks/mixed_ua_v7_meta.json`.
+  `benchmarks/tasks_public_4401_meta.json`.
 - Do not change the behaviour of existing router or planner profiles (rules
   v2, `hybrid`, `template`, `hybrid_gated`). A new idea goes in a new, named
   profile.

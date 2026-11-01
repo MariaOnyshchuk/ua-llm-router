@@ -8,9 +8,9 @@
 > micro-cascade, ensemble vote, 4-bit) were **not rescored**: their raw files
 > are only on the lab. Those numbers are from before the fix and are probably
 > about 0.01 low. All of these are v4 development numbers; claims come from
-> `mixed_ua_v7` test.
+> `tasks_public_4401` test.
 
-*Lab: `ucu-lab-2240`, 20 Aug 2026. Suite: `benchmarks/mixed_ua_v4_balanced.jsonl` (192 = 32×6). Decoding: T=0, seed=42, 3 repeats. HTTP 192/192 on all week-6 JSONL.*
+*Lab: `ucu-lab-2240`, 20 Aug 2026. Suite: `benchmarks/tasks_mixed_192.jsonl` (192 = 32×6). Decoding: T=0, seed=42, 3 repeats. HTTP 192/192 on all week-6 JSONL.*
 
 This week filled the missing **same-suite** table: Mamay-4B and Lapa solos on v4, then the matrix router with **social few-shot** and **leakage-fixed rules**, then a **micro-cascade** (no Mamay-12B).
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import Any
 
@@ -290,6 +291,53 @@ def normalize_intents(raw: dict[str, Any]) -> dict[str, Any]:
     return {**raw, "steps": fixed}
 
 
+_OPTION_LINE = re.compile(r"^\s*[А-ДA-E][\s.)]\s*\S", re.M)
+
+
+def request_data(user_prompt: str) -> str | None:
+    """The data the request works on: the text after the first blank line, else the answer options.
+
+    Requests in the composite suites put the instruction first and the data (source text,
+    notice, test question with options, specification) after a blank line.
+    """
+    text = (user_prompt or "").strip()
+    if "\n\n" in text:
+        data = text.split("\n\n", 1)[1].strip()
+        return data or None
+    options = [line for line in text.splitlines() if _OPTION_LINE.match(line)]
+    return "\n".join(options) if len(options) >= 2 else None
+
+
+def _squash(text: str) -> str:
+    return re.sub(r"\s+", " ", text or "").strip().casefold()
+
+
+_LINE_LABEL = re.compile(r"^\s*[\w ]{1,20}:\s+(?=\S)")
+
+
+def has_request_data(prompt: str, data: str) -> bool:
+    """Every line of the data is in the prompt, ignoring a leading label such as «Source:».
+
+    Line by line, so options the planner wrote in one line («А 45, Б 90, В 180») still count.
+    """
+    text = _squash(prompt)
+    lines = [_squash(_LINE_LABEL.sub("", line)) for line in data.splitlines()]
+    return all(line in text for line in lines if line)
+
+
+def with_request_data(prompt: str, data: str | None) -> str:
+    """Append the request's data to a first step that lost it.
+
+    The planner sometimes writes «Витягни з оголошення subject і number.» without the
+    notice, or keeps a test question without its options; the specialist then answers
+    something else (probe-100, 26 Oct). PLANNER_REQUEST_DATA=0 turns this off, for the
+    before/after comparison on composite v2 dev.
+    """
+    if not data or has_request_data(prompt, data) or os.environ.get("PLANNER_REQUEST_DATA") == "0":
+        return prompt
+    return f"{prompt}\n\nДані із запиту:\n{data}"
+
+
 def with_user_request(plan: Plan, user_prompt: str) -> Plan:
     """Tell each step its place in the plan and make the last step answer the whole request.
 
@@ -299,13 +347,16 @@ def with_user_request(plan: Plan, user_prompt: str) -> Plan:
     action, so they do not do the rest of the request too.
     """
     plan = ensure_dependency_placeholders(plan)
+    data = request_data(user_prompt)
     steps: list[PlanStep] = []
     last = len(plan.steps) - 1
     for index, step in enumerate(plan.steps):
         if index < last:
             # No copy of the whole request here: with it, a specialist did the whole task
-            # at step 1 and the next step repeated the work.
-            prompt = f"{step.prompt}\n\nВиконай лише цю одну дію і поверни лише її результат, без пояснень."
+            # at step 1 and the next step repeated the work. A step with no inputs gets the
+            # request's data, though, since it has nothing else to work on.
+            prompt = step.prompt if step.depends_on else with_request_data(step.prompt, data)
+            prompt = f"{prompt}\n\nВиконай лише цю одну дію і поверни лише її результат, без пояснень."
             steps.append(PlanStep(id=step.id, intent=step.intent, depends_on=step.depends_on, prompt=prompt))
             continue
         earlier = tuple(s.id for s in plan.steps[:last])

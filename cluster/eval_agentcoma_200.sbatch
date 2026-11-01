@@ -15,8 +15,8 @@
 #   sbatch cluster/eval_agentcoma_200.sbatch
 #   SPLIT=test sbatch cluster/eval_agentcoma_200.sbatch
 #
-# The source files benchmarks/agentcoma_uk_200_merged.jsonl and
-# benchmarks/agentcoma_uk_200_composite.jsonl are NOT in git: scp them to the
+# The source files benchmarks/graphs_agentcoma_200_source.jsonl and
+# benchmarks/graphs_agentcoma_200.jsonl are NOT in git: scp them to the
 # lab first. Generation JSONL stays on the lab / HF; only scores come back.
 #
 # Optional env: SPLIT=dev|test  SYSTEMS=...  REPEATS=3  MAX_TOKENS=256
@@ -40,7 +40,7 @@ REPEATS="${REPEATS:-3}"
 # 256 is the old default; the hybrid_gated dev runs of 12 Oct used 1024 (reasoning answers are cut at 256).
 MAX_TOKENS="${MAX_TOKENS:-256}"
 OUT_DIR="${ROOT}/results/week_13_agentcoma_200_${SPLIT}"
-BENCH="${ROOT}/benchmarks/agentcoma_uk_200_composite.jsonl"
+BENCH="${ROOT}/benchmarks/graphs_agentcoma_200.jsonl"
 
 mkdir -p "${ROOT}/logs" "${OUT_DIR}"
 

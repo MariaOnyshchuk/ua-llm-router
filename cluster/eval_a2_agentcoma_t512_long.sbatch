@@ -63,7 +63,7 @@ fi
 
 cd "${ROOT}"
 PYTHONPATH=. python -u scripts/run_planner_grid.py \
-  --bench benchmarks/agentcoma_uk_50_composite.jsonl \
+  --bench benchmarks/graphs_agentcoma_50_dev.jsonl \
   --family travel_agent,science_experiments \
   --models mamay4 \
   --max-tokens 512 \

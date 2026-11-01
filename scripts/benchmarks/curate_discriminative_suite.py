@@ -3,9 +3,9 @@
 
 Usage:
   python scripts/benchmarks/curate_discriminative_suite.py \\
-    --suite benchmarks/mixed_ua_v6_screen.jsonl \\
+    --suite benchmarks/archive/mixed_ua_v6_screen.jsonl \\
     --scores results/v6_screen/scores_*_detail.jsonl \\
-    --out benchmarks/mixed_ua_v6.jsonl
+    --out benchmarks/archive/mixed_ua_v6.jsonl
 """
 
 from __future__ import annotations
@@ -106,7 +106,7 @@ def main() -> None:
         help="Aliases used for variance/difficulty (default: all). "
         "Pass mamay4 lapa aya to drop a broken screening run.",
     )
-    p.add_argument("--out", type=Path, default=ROOT / "benchmarks" / "mixed_ua_v6.jsonl")
+    p.add_argument("--out", type=Path, default=ROOT / "benchmarks" / "archive" / "mixed_ua_v6.jsonl")
     p.add_argument("--meta-out", type=Path, default=None)
     p.add_argument("--drop-frac", type=float, default=0.43)
     p.add_argument("--seed", type=int, default=42)
@@ -120,9 +120,9 @@ def main() -> None:
     )
     args = p.parse_args()
     if args.out.resolve() in {
-        (ROOT / "benchmarks" / "mixed_ua_v4_balanced.jsonl").resolve(),
-        (ROOT / "benchmarks" / "mixed_ua_v5.jsonl").resolve(),
-        (ROOT / "benchmarks" / "mixed_ua_v3.jsonl").resolve(),
+        (ROOT / "benchmarks" / "tasks_mixed_192.jsonl").resolve(),
+        (ROOT / "benchmarks" / "archive" / "mixed_ua_v5.jsonl").resolve(),
+        (ROOT / "benchmarks" / "archive" / "mixed_ua_v3.jsonl").resolve(),
     }:
         raise SystemExit("refusing to overwrite a historical suite")
 

@@ -15,8 +15,9 @@
 #   sbatch cluster/eval_v7_router.sbatch                 # dev
 #   SPLIT=test sbatch cluster/eval_v7_router.sbatch
 #   FORMAT_GUARD=1 sbatch cluster/eval_v7_router.sbatch      # with the format guard
+#   WIKI=1 sbatch cluster/eval_v7_router.sbatch              # knowledge bucket with Wikipedia passages
 #
-# Needs benchmarks/mixed_ua_v7.jsonl, router/intent_rules.py and the current
+# Needs benchmarks/tasks_public_4401.jsonl, router/intent_rules.py and the current
 # scripts/run_small_router_cluster.py on the lab (scp + checksum). Writes
 # results/v7_<split>_router/. Not yet run: try SPLIT=dev first.
 
@@ -24,17 +25,28 @@ set -euo pipefail
 
 SPLIT="${SPLIT:-dev}"
 MAX_TOKENS="${MAX_TOKENS:-1024}"
-BENCH="${BENCH:-benchmarks/mixed_ua_v7.jsonl}"
+BENCH="${BENCH:-benchmarks/tasks_public_4401.jsonl}"
 SYSTEM="router_matrix_v2_fewshot"
 # FORMAT_GUARD=1 adds router/format_guard.py (system name gets the suffix _fg).
 FORMAT_GUARD="${FORMAT_GUARD:-0}"
+# WIKI=1 runs only the knowledge bucket with router/wiki_search.py, reading only the cache in
+# .cache/wiki (build it on the laptop with scripts/build_wiki_cache.py and copy it here).
+WIKI="${WIKI:-0}"
 GUARD_ARGS=()
-SCORES="scores_router.json"
-if [[ "${FORMAT_GUARD}" == "1" ]]; then
-  GUARD_ARGS=(--format-guard)
-  SYSTEM="${SYSTEM}_fg"
-  SCORES="scores_router_fg.json"
+SCORES="scores_router"
+RUN_GROUP="router"
+if [[ "${WIKI}" == "1" ]]; then
+  GUARD_ARGS+=(--wiki-rag --wiki-offline --bucket knowledge)
+  SYSTEM="${SYSTEM}_wiki"
+  SCORES="${SCORES}_wiki"
+  RUN_GROUP="wiki"
 fi
+if [[ "${FORMAT_GUARD}" == "1" ]]; then
+  GUARD_ARGS+=(--format-guard)
+  SYSTEM="${SYSTEM}_fg"
+  SCORES="${SCORES}_fg"
+fi
+SCORES="${SCORES}.json"
 ROOT="${HOME}/Diploma"
 # shellcheck disable=SC1091
 source "${ROOT}/.venv/bin/activate"
@@ -45,7 +57,11 @@ set +a
 export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
 export HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
 export VLLM_USE_FLASHINFER_SAMPLER=0
-OUT_DIR="${ROOT}/results/v7_${SPLIT}_router"
+OUT_DIR="${ROOT}/results/v7_${SPLIT}_${RUN_GROUP}"
+if [[ "${WIKI}" == "1" && ! -d "${ROOT}/.cache/wiki" ]]; then
+  echo "[v7-router] WIKI=1 but ${ROOT}/.cache/wiki is missing; copy the cache first" >&2
+  exit 1
+fi
 mkdir -p "${ROOT}/logs" "${OUT_DIR}"
 if [[ ! -f "${ROOT}/${BENCH}" ]]; then
   echo "[v7-router] missing ${BENCH}; scp it from the laptop first" >&2

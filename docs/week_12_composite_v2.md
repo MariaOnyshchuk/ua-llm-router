@@ -13,7 +13,7 @@ selector close the planning gap that free-form Hybrid v3 left on v1?
 
 | | |
 |--|--|
-| Path | `benchmarks/mixed_ua_composite_v2.jsonl` |
+| Path | `benchmarks/archive/mixed_ua_composite_v2.jsonl` |
 | Size | **200** = 5 families × (16 train + 12 dev + 12 test) |
 | Builder | `python scripts/benchmarks/build_composite_benchmark.py --version v2` |
 | Fingerprint | `7805aa17885b5f81` |
