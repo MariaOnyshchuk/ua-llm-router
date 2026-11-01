@@ -355,10 +355,21 @@ PLANNED_MISSING: tuple[tuple[str, str, str], ...] = (
 )
 
 
+# Files renamed on 1 Nov 2026 (docs/benchmarks.md, "Dataset file names"); the ledger keeps the old suite names.
+OLD_SUITE_NAMES = {
+    "tasks_public_4401": "mixed_ua_v7",
+    "tasks_mixed_192": "mixed_ua_v4_balanced",
+    "intent_requests_72": "intent_natural_v1",
+    "graphs_mixed_100_dev": "mixed_ua_composite_graph100",
+    "graphs_mixed_100_test": "mixed_ua_composite_test100",
+}
+
+
 def load_suites(bench_dir: Path) -> dict[str, dict[str, int]]:
-    """Bucket -> item count for every suite, used to validate the registry."""
+    """Bucket -> item count for every suite, used to validate the registry. Reads benchmarks/ and
+    benchmarks/archive/, and registers renamed files under their old names too."""
     suites: dict[str, dict[str, int]] = {}
-    for path in sorted(bench_dir.glob("*.jsonl")):
+    for path in sorted(bench_dir.glob("*.jsonl")) + sorted((bench_dir / "archive").glob("*.jsonl")):
         counts: dict[str, int] = defaultdict(int)
         by_split: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -369,10 +380,13 @@ def load_suites(bench_dir: Path) -> dict[str, dict[str, int]]:
             counts[row.get("bucket", "?")] += 1
             if row.get("split"):
                 by_split[row["split"]][row.get("bucket", "?")] += 1
-        suites[path.stem] = dict(counts)
-        # A suite with a split field (mixed_ua_v7) is also known as <stem>_dev, <stem>_test.
-        for split, split_counts in by_split.items():
-            suites.setdefault(f"{path.stem}_{split}", dict(split_counts))
+        for stem in (path.stem, OLD_SUITE_NAMES.get(path.stem)):
+            if not stem:
+                continue
+            suites[stem] = dict(counts)
+            # A suite with a split field (mixed_ua_v7) is also known as <stem>_dev, <stem>_test.
+            for split, split_counts in by_split.items():
+                suites.setdefault(f"{stem}_{split}", dict(split_counts))
     return suites
 
 
