@@ -48,6 +48,8 @@ Code: `router/intent_rules.py`.
 
 ---
 
+- **Learned routers vs rules v2 on held-out steps (1 Nov 2026, `nodes_mixed_600_test`, one pass):** kNN + nodes 0.834 and MLP + nodes 0.814 vs rules v2 0.793 (from text) / 0.809 (intent label); both pass the pre-set rule, kNN + nodes is better than both rules variants. Rules v2 matches no rule on 53% of items. On `graphs_mixed_100_dev` plan steps kNN + nodes was worse than the rules; MLP + nodes was not distinguishable there or here. Details: [`docs/benchmarks.md`](benchmarks.md).
+
 ## Benchmarks
 
 | Layer | Path | Size | Role |

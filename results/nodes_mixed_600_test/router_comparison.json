@@ -1,0 +1,566 @@
+{
+  "bench": "benchmarks/nodes_mixed_600_test.jsonl",
+  "n_items": 600,
+  "freeze_commit": "4548da0",
+  "decision_rule": "switch if the lower end of the 95% paired bootstrap interval of (learned - rules v2) > -0.02, against both rules variants",
+  "scores": {
+    "mamay4": {
+      "all": 0.7732,
+      "math": 0.74,
+      "translate": 0.9267,
+      "instruct": 0.8925,
+      "knowledge": 0.605,
+      "alignment": 0.61,
+      "code": 0.8648
+    },
+    "lapa": {
+      "all": 0.7452,
+      "math": 0.83,
+      "translate": 0.569,
+      "instruct": 0.8088,
+      "knowledge": 0.6837,
+      "alignment": 0.78,
+      "code": 0.7998
+    },
+    "aya": {
+      "all": 0.7815,
+      "math": 0.71,
+      "translate": 0.9237,
+      "instruct": 0.821,
+      "knowledge": 0.6933,
+      "alignment": 0.745,
+      "code": 0.796
+    },
+    "rules_v2_text": {
+      "all": 0.7926,
+      "math": 0.78,
+      "translate": 0.9012,
+      "instruct": 0.8102,
+      "knowledge": 0.6933,
+      "alignment": 0.78,
+      "code": 0.791
+    },
+    "rules_v2_intent": {
+      "all": 0.8091,
+      "math": 0.71,
+      "translate": 0.9237,
+      "instruct": 0.8925,
+      "knowledge": 0.6837,
+      "alignment": 0.78,
+      "code": 0.8648
+    },
+    "knn": {
+      "all": 0.8043,
+      "math": 0.79,
+      "translate": 0.9203,
+      "instruct": 0.8517,
+      "knowledge": 0.6637,
+      "alignment": 0.79,
+      "code": 0.8102
+    },
+    "mlp": {
+      "all": 0.7895,
+      "math": 0.75,
+      "translate": 0.913,
+      "instruct": 0.854,
+      "knowledge": 0.625,
+      "alignment": 0.74,
+      "code": 0.8552
+    },
+    "knn_nodes": {
+      "all": 0.8343,
+      "math": 0.81,
+      "translate": 0.939,
+      "instruct": 0.925,
+      "knowledge": 0.6971,
+      "alignment": 0.77,
+      "code": 0.8648
+    },
+    "mlp_nodes": {
+      "all": 0.8142,
+      "math": 0.81,
+      "translate": 0.9255,
+      "instruct": 0.89,
+      "knowledge": 0.6737,
+      "alignment": 0.78,
+      "code": 0.8057
+    },
+    "oracle": {
+      "all": 0.9329,
+      "math": 0.93,
+      "translate": 0.995,
+      "instruct": 0.9775,
+      "knowledge": 0.875,
+      "alignment": 0.88,
+      "code": 0.9402
+    }
+  },
+  "model_share": {
+    "rules_v2_text": {
+      "mamay4": 0.092,
+      "lapa": 0.317,
+      "aya": 0.592
+    },
+    "rules_v2_intent": {
+      "mamay4": 0.333,
+      "lapa": 0.333,
+      "aya": 0.333
+    },
+    "knn": {
+      "mamay4": 0.38,
+      "lapa": 0.318,
+      "aya": 0.302
+    },
+    "mlp": {
+      "mamay4": 0.55,
+      "lapa": 0.128,
+      "aya": 0.322
+    },
+    "knn_nodes": {
+      "mamay4": 0.335,
+      "lapa": 0.468,
+      "aya": 0.197
+    },
+    "mlp_nodes": {
+      "mamay4": 0.242,
+      "lapa": 0.66,
+      "aya": 0.098
+    }
+  },
+  "fallbacks": {
+    "rules_v2_text": {
+      "no_rule_matched_default_aya": {
+        "n": 319,
+        "share": 0.532,
+        "per_skill": {
+          "math": 74,
+          "translate": 59,
+          "instruct": 80,
+          "knowledge": 45,
+          "alignment": 0,
+          "code": 61
+        },
+        "score_on_these_items": 0.8029
+      }
+    },
+    "rules_v2_intent": {
+      "label_maps_to_default_aya": {
+        "n": 100,
+        "share": 0.167,
+        "per_skill": {
+          "math": 100,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": 0.71
+      }
+    },
+    "knn": {
+      "hard_fallback_default_aya": {
+        "n": 0,
+        "share": 0.0,
+        "per_skill": {
+          "math": 0,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": null
+      },
+      "exact_tie_first_in_list": {
+        "n": 25,
+        "share": 0.042,
+        "per_skill": {
+          "math": 2,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 2,
+          "alignment": 16,
+          "code": 5
+        },
+        "score_on_these_items": 0.7933
+      },
+      "gap_under_0.01": {
+        "n": 93,
+        "share": 0.155,
+        "per_skill": {
+          "math": 11,
+          "translate": 30,
+          "instruct": 9,
+          "knowledge": 7,
+          "alignment": 16,
+          "code": 20
+        },
+        "score_on_these_items": 0.8061
+      },
+      "gap_under_0.02": {
+        "n": 158,
+        "share": 0.263,
+        "per_skill": {
+          "math": 18,
+          "translate": 52,
+          "instruct": 21,
+          "knowledge": 12,
+          "alignment": 16,
+          "code": 39
+        },
+        "score_on_these_items": 0.828
+      },
+      "gap_under_0.05": {
+        "n": 342,
+        "share": 0.57,
+        "per_skill": {
+          "math": 42,
+          "translate": 86,
+          "instruct": 52,
+          "knowledge": 27,
+          "alignment": 68,
+          "code": 67
+        },
+        "score_on_these_items": 0.8043
+      }
+    },
+    "mlp": {
+      "hard_fallback_default_aya": {
+        "n": 0,
+        "share": 0.0,
+        "per_skill": {
+          "math": 0,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": null
+      },
+      "exact_tie_first_in_list": {
+        "n": 0,
+        "share": 0.0,
+        "per_skill": {
+          "math": 0,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": null
+      },
+      "gap_under_0.01": {
+        "n": 78,
+        "share": 0.13,
+        "per_skill": {
+          "math": 6,
+          "translate": 12,
+          "instruct": 18,
+          "knowledge": 11,
+          "alignment": 19,
+          "code": 12
+        },
+        "score_on_these_items": 0.7778
+      },
+      "gap_under_0.02": {
+        "n": 144,
+        "share": 0.24,
+        "per_skill": {
+          "math": 12,
+          "translate": 21,
+          "instruct": 29,
+          "knowledge": 16,
+          "alignment": 37,
+          "code": 29
+        },
+        "score_on_these_items": 0.8003
+      },
+      "gap_under_0.05": {
+        "n": 335,
+        "share": 0.558,
+        "per_skill": {
+          "math": 39,
+          "translate": 53,
+          "instruct": 64,
+          "knowledge": 39,
+          "alignment": 74,
+          "code": 66
+        },
+        "score_on_these_items": 0.8293
+      }
+    },
+    "knn_nodes": {
+      "hard_fallback_default_aya": {
+        "n": 0,
+        "share": 0.0,
+        "per_skill": {
+          "math": 0,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": null
+      },
+      "exact_tie_first_in_list": {
+        "n": 40,
+        "share": 0.067,
+        "per_skill": {
+          "math": 13,
+          "translate": 1,
+          "instruct": 2,
+          "knowledge": 8,
+          "alignment": 11,
+          "code": 5
+        },
+        "score_on_these_items": 0.7625
+      },
+      "gap_under_0.01": {
+        "n": 79,
+        "share": 0.132,
+        "per_skill": {
+          "math": 16,
+          "translate": 20,
+          "instruct": 11,
+          "knowledge": 12,
+          "alignment": 11,
+          "code": 9
+        },
+        "score_on_these_items": 0.8101
+      },
+      "gap_under_0.02": {
+        "n": 129,
+        "share": 0.215,
+        "per_skill": {
+          "math": 25,
+          "translate": 39,
+          "instruct": 22,
+          "knowledge": 19,
+          "alignment": 11,
+          "code": 13
+        },
+        "score_on_these_items": 0.8207
+      },
+      "gap_under_0.05": {
+        "n": 283,
+        "share": 0.472,
+        "per_skill": {
+          "math": 46,
+          "translate": 70,
+          "instruct": 54,
+          "knowledge": 41,
+          "alignment": 30,
+          "code": 42
+        },
+        "score_on_these_items": 0.8536
+      }
+    },
+    "mlp_nodes": {
+      "hard_fallback_default_aya": {
+        "n": 0,
+        "share": 0.0,
+        "per_skill": {
+          "math": 0,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": null
+      },
+      "exact_tie_first_in_list": {
+        "n": 0,
+        "share": 0.0,
+        "per_skill": {
+          "math": 0,
+          "translate": 0,
+          "instruct": 0,
+          "knowledge": 0,
+          "alignment": 0,
+          "code": 0
+        },
+        "score_on_these_items": null
+      },
+      "gap_under_0.01": {
+        "n": 46,
+        "share": 0.077,
+        "per_skill": {
+          "math": 6,
+          "translate": 13,
+          "instruct": 10,
+          "knowledge": 3,
+          "alignment": 3,
+          "code": 11
+        },
+        "score_on_these_items": 0.7971
+      },
+      "gap_under_0.02": {
+        "n": 96,
+        "share": 0.16,
+        "per_skill": {
+          "math": 13,
+          "translate": 21,
+          "instruct": 23,
+          "knowledge": 8,
+          "alignment": 3,
+          "code": 28
+        },
+        "score_on_these_items": 0.8101
+      },
+      "gap_under_0.05": {
+        "n": 214,
+        "share": 0.357,
+        "per_skill": {
+          "math": 24,
+          "translate": 54,
+          "instruct": 53,
+          "knowledge": 14,
+          "alignment": 10,
+          "code": 59
+        },
+        "score_on_these_items": 0.8308
+      }
+    }
+  },
+  "comparisons": {
+    "knn - rules_v2_text": {
+      "diff": 0.0117,
+      "ci95": [
+        -0.0152,
+        0.0387
+      ],
+      "not_worse_by_more_than_0.02": true,
+      "per_skill": {
+        "math": 0.01,
+        "translate": 0.0192,
+        "instruct": 0.0415,
+        "knowledge": -0.0296,
+        "alignment": 0.01,
+        "code": 0.0192
+      }
+    },
+    "knn - rules_v2_intent": {
+      "diff": -0.0048,
+      "ci95": [
+        -0.0313,
+        0.0215
+      ],
+      "not_worse_by_more_than_0.02": false,
+      "per_skill": {
+        "math": 0.08,
+        "translate": -0.0033,
+        "instruct": -0.0408,
+        "knowledge": -0.02,
+        "alignment": 0.01,
+        "code": -0.0547
+      }
+    },
+    "mlp - rules_v2_text": {
+      "diff": -0.0031,
+      "ci95": [
+        -0.0304,
+        0.0238
+      ],
+      "not_worse_by_more_than_0.02": false,
+      "per_skill": {
+        "math": -0.03,
+        "translate": 0.0118,
+        "instruct": 0.0438,
+        "knowledge": -0.0683,
+        "alignment": -0.04,
+        "code": 0.0642
+      }
+    },
+    "mlp - rules_v2_intent": {
+      "diff": -0.0196,
+      "ci95": [
+        -0.0459,
+        0.0067
+      ],
+      "not_worse_by_more_than_0.02": false,
+      "per_skill": {
+        "math": 0.04,
+        "translate": -0.0107,
+        "instruct": -0.0385,
+        "knowledge": -0.0587,
+        "alignment": -0.04,
+        "code": -0.0097
+      }
+    },
+    "knn_nodes - rules_v2_text": {
+      "diff": 0.0417,
+      "ci95": [
+        0.014,
+        0.0693
+      ],
+      "not_worse_by_more_than_0.02": true,
+      "per_skill": {
+        "math": 0.03,
+        "translate": 0.0378,
+        "instruct": 0.1148,
+        "knowledge": 0.0037,
+        "alignment": -0.01,
+        "code": 0.0738
+      }
+    },
+    "knn_nodes - rules_v2_intent": {
+      "diff": 0.0252,
+      "ci95": [
+        0.0025,
+        0.0485
+      ],
+      "not_worse_by_more_than_0.02": true,
+      "per_skill": {
+        "math": 0.1,
+        "translate": 0.0153,
+        "instruct": 0.0325,
+        "knowledge": 0.0133,
+        "alignment": -0.01,
+        "code": -0.0
+      }
+    },
+    "mlp_nodes - rules_v2_text": {
+      "diff": 0.0215,
+      "ci95": [
+        -0.0044,
+        0.0478
+      ],
+      "not_worse_by_more_than_0.02": true,
+      "per_skill": {
+        "math": 0.03,
+        "translate": 0.0243,
+        "instruct": 0.0798,
+        "knowledge": -0.0196,
+        "alignment": 0.0,
+        "code": 0.0147
+      }
+    },
+    "mlp_nodes - rules_v2_intent": {
+      "diff": 0.005,
+      "ci95": [
+        -0.0186,
+        0.0292
+      ],
+      "not_worse_by_more_than_0.02": true,
+      "per_skill": {
+        "math": 0.1,
+        "translate": 0.0018,
+        "instruct": -0.0025,
+        "knowledge": -0.01,
+        "alignment": 0.0,
+        "code": -0.0592
+      }
+    }
+  },
+  "passes_rule": {
+    "knn": false,
+    "mlp": false,
+    "knn_nodes": true,
+    "mlp_nodes": true
+  }
+}

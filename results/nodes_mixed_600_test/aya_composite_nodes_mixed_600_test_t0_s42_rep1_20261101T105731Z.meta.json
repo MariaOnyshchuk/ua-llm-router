@@ -1,0 +1,16 @@
+{
+  "system": "aya",
+  "repeat": 1,
+  "bench": "/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/benchmarks/nodes_mixed_600_test.jsonl",
+  "split_filter": null,
+  "n": 600,
+  "failures": 0,
+  "calls": 600,
+  "latency_ms_total": 1221822.9,
+  "gpu_seconds_total": 1221.8229,
+  "decoding": {
+    "temperature": 0.0,
+    "seed": 42,
+    "max_tokens": 1024
+  }
+}

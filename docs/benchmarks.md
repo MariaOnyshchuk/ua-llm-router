@@ -320,6 +320,48 @@ the routers are frozen. Fingerprint `2dd49822418791a0`.
   interval of (learned − rules v2) is above −0.02. Rules v2 is scored twice: from the prompt text (its regexes)
   and with the item's intent label, as on plan steps.
 
+#### Result (1 Nov 2026, JUPITER job 2623903, run once)
+
+Mamay-4B, Lapa and Aya each answered all 600 items once (T=0, seed 42, max_tokens 1024; 1800 of 1800 complete,
+none empty). Routers were scored on these stored answers by `scripts/analysis/node_test_routers.py`, frozen with the
+routers and rules v2 at commit 4548da0; the script was committed before the first score (bf97061, f6672fa,
+02c3741). Output: `results/nodes_mixed_600_test/router_comparison.json`.
+
+| System | All | math | translate | instruct | knowledge | alignment | code |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Mamay-4B | 0.773 | 0.740 | 0.927 | 0.892 | 0.605 | 0.610 | 0.865 |
+| Lapa | 0.745 | 0.830 | 0.569 | 0.809 | 0.684 | 0.780 | 0.800 |
+| Aya | 0.781 | 0.710 | 0.924 | 0.821 | 0.693 | 0.745 | 0.796 |
+| rules v2, from text | 0.793 | 0.780 | 0.901 | 0.810 | 0.693 | 0.780 | 0.791 |
+| rules v2, with intent label | 0.809 | 0.710 | 0.924 | 0.892 | 0.684 | 0.780 | 0.865 |
+| kNN (v7 dev) | 0.804 | 0.790 | 0.920 | 0.852 | 0.664 | 0.790 | 0.810 |
+| MLP (v7 dev) | 0.789 | 0.750 | 0.913 | 0.854 | 0.625 | 0.740 | 0.855 |
+| kNN + nodes | **0.834** | 0.810 | 0.939 | 0.925 | 0.697 | 0.770 | 0.865 |
+| MLP + nodes | 0.814 | 0.810 | 0.925 | 0.890 | 0.674 | 0.780 | 0.806 |
+| oracle (best per item) | 0.933 | 0.930 | 0.995 | 0.978 | 0.875 | 0.880 | 0.940 |
+
+| Difference (paired bootstrap, 10 000, seed 42) | vs rules v2 from text | vs rules v2 with intent label | Passes the rule |
+|---|---|---|---|
+| kNN (v7 dev) | +0.012 [−0.015, +0.039] | −0.005 [−0.031, +0.021] | no |
+| MLP (v7 dev) | −0.003 [−0.030, +0.024] | −0.020 [−0.046, +0.007] | no |
+| kNN + nodes | **+0.042 [+0.014, +0.069]** | **+0.025 [+0.003, +0.049]** | yes |
+| MLP + nodes | +0.021 [−0.004, +0.048] | +0.005 [−0.019, +0.029] | yes |
+
+- By the rule fixed before the run (lower bound above −0.02 against both rules variants), kNN + nodes and MLP +
+  nodes pass; the routers trained on v7 dev alone do not. kNN + nodes is also better than both rules variants
+  (both intervals above 0); MLP + nodes is not distinguishable from them.
+- Undecided items (out of 600). Rules v2 from text matches no rule on 319 (53%) and sends them to Aya: math 74,
+  translate 59, instruct 80, knowledge 45, alignment 0, code 61. On those items Aya scores 0.803, Mamay-4B would
+  score 0.841. With the label, only the 100 math items reach the default, by design. The learned routers never
+  fall back (0 hard fallbacks). kNN has exact ties, where the choice comes from list order (Mamay-4B): 25 (v7) and
+  40 (+ nodes); MLP has none. Top two predictions less than 0.02 apart: kNN 158, kNN + nodes 129, MLP 144,
+  MLP + nodes 96.
+- Caveats. This test is single steps written by the same author and prompt as the training nodes, so it is in
+  distribution for the +nodes routers; rules v2 was tuned on `tasks_mixed_192`. On `graphs_mixed_100_dev` plan
+  steps (live, 30–31 Oct) kNN + nodes was worse than the rules (oracle plan: −0.060 [−0.120, −0.001]) while MLP +
+  nodes was not distinguishable (−0.014 [−0.076, +0.049]). The two sets disagree about kNN; they agree that
+  MLP + nodes is at least as good as the rules. `graphs_mixed_100_test` (frozen, not run) is the end-to-end check.
+
 ## Composite graphs_mixed_100_test (28 Oct 2026)
 
 `benchmarks/graphs_mixed_100_test.jsonl`, built by `scripts/benchmarks/build_graphs_mixed_100_test.py` with the
