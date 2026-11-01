@@ -1,20 +1,21 @@
 #!/bin/bash
-#SBATCH --job-name=nodes_mixed_600_train
+#SBATCH --job-name=nodes-600
 #SBATCH --account=e-dev-2026d09-051
 #SBATCH --partition=booster
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=32
 #SBATCH --time=02:30:00
-#SBATCH --output=/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/logs/nodes-train-%j.out
-#SBATCH --error=/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/logs/nodes-train-%j.err
+#SBATCH --output=/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/logs/nodes-600-%j.out
+#SBATCH --error=/e/project1/e-dev-2026d09-051/onyshchuk1/Diploma/logs/nodes-600-%j.err
 
-# Node training set (benchmarks/nodes_mixed_600_train.jsonl, 600 single-skill items) on JUPITER:
+# Node sets (benchmarks/nodes_mixed_600_{train,test}.jsonl, 600 single-skill items each) on JUPITER:
 # Mamay-4B, Lapa and Aya in bf16, one per card, T=0, seed=42, max_tokens=1024, one run.
-# The scores are training labels for the learned routers (kNN, MLP), not results to cite.
+# SPLIT=train gives the training labels for the learned routers; SPLIT=test is the held-out router test
+# (run once, after the freeze commit). Routers are scored afterwards on these stored answers.
 # Each model has its own runner process, so the three run at the same time.
 #
-#   sbatch cluster/jupiter_nodes_mixed_600_train.sbatch
+#   SPLIT=test sbatch --export=ALL cluster/jupiter_nodes_mixed_600.sbatch
 
 set -euo pipefail
 
@@ -27,9 +28,10 @@ export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export VLLM_USE_FLASHINFER_SAMPLER=0
 
-RAW_DIR="${ROOT}/logs/nodes_mixed_600_train"
-OUT_DIR="${ROOT}/results/nodes_mixed_600_train"
-BENCH=benchmarks/nodes_mixed_600_train.jsonl
+SPLIT="${SPLIT:-train}"
+RAW_DIR="${ROOT}/logs/nodes_mixed_600_${SPLIT}"
+OUT_DIR="${ROOT}/results/nodes_mixed_600_${SPLIT}"
+BENCH=benchmarks/nodes_mixed_600_${SPLIT}.jsonl
 mkdir -p "${RAW_DIR}" "${OUT_DIR}"
 
 echo "[nodes] host=$(hostname)"
@@ -104,7 +106,7 @@ done
 for log in "${ROOT}"/logs/nodes-run-*-"${SLURM_JOB_ID}".log; do tail -n 2 "${log}"; done
 [[ "${status}" == 0 ]] || { echo "[nodes] a runner failed" >&2; exit 1; }
 
-python scripts/score_composite_results.py "${RAW_DIR}"/*_composite_nodes_mixed_600_train_*.jsonl \
+python scripts/score_composite_results.py "${RAW_DIR}"/*_composite_nodes_mixed_600_${SPLIT}_*.jsonl \
   --out "${OUT_DIR}/scores_all.json"
 
 echo "[nodes] finished -> ${OUT_DIR}/scores_all.json"
