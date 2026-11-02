@@ -37,6 +37,6 @@ Vote rate 29%; flip rate 5% of votes (3/56). Wall p50 doubles because ZNO/alignm
 
 **Verdict:** same as the micro-cascade — **not worth shipping**. Rules v2 stays the product. Ensemble is a measured upper bound on **votable** items only, and that bound is *below* the specialist first hop.
 
-Mode: `python scripts/run_small_router_cluster.py --mode router_ensemble --align-prompt fewshot`. Helpers: `router/ensemble.py`.
+Mode: `python scripts/run_small_router_cluster.py --mode router_ensemble --align-prompt fewshot`. Helpers: `router/ensemble.py`. Both were removed on 2 Nov 2026: the helpers are in `router/archive/ensemble.py` and the mode is no longer in the runner; to reproduce, check out a commit from before that date.
 
 Artifacts: `results/week_7_ensemble/`.

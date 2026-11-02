@@ -4,8 +4,7 @@
   open http://localhost:4010/        (redirects to /debug, the one page)
 
 The page and its API live in router/debug.py and router/static/debug.html. The specialists
-are reached on their vLLM ports (SSH tunnels to the lab). LiteLLM is optional:
-  litellm --config litellm/config.yaml --port 4000
+are reached on their vLLM ports (SSH tunnels to the lab), listed in router/backends.py.
 """
 
 from __future__ import annotations
@@ -28,8 +27,6 @@ from router.orchestrator import Plan, execute_plan
 from router.planner import PLANNER_PROFILES, generate_plan
 from router.wiki_search import WikiClient, wiki_augment
 
-LITELLM_BASE = os.getenv("LITELLM_BASE", "http://localhost:4000").rstrip("/")
-LITELLM_KEY = os.getenv("LITELLM_MASTER_KEY", "sk-diploma-dev")
 AUTO_MODELS = {"auto", "router", "ua-router"}
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 # Wikipedia passages for knowledge requests: per request with "wiki": true, or for all with ROUTER_WIKI=1.
@@ -253,12 +250,14 @@ async def chat_completions(request: Request):
         }
 
     stream = bool(body.get("stream"))
-    headers = {
-        "Authorization": f"Bearer {LITELLM_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    url = f"{LITELLM_BASE}/v1/chat/completions"
+    alias = str(body.get("model"))
+    if alias not in BACKENDS:
+        raise HTTPException(status_code=400, detail=f"unknown model {alias}; use one of {sorted(BACKENDS)} or auto")
+    # the router alias (e.g. "lapa") becomes the vLLM base URL and the served model name
+    base, served_model = BACKENDS[alias]
+    url = f"{base}/chat/completions"
+    headers = {"Content-Type": "application/json"}
+    body = {**body, "model": served_model}
     body.pop("pool", None)
     body.pop("router_profile", None)
 

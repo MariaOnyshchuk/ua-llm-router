@@ -1,4 +1,4 @@
-# UA Specialist Router (LiteLLM)
+# UA Specialist Router
 
 Short design: [DESIGN.md](DESIGN.md) · empirical summary: [docs/key_takeaways.md](docs/key_takeaways.md) · conclusion: [docs/conclusion.md](docs/conclusion.md)
 
@@ -20,7 +20,7 @@ uvicorn router.app:app --port 4010
 # open http://localhost:4010/
 ```
 
-The page talks to specialists **directly** on `:8001` Lapa, `:8003` Mamay-4B, `:8004` Qwen-7B, `:8005` Aya. You can force a single model, restrict the pool, switch rules v1/v2, compare specialists, try micro-cascade / ensemble vote, or run the composite planner and inspect every dependent step.
+The page talks to specialists **directly** on `:8001` Lapa, `:8003` Mamay-4B, `:8004` Qwen-7B, `:8005` Aya. You can force a single model, restrict the pool, switch rules v1/v2, compare specialists, or run the composite planner and inspect every dependent step.
 
 ## Composite benchmark
 
@@ -42,13 +42,10 @@ python scripts/score_composite_results.py \
   --out results/week_10_composite_smoke/scores.json
 ```
 
-## Full stack (OpenAI-compatible, when LiteLLM is up)
+## OpenAI-compatible endpoint
 
 ```bash
-# Terminal A — LiteLLM
-litellm --config litellm/config.yaml --port 4000
-
-# Terminal B — rules router + playground
+# Rules router + playground; specialists are reached on their vLLM ports (router/backends.py)
 uvicorn router.app:app --port 4010
 
 # Client
@@ -60,4 +57,4 @@ curl http://localhost:4010/v1/chat/completions \
   }'
 ```
 
-Aliases: `auto` | `lapa` | `mamay` | `gemma` | `qwen`
+Aliases: `auto` or any key of `BACKENDS` in `router/backends.py` (`mamay4`, `lapa`, `aya`, `qwen7`, `mamay12`, ...)

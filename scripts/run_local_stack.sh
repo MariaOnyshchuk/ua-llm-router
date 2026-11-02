@@ -23,14 +23,7 @@ fi
 source .venv/bin/activate
 pip install -q -r requirements.txt
 
-# 3) LiteLLM on :4000
-lsof -ti:4000 | xargs kill -9 2>/dev/null || true
-echo "[stack] starting LiteLLM on :4000"
-nohup litellm --config litellm/config.yaml --port 4000 > logs/litellm.log 2>&1 &
-echo $! > logs/litellm.pid
-sleep 3
-
-# 4) Rules router on :4010
+# 3) Rules router on :4010 (calls the vLLM ports in router/backends.py directly)
 lsof -ti:4010 | xargs kill -9 2>/dev/null || true
 echo "[stack] starting intent router on :4010"
 mkdir -p logs

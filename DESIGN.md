@@ -15,9 +15,11 @@ Instead of hosting one ~120B model, route each query to a **specialist** (~12–
 | `gemma`  | `google/gemma-3-12b-it` (or Gemma 4 when pinned) | Fresher knowledge     | Facts, “що нового”, general world knowledge     |
 | `qwen`   | `Qwen/Qwen2.5-Coder-14B-Instruct`         | Coding                    | Code, debug, technical implementation           |
 
-Fill real endpoints in `litellm/config.yaml` once vLLM (or APIs) are up.
+Endpoints are in `router/backends.py` (the LiteLLM config used in July is in `router/archive/litellm/`).
 
 ## System sketch
+
+July design. Since 2 Nov 2026 there is no LiteLLM proxy: the router calls the vLLM ports in `router/backends.py` directly.
 
 ```
 Client (OpenAI SDK)
@@ -78,7 +80,7 @@ Paper axes for Methods: **when** (pre-generation), **what** (task/domain signals
 ```
 Diploma/
   DESIGN.md                 ← this file
-  litellm/config.yaml       ← aliases → backends
+  router/backends.py        ← aliases → vLLM ports and model names
   router/intent_rules.py    ← rules
   router/app.py             ← tiny OpenAI-compatible shim
   scripts/smoke_test.sh     ← curl checks

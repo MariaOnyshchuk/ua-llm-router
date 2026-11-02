@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 
-from router.cascade import ALIGN_DIGIT_RE, ZNO_LETTER_RE
+from router.archive.cascade import ALIGN_DIGIT_RE, ZNO_LETTER_RE
 
 ENSEMBLE_VOTERS = ("lapa", "mamay4", "aya")
 

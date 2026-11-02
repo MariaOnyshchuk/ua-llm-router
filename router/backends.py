@@ -1,4 +1,4 @@
-"""vLLM specialist endpoints (same ports as cluster eval / LiteLLM)."""
+"""vLLM specialist endpoints (same ports as the cluster eval jobs); the router calls these directly."""
 
 from __future__ import annotations
 
