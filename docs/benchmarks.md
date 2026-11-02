@@ -388,6 +388,16 @@ is reported as a follow-up and not used for the switch decision.
   1423 v7 dev items add nothing; whether they help on planner-written steps is not measured here.
 - The setting matters little. Refit on all train nodes, the test score is 0.830–0.836 for k = 5…80 and
   0.811–0.827 over the four MLP settings (for information only, not used to choose).
+- Choice of k by 5-fold CV MSE on each router's own training set (from `router/artifacts/*/config.json`):
+
+  | kNN trained on | k=5 | k=10 | k=20 | k=40 | k=80 | chosen |
+  |---|---:|---:|---:|---:|---:|---:|
+  | v7 dev (1423) | 0.1876 | 0.1685 | 0.1640 | 0.1631 | 0.1654 | 40 |
+  | v7 dev + nodes (2023) | 0.1710 | 0.1550 | 0.1528 | 0.1531 | 0.1562 | 20 |
+  | nodes only (600) | 0.1235 | 0.1178 | 0.1217 | 0.1276 | 0.1335 | 10 |
+
+  Next to the best k the error changes by less than 0.005; the MSE values are not comparable across rows
+  (different training sets). k does not change the routing result in any way these tests can show.
 - Ties. kNN with k=10 averages ten 0/1 scores, so predictions come in steps of 0.1: 124 of 600 items (21%) are
   exact ties decided by list order. MLP nodes only has 53 exact ties, because its predictions are clipped at 1.0
   before the argmax.
