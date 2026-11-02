@@ -1,0 +1,83 @@
+{
+  "systems": {
+    "lapa": {
+      "n": 100,
+      "repeats": 1,
+      "final_score_mean": 0.6617,
+      "final_score_sd": 0.0,
+      "final_success_rate": 0.43,
+      "stage_mean": 0.6617,
+      "all_stages_pass_rate": 0.0,
+      "plan_valid_rate": null,
+      "plan_exact_match_rate": null,
+      "intent_f1": null,
+      "fallback_rate": null,
+      "workflow_errors": {},
+      "http_ok_rate": 1.0,
+      "calls_per_item": 1.0,
+      "latency_p50_ms": 5961.5,
+      "latency_avg_ms": 9040.6,
+      "gpu_seconds_per_item": 9.0406,
+      "by_family": {
+        "chain": {
+          "n": 30,
+          "final_score": 0.6167,
+          "final_success_rate": 0.4333,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "graph": {
+          "n": 30,
+          "final_score": 0.6639,
+          "final_success_rate": 0.4,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "parallel": {
+          "n": 30,
+          "final_score": 0.6833,
+          "final_success_rate": 0.4,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        },
+        "simple": {
+          "n": 10,
+          "final_score": 0.725,
+          "final_success_rate": 0.6,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_split": {
+        "dev": {
+          "n": 100,
+          "final_score": 0.6617,
+          "final_success_rate": 0.43,
+          "all_stages_pass_rate": 0.0,
+          "plan_exact_match_rate": null,
+          "intent_f1": null,
+          "fallback_rate": null,
+          "workflow_errors": {},
+          "http_ok_rate": 1.0
+        }
+      },
+      "by_selector_mode": {}
+    }
+  }
+}
