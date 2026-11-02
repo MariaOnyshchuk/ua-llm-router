@@ -47,7 +47,7 @@ into instruct.
 | Change | Where | When it applies |
 |---|---|---|
 | Few-shot alignment prompt | `scripts/alignment_prompt_variants.py`, `--align-prompt fewshot` | social 0/1/2 items only: the scale is spelled out (1 = ordinary behaviour, not praise) and three examples are given. Ethics 0/1 items are unchanged. Always on in the evaluation protocol and in the demo page. |
-| Reasoning suffix | `router/planner.py`, `THINK_SUFFIX` | single-call numeric word problems in the composite runs: list the items, check each against the condition, then compute. |
+| Reasoning suffix (removed 2 Nov 2026) | was `router/planner.py`, `THINK_SUFFIX` | single-call numeric word problems in the composite runs, found by a regex; removed with the planner's rule gates, so no rule changes a prompt before the planner LLM sees it. |
 
 ## 4. Other profiles in the same file
 

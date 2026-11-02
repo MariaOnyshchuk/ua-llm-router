@@ -88,33 +88,6 @@ SYSTEM_INSTRUCTION_GATED = """Ти диспетчер запитів для ук
 Поверни ЛИШЕ JSON.
 """
 
-# Appended to a single-call numeric word problem. Without it the specialists
-# compute at once and skip the commonsense condition (AgentCoMa dev, 12 Oct 2026).
-THINK_SUFFIX = (
-    "\n\nСпершу випиши кожен предмет чи число з умови і для кожного коротко виріши, "
-    "чи він справді підходить під умову задачі (подумай, як це буває в реальному житті). "
-    "Потім порахуй. В останньому рядку напиши: Відповідь: <число>"
-)
-
-# A word problem asks "how many / how much", or names a quantity ("яка площа", "якою
-# буде температура"). A bare "який ... 2020 ...?" is not one: an earlier, wider rule
-# fired on "Який фільм 2020 року порадиш?".
-_QUANTITY = (
-    r"сум|площ|вартіст|кількіст|цін|температур|відстан|швидкіст|тривал|популяці|"
-    r"мас|ваг|об['’ʼ]?єм|довжин|висот|ширин|відсот|частк|вік|час|решт|залиш|бюджет|витрат|прибут"
-)
-_WORD_PROBLEM_ASK = re.compile(
-    r"(?i)\b(скільки|обчисли|порахуй|how many|how much)\b"
-    r"|\bяк(а|ий|е|і|у|ою|им|ої|ого)\b[^?.!]{0,60}?\b(" + _QUANTITY + r")\w*"
-)
-_NUMBER = re.compile(
-    r"(?i)\d+(?:[.,]\d+)?|\b(один|одна|одну|два|дві|три|чотири|п['’ʼ]?ять|шість|сім|вісім|"
-    r"дев['’ʼ]?ять|десять|двадцять|тридцять|сорок|сто|тисяч\w*|половин\w*|пів|десятиліт\w*|удвічі|втричі)\b"
-)
-# Multiple-choice and fixed-format prompts must keep their own answer format.
-_FIXED_FORMAT = re.compile(r"(?i)(лише|тільки|only|рівно)\s+(літер|цифр|число|json|код|\d)|варіант(у|ів|и)\b|\(A, B")
-
-
 SYSTEM_INSTRUCTION = """Ти планувальник складених запитів для українського асистента.
 Розбий запит на 2-4 залежні кроки. Дозволені intent:
 translate, knowledge, instruct, code, alignment, chat.
@@ -207,56 +180,16 @@ def extract_json_object(text: str) -> dict[str, Any]:
     return value
 
 
-# "Answer with the letter only" / "only a digit": the whole answer is one symbol, so one task.
-_SINGLE_SYMBOL = re.compile(
-    r"(?i)(відповід\w*|answer)\s*(—|-|:)?\s*(дай\s+)?(лише|тільки|only)\s+(однією\s+)?(літер|цифр|буквою|a letter|a digit)"
-)
-
-
-# A plan needs a request that states several actions itself: a sequence word ("спочатку …
-# потім") or two task verbs joined by a comma or a conjunction ("переклади … і поясни").
-# A format requirement ("поверни лише JSON") is not a second action.
-_SEQUENCE = re.compile(
-    r"(?i)\b(спочатку|спершу|потім|після\s+(цього|того)|далі|наостанок|насамкінець|фінально"
-    r"|first\b.*\bthen|and then|after that|finally)\b"
-)
-_TASK_VERB = (
-    r"(переклад\w+|поясн\w+|напиш\w+|склад\w+|підсумуй\w*|перекаж\w+|витягн\w+|класифіку\w+"
-    r"|порахуй\w*|обчисл\w+|назви|перелічи|реалізу\w+|виправ\w+|порівня\w+|опиши|визнач\w*"
-    r"|знайд\w+|розв'яж\w+|обґрунту\w+|зроби|дай\s+відповідь|відповідай|відповіси"
-    r"|розкаж\w+|наведи|додай|оціни|скороти|перефразуй|перепиши|придумай|запропонуй"
-    r"|translate|explain|write|summari[sz]e|list|answer)"
-)
-_TWO_ACTIONS = re.compile(
-    r"(?i)\b" + _TASK_VERB + r"\b[^.!?\n]{0,160}?(,|\bі\b|\bй\b|\bта\b|\bа\b)\s+(?:[\w'’-]+\s+){0,2}?" + _TASK_VERB + r"\b"
-)
-
-
-def states_several_actions(prompt: str) -> bool:
-    """The request text itself asks for more than one action."""
-    text = prompt or ""
-    return bool(_SEQUENCE.search(text) or _TWO_ACTIONS.search(text))
-
-
-def is_word_problem(prompt: str) -> bool:
-    """A question that asks for a quantity and states at least two numbers."""
-    text = prompt or ""
-    if _FIXED_FORMAT.search(text) or not text.rstrip().endswith("?"):
-        return False
-    return bool(_WORD_PROBLEM_ASK.search(text)) and len(_NUMBER.findall(text)) >= 2
-
-
 def single_call_plan(prompt: str, router_profile: str = "v2") -> Plan:
-    """One call on the user's own words; word problems get the reasoning suffix.
+    """One call on the user's own words, used when the planner LLM returns one task or no valid plan.
 
     The intent comes from the selected router table, so the single call goes where the
     plain router would send the same request.
     """
     decision = route_intent(prompt, profile=router_profile)
-    text = prompt + THINK_SUFFIX if is_word_problem(prompt) else prompt
     return Plan(
-        steps=(PlanStep(id="single", intent=decision.intent, depends_on=(), prompt=text),),
-        source="single_call_gate",
+        steps=(PlanStep(id="single", intent=decision.intent, depends_on=(), prompt=prompt),),
+        source="single_call",
     )
 
 
@@ -465,26 +398,8 @@ async def generate_plan(
         _, planner_model = resolve_profile(profile)
         planner_model = planner_model or PLANNER_MODEL
 
-    if profile in GATED_PLANNERS and _SINGLE_SYMBOL.search(user_prompt or ""):
-        return single_call_plan(user_prompt, router_profile), {
-            "mode": "rule", "profile": profile, "template_id": None, "valid": True,
-            "attempts": [], "repaired": False, "fallback": False, "gate": "single_symbol_answer",
-        }
-    if profile in GATED_PLANNERS and is_word_problem(user_prompt):
-        # Mamay-4B splits word problems into steps; a rule is more reliable here and saves the call.
-        return single_call_plan(user_prompt, router_profile), {
-            "mode": "rule", "profile": profile, "template_id": None, "valid": True,
-            "attempts": [], "repaired": False, "fallback": False, "gate": "single_word_problem",
-        }
-
-    if profile in GATED_PLANNERS and not states_several_actions(user_prompt):
-        # The planner model splits some one-task requests (0.035 on v7 dev). It is asked only
-        # when the request states several actions, which also saves its call on the rest.
-        return single_call_plan(user_prompt, router_profile), {
-            "mode": "rule", "profile": profile, "template_id": None, "valid": True,
-            "attempts": [], "repaired": False, "fallback": False, "gate": "single_one_action",
-        }
-
+    # The planner LLM decides whether the request is one task or several; no rule decides
+    # before it (rule gates removed 2 Nov 2026, last used at commit 961f476).
     planner_prompt = f"{system}\n\nЗАПИТ КОРИСТУВАЧА:\n{user_prompt}"
     attempts: list[dict[str, Any]] = []
     hop = await caller(planner_model, planner_prompt)

@@ -20,10 +20,8 @@ from router.orchestrator import (
 )
 from router.planner import (
     SYSTEM_INSTRUCTION_V3_MINIMAL,
-    THINK_SUFFIX,
     enforce_final_constraint,
     generate_plan,
-    is_word_problem,
     request_data,
 )
 from router.workflows import select_plan, select_template
@@ -568,33 +566,32 @@ class GatedPlannerTests(unittest.TestCase):
         plan, meta = asyncio.run(generate_plan(prompt, caller, profile="hybrid_gated"))
         return plan, meta, calls
 
-    def test_word_problem_rule(self) -> None:
-        self.assertTrue(is_word_problem("У кімнаті 3 столи і 4 стільці на кожен. Скільки всього стільців?"))
-        self.assertFalse(is_word_problem("Який фільм 2020 року порадиш подивитись?"))
-        self.assertFalse(is_word_problem("Що подарувати татові на 60-річчя? Він любить риболовлю."))
-        self.assertFalse(is_word_problem("Скільки буде 2+2? Відповідай лише цифрою (A, B, C)?"))
-
-    def test_word_problem_skips_the_planner(self) -> None:
+    def test_word_problem_goes_to_the_planner(self) -> None:
+        # No rule decides before the LLM: the planner is asked and its "one task" answer is used.
         prompt = "У кімнаті 3 столи і 4 стільці на кожен. Скільки всього стільців?"
-        plan, meta, calls = self._run(prompt, "unused")
-        self.assertEqual(calls, [])
-        self.assertEqual(len(plan.steps), 1)
-        self.assertEqual(plan.steps[0].prompt, prompt + THINK_SUFFIX)
-        self.assertEqual(meta["gate"], "single_word_problem")
-
-    def test_single_task_keeps_the_users_words(self) -> None:
-        prompt = "Що подарувати татові на 60-річчя? Він любить риболовлю."
-        plan, meta, calls = self._run(prompt, "unused")
-        self.assertEqual(calls, [])  # one action in the text: the planner model is not asked
+        plan, meta, calls = self._run(prompt, '{"steps":[]}')
+        self.assertEqual(calls, ["mamay4"])
         self.assertEqual([s.prompt for s in plan.steps], [prompt])
-        self.assertEqual(meta["gate"], "single_one_action")
+        self.assertEqual(meta["gate"], "single")
 
-    def test_format_requirement_is_not_a_second_action(self) -> None:
-        prompt = ("На полиці стоять 4 склянки, 3 чашки, 2 тарілки і 5 келихів. Мені треба порахувати лише "
-                  'той посуд, з якого п\'ють. Поверни лише JSON у форматі {"answer": число}.')
-        plan, meta, calls = self._run(prompt, "unused")
-        self.assertEqual(calls, [])
-        self.assertEqual(len(plan.steps), 1)
+    def test_single_task_is_decided_by_the_planner(self) -> None:
+        prompt = "Що подарувати татові на 60-річчя? Він любить риболовлю."
+        plan, meta, calls = self._run(prompt, '{"steps":[]}')
+        self.assertEqual(calls, ["mamay4"])
+        self.assertEqual([s.prompt for s in plan.steps], [prompt])
+        self.assertEqual(meta["mode"], "llm")
+
+    def test_planner_may_split_a_request_without_sequence_words(self) -> None:
+        # The old rule gate sent this to one call because the text has no "потім" or two joined verbs.
+        prompt = "Знайди в оголошенні дату збору і склади з неї нагадування."
+        reply = (
+            '{"steps":[{"id":"step1","intent":"knowledge","depends_on":[],"prompt":"Знайди дату"},'
+            '{"id":"step2","intent":"instruct","depends_on":["step1"],"prompt":"Нагадування: {{step1.content}}"}]}'
+        )
+        plan, meta, calls = self._run(prompt, reply)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(plan.steps), 2)
+        self.assertNotIn("gate", meta)
 
     def test_planner_may_still_call_several_actions_one_task(self) -> None:
         prompt = "Переклади українською 'early bird' і поясни значення."
