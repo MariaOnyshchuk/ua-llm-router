@@ -18,6 +18,12 @@ scores from score_composite_results.py, `final_score` per model), and --suffix n
   .venv/bin/python scripts/train_routerbench_router.py \
     --extra-suite benchmarks/nodes_mixed_600_train.jsonl \
     --extra-scores results/nodes_mixed_600_train/scores_all_detail.jsonl --suffix _nodes
+
+With --only-extra the v7 dev items are left out and the routers learn from the node set alone:
+
+  .venv/bin/python scripts/train_routerbench_router.py --only-extra \
+    --extra-suite benchmarks/nodes_mixed_600_train.jsonl \
+    --extra-scores results/nodes_mixed_600_train/scores_all_detail.jsonl --suffix _nodes_only
 """
 
 from __future__ import annotations
@@ -95,12 +101,18 @@ def main() -> None:
     p.add_argument("--extra-suite", type=Path, default=None)
     p.add_argument("--extra-scores", type=Path, default=None)
     p.add_argument("--suffix", default="", help="output folder router/artifacts/<kind><suffix>")
+    p.add_argument("--only-extra", action="store_true", help="train on the extra suite alone, without v7 dev")
     args = p.parse_args()
+    if args.only_extra and not args.extra_suite:
+        p.error("--only-extra needs --extra-suite and --extra-scores")
     args.suite, args.scores = args.suite.resolve(), args.scores.resolve()
     if args.extra_suite:
         args.extra_suite, args.extra_scores = args.extra_suite.resolve(), args.extra_scores.resolve()
 
-    rows, Q, _C = rb.load_dev(args.suite, args.scores, "dev")
+    if args.only_extra:
+        rows, Q = [], np.zeros((0, len(rb.MODELS)))
+    else:
+        rows, Q, _C = rb.load_dev(args.suite, args.scores, "dev")
     n_v7 = len(rows)
     if args.extra_suite:
         extra_rows, extra_Q = load_extra(args.extra_suite, args.extra_scores)
@@ -131,8 +143,10 @@ def main() -> None:
             "hyper_parameters": best,
             "cv_mse": round(best_mse, 4),
             "grid": [{"hp": hp, "cv_mse": round(m, 4)} for m, hp in scored],
-            "train": {"suite": str(args.suite.relative_to(ROOT)), "split": "dev", "n_items": len(rows),
-                      "ids_sha256_16": ids_hash, "scores": str(args.scores.relative_to(ROOT)),
+            "train": {"suite": None if args.only_extra else str(args.suite.relative_to(ROOT)),
+                      "split": None if args.only_extra else "dev", "n_items": len(rows),
+                      "ids_sha256_16": ids_hash,
+                      "scores": None if args.only_extra else str(args.scores.relative_to(ROOT)),
                       "n_v7_dev": n_v7,
                       "extra_suite": str(args.extra_suite.relative_to(ROOT)) if args.extra_suite else None,
                       "extra_scores": str(args.extra_scores.relative_to(ROOT)) if args.extra_scores else None},

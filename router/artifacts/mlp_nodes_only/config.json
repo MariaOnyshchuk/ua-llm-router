@@ -1,0 +1,73 @@
+{
+  "kind": "mlp_nodes_only",
+  "router": "QualityArgmaxRouter (max-quality end, lambda = inf)",
+  "encoder": "e5",
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "encoder_revision": null,
+  "models": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "default": "aya",
+  "hyper_parameters": {
+    "hidden": [
+      128
+    ],
+    "alpha": 0.001
+  },
+  "cv_mse": 0.1234,
+  "grid": [
+    {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.1234
+    },
+    {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1248
+    },
+    {
+      "hp": {
+        "hidden": [
+          256,
+          64
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.131
+    },
+    {
+      "hp": {
+        "hidden": [
+          256,
+          64
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.134
+    }
+  ],
+  "train": {
+    "suite": null,
+    "split": null,
+    "n_items": 600,
+    "ids_sha256_16": "9eaa1c40490ed0a7",
+    "scores": null,
+    "n_v7_dev": 0,
+    "extra_suite": "benchmarks/nodes_mixed_600_train.jsonl",
+    "extra_scores": "results/nodes_mixed_600_train/scores_all_detail.jsonl"
+  },
+  "sklearn": "1.9.1",
+  "git_commit": "961f476956028fe1d6c1c74f48b1ab1938821c74",
+  "trained_at": "2026-11-02T11:58:25+00:00"
+}

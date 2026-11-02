@@ -189,6 +189,15 @@ Paired bootstrap, 95%:
 Reading: decomposition pays off on chains. The planners split far fewer items than the gold graph (about 1.6
 calls against 3.0), so most of the gap to the gold graph is items the gate sends as one call.
 
+Rule gates removed (2 Nov 2026). In these runs the gated profiles had three regex rules in front of the planner
+LLM: a one-symbol answer, a numeric word problem (which also got a reasoning suffix) and "no sequence word or
+two joined task verbs" each sent the request to one call without asking the planner. On graphs_mixed_100_dev they
+decided 75 of the 100 requests (65 one action, 10 word problems), so the planner was asked on 25 only. Plan
+repair ran on 2 requests with the Mamay-4B planner (both failed and fell back to one call) and on 0–1 with Aya.
+The rules are gone from `router/planner.py`: the planner LLM now gets every request and decides one task or
+several itself; an invalid plan after one repair still falls back to one call. The numbers above are with the
+rules (code at commit 961f476) and are not comparable with runs after the change.
+
 ### Learned routers and single models (30 Oct 2026, JUPITER job 2596743, dev only)
 
 Same node, settings and dataset as job 2574111; HTTP 200 and a non-empty answer on all 900 rows. All 14
@@ -361,6 +370,27 @@ routers and rules v2 at commit 4548da0; the script was committed before the firs
   steps (live, 30–31 Oct) kNN + nodes was worse than the rules (oracle plan: −0.060 [−0.120, −0.001]) while MLP +
   nodes was not distinguishable (−0.014 [−0.076, +0.049]). The two sets disagree about kNN; they agree that
   MLP + nodes is at least as good as the rules. `graphs_mixed_100_test` (frozen, not run) is the end-to-end check.
+
+#### Follow-up: routers trained on the node set alone (2 Nov 2026, not part of the frozen comparison)
+
+`scripts/train_routerbench_router.py --only-extra` trains kNN and MLP on the 600 train nodes without v7 dev;
+settings chosen by 5-fold CV on the train nodes (kNN k=10, CV MSE 0.1178; MLP one layer of 128, alpha 0.001,
+0.1234). Scored on the same stored test answers by `scripts/analysis/node_test_nodes_only.py`
+(`results/nodes_mixed_600_test/router_comparison_nodes_only.json`). This run comes after the node test, so it
+is reported as a follow-up and not used for the switch decision.
+
+| Router | Trained on | Test score | − rules v2 text | − rules v2 intent | − same kind with v7 dev + nodes |
+|---|---|---:|---|---|---|
+| kNN nodes only | 600 nodes | 0.830 | +0.038 [+0.012, +0.063] | +0.021 [−0.002, +0.045] | −0.004 [−0.022, +0.014] |
+| MLP nodes only | 600 nodes | 0.823 | +0.030 [+0.004, +0.056] | +0.013 [−0.012, +0.038] | +0.009 [−0.013, +0.030] |
+
+- Adding v7 dev to the nodes does not change the node-test score (both differences contain 0). On this test the
+  1423 v7 dev items add nothing; whether they help on planner-written steps is not measured here.
+- The setting matters little. Refit on all train nodes, the test score is 0.830–0.836 for k = 5…80 and
+  0.811–0.827 over the four MLP settings (for information only, not used to choose).
+- Ties. kNN with k=10 averages ten 0/1 scores, so predictions come in steps of 0.1: 124 of 600 items (21%) are
+  exact ties decided by list order. MLP nodes only has 53 exact ties, because its predictions are clipped at 1.0
+  before the argmax.
 
 ## Composite graphs_mixed_100_test (28 Oct 2026)
 

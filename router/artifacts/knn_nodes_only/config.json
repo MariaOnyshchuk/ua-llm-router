@@ -1,0 +1,62 @@
+{
+  "kind": "knn_nodes_only",
+  "router": "QualityArgmaxRouter (max-quality end, lambda = inf)",
+  "encoder": "e5",
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "encoder_revision": null,
+  "models": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "default": "aya",
+  "hyper_parameters": {
+    "k": 10
+  },
+  "cv_mse": 0.1178,
+  "grid": [
+    {
+      "hp": {
+        "k": 5
+      },
+      "cv_mse": 0.1235
+    },
+    {
+      "hp": {
+        "k": 10
+      },
+      "cv_mse": 0.1178
+    },
+    {
+      "hp": {
+        "k": 20
+      },
+      "cv_mse": 0.1217
+    },
+    {
+      "hp": {
+        "k": 40
+      },
+      "cv_mse": 0.1276
+    },
+    {
+      "hp": {
+        "k": 80
+      },
+      "cv_mse": 0.1335
+    }
+  ],
+  "train": {
+    "suite": null,
+    "split": null,
+    "n_items": 600,
+    "ids_sha256_16": "9eaa1c40490ed0a7",
+    "scores": null,
+    "n_v7_dev": 0,
+    "extra_suite": "benchmarks/nodes_mixed_600_train.jsonl",
+    "extra_scores": "results/nodes_mixed_600_train/scores_all_detail.jsonl"
+  },
+  "sklearn": "1.9.1",
+  "git_commit": "961f476956028fe1d6c1c74f48b1ab1938821c74",
+  "trained_at": "2026-11-02T11:58:14+00:00"
+}

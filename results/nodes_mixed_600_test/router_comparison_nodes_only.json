@@ -1,0 +1,323 @@
+{
+  "bench": "benchmarks/nodes_mixed_600_test.jsonl",
+  "n_items": 600,
+  "note": "follow-up after the 1 Nov node test",
+  "configs": {
+    "knn": {
+      "hp": {
+        "k": 40
+      },
+      "cv_mse": 0.1631,
+      "n_train": 1423
+    },
+    "mlp": {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1653,
+      "n_train": 1423
+    },
+    "knn_nodes": {
+      "hp": {
+        "k": 20
+      },
+      "cv_mse": 0.1528,
+      "n_train": 2023
+    },
+    "mlp_nodes": {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1554,
+      "n_train": 2023
+    },
+    "knn_nodes_only": {
+      "hp": {
+        "k": 10
+      },
+      "cv_mse": 0.1178,
+      "n_train": 600
+    },
+    "mlp_nodes_only": {
+      "hp": {
+        "hidden": [
+          128
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.1234,
+      "n_train": 600
+    }
+  },
+  "scores": {
+    "mamay4": {
+      "all": 0.7732,
+      "math": 0.74,
+      "translate": 0.9267,
+      "instruct": 0.8925,
+      "knowledge": 0.605,
+      "alignment": 0.61,
+      "code": 0.8648
+    },
+    "lapa": {
+      "all": 0.7452,
+      "math": 0.83,
+      "translate": 0.569,
+      "instruct": 0.8088,
+      "knowledge": 0.6837,
+      "alignment": 0.78,
+      "code": 0.7998
+    },
+    "aya": {
+      "all": 0.7815,
+      "math": 0.71,
+      "translate": 0.9237,
+      "instruct": 0.821,
+      "knowledge": 0.6933,
+      "alignment": 0.745,
+      "code": 0.796
+    },
+    "rules_v2_text": {
+      "all": 0.7926,
+      "math": 0.78,
+      "translate": 0.9012,
+      "instruct": 0.8102,
+      "knowledge": 0.6933,
+      "alignment": 0.78,
+      "code": 0.791
+    },
+    "rules_v2_intent": {
+      "all": 0.8091,
+      "math": 0.71,
+      "translate": 0.9237,
+      "instruct": 0.8925,
+      "knowledge": 0.6837,
+      "alignment": 0.78,
+      "code": 0.8648
+    },
+    "knn": {
+      "all": 0.8043,
+      "math": 0.79,
+      "translate": 0.9203,
+      "instruct": 0.8517,
+      "knowledge": 0.6637,
+      "alignment": 0.79,
+      "code": 0.8102
+    },
+    "mlp": {
+      "all": 0.7895,
+      "math": 0.75,
+      "translate": 0.913,
+      "instruct": 0.854,
+      "knowledge": 0.625,
+      "alignment": 0.74,
+      "code": 0.8552
+    },
+    "knn_nodes": {
+      "all": 0.8343,
+      "math": 0.81,
+      "translate": 0.939,
+      "instruct": 0.925,
+      "knowledge": 0.6971,
+      "alignment": 0.77,
+      "code": 0.8648
+    },
+    "mlp_nodes": {
+      "all": 0.8142,
+      "math": 0.81,
+      "translate": 0.9255,
+      "instruct": 0.89,
+      "knowledge": 0.6737,
+      "alignment": 0.78,
+      "code": 0.8057
+    },
+    "knn_nodes_only": {
+      "all": 0.8303,
+      "math": 0.8,
+      "translate": 0.9212,
+      "instruct": 0.8908,
+      "knowledge": 0.755,
+      "alignment": 0.78,
+      "code": 0.8348
+    },
+    "mlp_nodes_only": {
+      "all": 0.8226,
+      "math": 0.79,
+      "translate": 0.9585,
+      "instruct": 0.9108,
+      "knowledge": 0.715,
+      "alignment": 0.72,
+      "code": 0.8415
+    },
+    "oracle": {
+      "all": 0.9329,
+      "math": 0.93,
+      "translate": 0.995,
+      "instruct": 0.9775,
+      "knowledge": 0.875,
+      "alignment": 0.88,
+      "code": 0.9402
+    }
+  },
+  "model_share": {
+    "knn": {
+      "mamay4": 0.38,
+      "lapa": 0.318,
+      "aya": 0.302
+    },
+    "mlp": {
+      "mamay4": 0.55,
+      "lapa": 0.128,
+      "aya": 0.322
+    },
+    "knn_nodes": {
+      "mamay4": 0.335,
+      "lapa": 0.468,
+      "aya": 0.197
+    },
+    "mlp_nodes": {
+      "mamay4": 0.242,
+      "lapa": 0.66,
+      "aya": 0.098
+    },
+    "knn_nodes_only": {
+      "mamay4": 0.36,
+      "lapa": 0.443,
+      "aya": 0.197
+    },
+    "mlp_nodes_only": {
+      "mamay4": 0.383,
+      "lapa": 0.375,
+      "aya": 0.242
+    }
+  },
+  "ties": {
+    "knn": {
+      "exact_tie": 25,
+      "gap_under_0.02": 158
+    },
+    "mlp": {
+      "exact_tie": 0,
+      "gap_under_0.02": 144
+    },
+    "knn_nodes": {
+      "exact_tie": 40,
+      "gap_under_0.02": 129
+    },
+    "mlp_nodes": {
+      "exact_tie": 0,
+      "gap_under_0.02": 96
+    },
+    "knn_nodes_only": {
+      "exact_tie": 124,
+      "gap_under_0.02": 145
+    },
+    "mlp_nodes_only": {
+      "exact_tie": 53,
+      "gap_under_0.02": 121
+    }
+  },
+  "comparisons": {
+    "knn_nodes_only - rules_v2_text": {
+      "diff": 0.0377,
+      "ci95": [
+        0.0122,
+        0.0634
+      ]
+    },
+    "knn_nodes_only - rules_v2_intent": {
+      "diff": 0.0212,
+      "ci95": [
+        -0.0023,
+        0.0454
+      ]
+    },
+    "knn_nodes_only - knn_nodes": {
+      "diff": -0.004,
+      "ci95": [
+        -0.0219,
+        0.0141
+      ]
+    },
+    "knn_nodes_only - mlp_nodes": {
+      "diff": 0.0162,
+      "ci95": [
+        -0.0022,
+        0.035
+      ]
+    },
+    "knn_nodes_only - knn": {
+      "diff": 0.026,
+      "ci95": [
+        0.002,
+        0.0504
+      ]
+    },
+    "knn_nodes_only - mlp": {
+      "diff": 0.0408,
+      "ci95": [
+        0.0164,
+        0.0652
+      ]
+    },
+    "mlp_nodes_only - rules_v2_text": {
+      "diff": 0.03,
+      "ci95": [
+        0.0038,
+        0.0555
+      ]
+    },
+    "mlp_nodes_only - rules_v2_intent": {
+      "diff": 0.0135,
+      "ci95": [
+        -0.0117,
+        0.0383
+      ]
+    },
+    "mlp_nodes_only - knn_nodes": {
+      "diff": -0.0117,
+      "ci95": [
+        -0.033,
+        0.0097
+      ]
+    },
+    "mlp_nodes_only - mlp_nodes": {
+      "diff": 0.0085,
+      "ci95": [
+        -0.0128,
+        0.03
+      ]
+    },
+    "mlp_nodes_only - knn": {
+      "diff": 0.0183,
+      "ci95": [
+        -0.0065,
+        0.0437
+      ]
+    },
+    "mlp_nodes_only - mlp": {
+      "diff": 0.0331,
+      "ci95": [
+        0.0086,
+        0.0577
+      ]
+    }
+  },
+  "test_score_per_setting_info_only": {
+    "knn {\"k\": 5}": 0.8309,
+    "knn {\"k\": 10}": 0.8303,
+    "knn {\"k\": 20}": 0.8362,
+    "knn {\"k\": 40}": 0.8295,
+    "knn {\"k\": 80}": 0.8345,
+    "mlp {\"hidden\": [128], \"alpha\": 0.001}": 0.8178,
+    "mlp {\"hidden\": [128], \"alpha\": 0.1}": 0.8109,
+    "mlp {\"hidden\": [256, 64], \"alpha\": 0.001}": 0.827,
+    "mlp {\"hidden\": [256, 64], \"alpha\": 0.1}": 0.8169
+  }
+}
