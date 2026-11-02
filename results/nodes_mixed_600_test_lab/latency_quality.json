@@ -1,0 +1,138 @@
+{
+  "bench": "nodes_mixed_600_test",
+  "n_items": 600,
+  "machine": "UCU lab ml-compute-1, RTX 6000 Ada",
+  "x": "mean latency of the chosen model per item, seconds (router overhead not included)",
+  "y": "mean final_score",
+  "latency_range_for_aiq": [
+    2.14,
+    6.665
+  ],
+  "points": {
+    "mamay4": {
+      "latency_s": 4.803,
+      "score": 0.7753
+    },
+    "lapa": {
+      "latency_s": 6.665,
+      "score": 0.749
+    },
+    "aya": {
+      "latency_s": 2.14,
+      "score": 0.7765
+    },
+    "mamay27": {
+      "latency_s": 9.607,
+      "score": 0.8669
+    },
+    "rules_v2_text": {
+      "latency_s": 2.85,
+      "score": 0.7948
+    },
+    "rules_v2_intent": {
+      "latency_s": 4.215,
+      "score": 0.8113
+    },
+    "llm_mamay4": {
+      "latency_s": 5.165,
+      "score": 0.8115
+    },
+    "oracle": {
+      "latency_s": 2.726,
+      "score": 0.9372
+    },
+    "knn": {
+      "latency_s": 4.922,
+      "score": 0.8071
+    },
+    "mlp": {
+      "latency_s": 4.059,
+      "score": 0.7955
+    },
+    "knn_nodes": {
+      "latency_s": 4.877,
+      "score": 0.83
+    },
+    "mlp_nodes": {
+      "latency_s": 5.77,
+      "score": 0.8152
+    },
+    "knn_nodes_only": {
+      "latency_s": 4.954,
+      "score": 0.8315
+    },
+    "mlp_nodes_only": {
+      "latency_s": 4.62,
+      "score": 0.82
+    }
+  },
+  "aiq": {
+    "zero": 0.7765,
+    "knn_nodes_only": 0.8332,
+    "mlp_nodes_only": 0.8126
+  },
+  "curves": {
+    "knn_nodes_only": [
+      [
+        2.14,
+        0.7765
+      ],
+      [
+        2.141,
+        0.7832
+      ],
+      [
+        2.147,
+        0.7898
+      ],
+      [
+        2.269,
+        0.8048
+      ],
+      [
+        2.326,
+        0.8107
+      ],
+      [
+        2.754,
+        0.8196
+      ],
+      [
+        4.437,
+        0.8414
+      ]
+    ],
+    "mlp_nodes_only": [
+      [
+        2.14,
+        0.7765
+      ],
+      [
+        2.23,
+        0.7862
+      ],
+      [
+        2.376,
+        0.7937
+      ],
+      [
+        2.485,
+        0.7972
+      ],
+      [
+        4.233,
+        0.8174
+      ],
+      [
+        4.62,
+        0.82
+      ]
+    ],
+    "zero": [
+      [
+        2.14,
+        0.7765
+      ]
+    ]
+  }
+}

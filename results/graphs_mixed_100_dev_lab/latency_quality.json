@@ -1,0 +1,126 @@
+{
+  "bench": "graphs_mixed_100_dev",
+  "n_items": 100,
+  "machine": "UCU lab ml-compute-1, RTX 6000 Ada",
+  "x": "mean latency of the chosen model per item, seconds (router overhead not included)",
+  "y": "mean final_score",
+  "latency_range_for_aiq": [
+    3.635,
+    9.041
+  ],
+  "points": {
+    "mamay4": {
+      "latency_s": 8.681,
+      "score": 0.6542
+    },
+    "lapa": {
+      "latency_s": 9.041,
+      "score": 0.6617
+    },
+    "aya": {
+      "latency_s": 3.635,
+      "score": 0.6317
+    },
+    "mamay27": {
+      "latency_s": 13.99,
+      "score": 0.8375
+    },
+    "rules_v2_text": {
+      "latency_s": 6.596,
+      "score": 0.6283
+    },
+    "llm_mamay4": {
+      "latency_s": 8.77,
+      "score": 0.6575
+    },
+    "oracle": {
+      "latency_s": 4.815,
+      "score": 0.8242
+    },
+    "knn": {
+      "latency_s": 7.871,
+      "score": 0.6858
+    },
+    "mlp": {
+      "latency_s": 7.663,
+      "score": 0.6858
+    },
+    "knn_nodes": {
+      "latency_s": 8.533,
+      "score": 0.6608
+    },
+    "mlp_nodes": {
+      "latency_s": 8.641,
+      "score": 0.6842
+    },
+    "knn_nodes_only": {
+      "latency_s": 7.885,
+      "score": 0.6808
+    },
+    "mlp_nodes_only": {
+      "latency_s": 7.467,
+      "score": 0.6925
+    }
+  },
+  "aiq": {
+    "zero": 0.6467,
+    "knn_nodes_only": 0.7026,
+    "mlp_nodes_only": 0.6882
+  },
+  "curves": {
+    "knn_nodes_only": [
+      [
+        3.635,
+        0.6317
+      ],
+      [
+        3.744,
+        0.6617
+      ],
+      [
+        5.045,
+        0.6908
+      ],
+      [
+        6.475,
+        0.7175
+      ]
+    ],
+    "mlp_nodes_only": [
+      [
+        3.635,
+        0.6317
+      ],
+      [
+        3.686,
+        0.6417
+      ],
+      [
+        3.884,
+        0.6567
+      ],
+      [
+        4.762,
+        0.6858
+      ],
+      [
+        5.271,
+        0.6892
+      ],
+      [
+        6.303,
+        0.6958
+      ]
+    ],
+    "zero": [
+      [
+        3.635,
+        0.6317
+      ],
+      [
+        9.041,
+        0.6617
+      ]
+    ]
+  }
+}
