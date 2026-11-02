@@ -31,14 +31,14 @@ from router.backends import BACKENDS  # noqa: E402
 from router.client import async_chat  # noqa: E402
 from router.planner import (  # noqa: E402
     SYSTEM_INSTRUCTION,
-    SYSTEM_INSTRUCTION_V3_MINIMAL,
+    SYSTEM_INSTRUCTION_MINIMAL,
     extract_json_object,
     generate_plan,
 )
 
 PROMPT_VARIANTS: dict[str, str] = {
     "current_v2": SYSTEM_INSTRUCTION,
-    "minimal_v3": SYSTEM_INSTRUCTION_V3_MINIMAL,
+    "minimal_v3": SYSTEM_INSTRUCTION_MINIMAL,
 }
 
 DEFAULT_MODELS = ("mamay4", "mamay12")

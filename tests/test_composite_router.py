@@ -19,7 +19,7 @@ from router.orchestrator import (
     validate_plan,
 )
 from router.planner import (
-    SYSTEM_INSTRUCTION_V3_MINIMAL,
+    SYSTEM_INSTRUCTION_MINIMAL,
     enforce_final_constraint,
     generate_plan,
     request_data,
@@ -302,14 +302,14 @@ class PlanTests(unittest.TestCase):
             generate_plan(
                 "question",
                 caller,
-                instruction=SYSTEM_INSTRUCTION_V3_MINIMAL,
+                instruction=SYSTEM_INSTRUCTION_MINIMAL,
                 model="mamay12",
             )
         )
         self.assertTrue(meta["valid"])
         self.assertEqual(plan.steps[0].intent, "knowledge")
         self.assertEqual(seen[0][0], "mamay12")
-        self.assertTrue(seen[0][1].startswith(SYSTEM_INSTRUCTION_V3_MINIMAL))
+        self.assertTrue(seen[0][1].startswith(SYSTEM_INSTRUCTION_MINIMAL))
 
     def test_final_constraint_is_enforced(self) -> None:
         plan = Plan(

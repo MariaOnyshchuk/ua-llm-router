@@ -16,7 +16,7 @@ PLANNER_MODEL = "mamay4"
 # Named planner profiles used by run_composite_router / ablations.
 PLANNER_PROFILES = (
     "hybrid",           # current free-form SYSTEM_INSTRUCTION (default)
-    "hybrid_minimal",   # SYSTEM_INSTRUCTION_V3_MINIMAL
+    "hybrid_minimal",   # SYSTEM_INSTRUCTION_MINIMAL
     "hybrid_fewshot",   # SYSTEM_INSTRUCTION_FEWSHOT
     "template",         # constrained workflow selector (no LLM plan)
     "hybrid_mamay12",   # free-form planner on Mamay-12B
@@ -35,18 +35,15 @@ GATED_PLANNERS: dict[str, str | None] = {
     "hybrid_gated_mamay12": "mamay12",
 }
 
-SYSTEM_INSTRUCTION_V3_MINIMAL = """Ти плануєш виконання складеного запиту для українського асистента,
-розбиваючи його на 2-4 залежні кроки. Кожен крок має один з intent:
-translate, knowledge, instruct, code, alignment, chat — обери сам,
-який підходить найкраще для того, що конкретно потрібно зробити на цьому кроці.
+SYSTEM_INSTRUCTION_MINIMAL = """Ти - планувальник, який розподіляє частини запиту від користувача між найпідходящими моделями. Кількість питань при розбитті вирішуєш ти. Кожен крок має один з intent:
+translate, knowledge, instruct, code, alignment, chat.
 
 Поверни ЛИШЕ JSON у форматі:
 {"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."}, ...]}
 
 Залежність між кроками познач у prompt як {{step_id.content}}.
 Не вигадуй фактів, яких немає в запиті чи в результатах попередніх кроків.
-Фінальний крок має дослівно відтворити всі вимоги користувача щодо формату
-відповіді (наприклад: лише JSON, рівно два рядки, лише блок коду тощо).
+Останній крок мусить сформулювати фінальну відповідь, яку побачить користувач. Будь ласка, зважай на вказівки стосовно формату відповіді.
 """
 
 SYSTEM_INSTRUCTION_GATED = """Ти диспетчер запитів для українського асистента.
@@ -366,7 +363,7 @@ def resolve_profile(profile: str) -> tuple[str, str | None]:
 
 def instruction_for_profile(profile: str) -> str:
     if profile == "hybrid_minimal":
-        return SYSTEM_INSTRUCTION_V3_MINIMAL
+        return SYSTEM_INSTRUCTION_MINIMAL
     if profile == "hybrid_fewshot":
         return SYSTEM_INSTRUCTION_FEWSHOT
     if profile in {"hybrid", "hybrid_mamay12"}:
