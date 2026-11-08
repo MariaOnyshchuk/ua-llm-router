@@ -173,6 +173,9 @@ def make_model(kind: str, hp: dict):
 GRIDS = {
     "knn": [{"k": k} for k in (5, 10, 20, 40, 80)],
     "mlp": [{"hidden": h, "alpha": a} for h in ((128,), (256, 64)) for a in (1e-3, 1e-1)],
+    # Deeper networks (8 Nov 2026), trained as a separate router so the original grid stays as it was.
+    "mlp_deep": [{"hidden": h, "alpha": a} for h in ((256, 128), (512, 256, 128), (512, 256, 128, 64))
+                 for a in (1e-3, 1e-1)],
 }
 
 

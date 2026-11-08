@@ -209,6 +209,29 @@ ROUTER_PROFILES: dict[str, dict[str, object]] = {
         "blurb": "MLP trained on v7 dev and the node training set",
         "learned": "mlp_nodes",
     },
+    # The same routers trained on the node training set alone (600 steps, 2 Nov 2026).
+    "knn_nodes_only": {
+        "label": "Learned kNN (nodes only)",
+        "remap": {},
+        "default": "aya",
+        "blurb": "kNN trained on the node training set alone",
+        "learned": "knn_nodes_only",
+    },
+    "mlp_nodes_only": {
+        "label": "Learned MLP (nodes only)",
+        "remap": {},
+        "default": "aya",
+        "blurb": "MLP trained on the node training set alone",
+        "learned": "mlp_nodes_only",
+    },
+    # Deeper MLP on the same 600 nodes (8 Nov 2026): grid (256,128) to (512,256,128,64), CV chose (512,256,128).
+    "mlp_deep_nodes_only": {
+        "label": "Learned MLP, deeper (nodes only)",
+        "remap": {},
+        "default": "aya",
+        "blurb": "three-layer MLP trained on the node training set alone",
+        "learned": "mlp_deep_nodes_only",
+    },
     "clf": {
         "label": "Learned classifier",
         "remap": {},

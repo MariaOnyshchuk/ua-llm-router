@@ -1,0 +1,103 @@
+{
+  "kind": "mlp_deep_nodes_only",
+  "router": "QualityArgmaxRouter (max-quality end, lambda = inf)",
+  "encoder": "e5",
+  "encoder_name": "intfloat/multilingual-e5-large",
+  "encoder_revision": null,
+  "models": [
+    "mamay4",
+    "lapa",
+    "aya"
+  ],
+  "default": "aya",
+  "hyper_parameters": {
+    "hidden": [
+      512,
+      256,
+      128
+    ],
+    "alpha": 0.1
+  },
+  "cv_mse": 0.1227,
+  "grid": [
+    {
+      "hp": {
+        "hidden": [
+          256,
+          128
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.1242
+    },
+    {
+      "hp": {
+        "hidden": [
+          256,
+          128
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1292
+    },
+    {
+      "hp": {
+        "hidden": [
+          512,
+          256,
+          128
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.1257
+    },
+    {
+      "hp": {
+        "hidden": [
+          512,
+          256,
+          128
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1227
+    },
+    {
+      "hp": {
+        "hidden": [
+          512,
+          256,
+          128,
+          64
+        ],
+        "alpha": 0.001
+      },
+      "cv_mse": 0.1317
+    },
+    {
+      "hp": {
+        "hidden": [
+          512,
+          256,
+          128,
+          64
+        ],
+        "alpha": 0.1
+      },
+      "cv_mse": 0.1258
+    }
+  ],
+  "train": {
+    "suite": null,
+    "split": null,
+    "n_items": 600,
+    "ids_sha256_16": "9eaa1c40490ed0a7",
+    "scores": null,
+    "n_v7_dev": 0,
+    "extra_suite": "benchmarks/nodes_mixed_600_train.jsonl",
+    "extra_scores": "results/nodes_mixed_600_train/scores_all_detail.jsonl"
+  },
+  "sklearn": "1.9.1",
+  "git_commit": "2be90ffde4bfa893f9a59799240a7667c505e961",
+  "trained_at": "2026-11-08T20:36:29+00:00"
+}
