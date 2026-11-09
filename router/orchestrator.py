@@ -8,7 +8,7 @@ from typing import Any, Awaitable, Callable
 
 from router.intent_rules import ROUTER_MODELS, route_intent
 
-ALLOWED_INTENTS = frozenset({"translate", "knowledge", "instruct", "code", "alignment", "chat"})
+ALLOWED_INTENTS = frozenset({"translate", "knowledge", "instruct", "code", "alignment", "math", "chat"})
 PLACEHOLDER_RE = re.compile(r"\{\{([a-zA-Z][\w-]*)\.content\}\}")
 AsyncCaller = Callable[[str, str], Awaitable[dict[str, Any]]]
 

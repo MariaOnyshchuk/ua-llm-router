@@ -68,7 +68,7 @@ def item(skill, label, sub, form, prompt, gold, check, wrong, does="", **extra):
 def M(sub, form, prompt, expr, wrong, mark=True):
     """Math word problem: `expr` is Python arithmetic; the gold is computed from it."""
     value = round(eval(expr, {"__builtins__": {}}, {}), 2)  # noqa: S307 - our own constants
-    return item("math", "chat", sub, form, prompt + (ANS if mark else ""), f"Відповідь: {_fmt(value)}",
+    return item("math", "math", sub, form, prompt + (ANS if mark else ""), f"Відповідь: {_fmt(value)}",
                 {"type": "numeric", "value": value, "tolerance": 0.01}, f"Відповідь: {_fmt(wrong)}",
                 does=f"{expr} = {_fmt(value)}")
 
@@ -80,7 +80,7 @@ def MT(sub, form, prompt, gold, wrong, does):
     if gold[0] == "0" and ":" in gold:
         alt = r"(?<![\d:])" + gold[1:] + r"(?![\d:])"
     check = rx(pattern) if alt is None else anyr(rx(pattern), rx(alt))
-    return item("math", "chat", sub, form, prompt, gold, check, wrong, does=does)
+    return item("math", "math", sub, form, prompt, gold, check, wrong, does=does)
 
 
 def T(sub, form, prompt, gold, groups, wrong, extra=()):
@@ -93,8 +93,9 @@ def I(sub, form, prompt, gold, check, wrong):  # noqa: E743
     return item("instruct", "instruct", sub, form, prompt, gold, check, wrong)
 
 
-def K(sub, form, prompt, gold, check, wrong, **extra):
-    return item("knowledge", "knowledge", sub, form, prompt, gold, check, wrong, **extra)
+def K(sub, form, prompt, gold, check, wrong, label="knowledge", **extra):
+    """Knowledge item. label="math" when the answer needs a calculation (price per unit, totals)."""
+    return item("knowledge", label, sub, form, prompt, gold, check, wrong, **extra)
 
 
 def A(sub, form, action, value, style="digit", anchors=(), lead=None):

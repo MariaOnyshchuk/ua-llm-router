@@ -11,7 +11,7 @@ the per-item oracle. Differences are paired bootstrap 95% intervals (10 000 resa
 
 Fallbacks are recorded for every router, per skill:
 - rules v2 from text: no rule matched, so the request went to the default model (Aya);
-- rules v2 with the intent label: the label maps to the default ("chat", which math steps carry);
+- rules v2 with the intent label: before 9 Nov 2026 math steps carried "chat", which maps to the default;
 - learned routers: hard fallbacks (predicted model outside the pool, which sends the request to Aya in
   router/learned.py), exact ties between the top predicted scores (argmax then takes the first model in
   list order, Mamay-4B, so the choice comes from list order, not from the prediction) and near ties (top two

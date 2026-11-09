@@ -6,6 +6,8 @@ Decision table (week 7, v4-best specialists in the *rules*):
   instruct   → mamay4
   knowledge  → lapa
   alignment  → lapa
+  math       → lapa     (planner/classifier intent only, no keyword rule; node train math
+                         Lapa 0.85, Mamay-4B 0.75, Aya 0.74; added 9 Nov 2026)
   chat       → aya      (default; was mamay4; v4 chat 1.000 vs 0.984)
 
 Backends:
@@ -124,6 +126,10 @@ _RULES: list[tuple[str, str, re.Pattern[str], str]] = [
     ),
 ]
 
+
+# Math has no keyword rule (no new regex rules, 27 Oct 2026); it is reached only through an intent from
+# the planner or the classifier. Lapa: node train math 0.85 vs Mamay-4B 0.75 and Aya 0.74.
+MATH_MODEL = "lapa"
 
 # Allowed router targets (must match LiteLLM aliases / cluster BACKENDS)
 # Multi-lineage pool: Mamay-4B/Lapa (Gemma-UA), Aya (Cohere), Qwen7 (Qwen).
@@ -287,6 +293,9 @@ def route_intent(
     )
     if hinted == "chat":
         decision = RouteDecision(fallback, "chat", f"planner intent hint → {fallback}")
+    elif hinted == "math":
+        target = str(remap.get("math", MATH_MODEL))
+        decision = RouteDecision(target, "math", f"planner intent hint; math → {target} (node train math 0.85)")
     elif hinted_rule is not None:
         model, reason = hinted_rule
         target = str(remap.get(hinted, model))

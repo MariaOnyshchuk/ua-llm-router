@@ -1,4 +1,4 @@
-"""Math nodes (planner label: chat). Golds are computed from the arithmetic in each item."""
+"""Math nodes (planner label: math). Golds are computed from the arithmetic in each item."""
 
 from nodes_train.common import PREV, ROOT, M, MT
 

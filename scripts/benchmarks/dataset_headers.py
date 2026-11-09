@@ -11,12 +11,13 @@ from __future__ import annotations
 
 WHY = {
     "graphs_mixed_100_dev.jsonl": "100 graph tasks (250 nodes), all dev; written by us + STaD, ZNO, Belebele "
-                                  "(was mixed_ua_composite_graph100)",
+                                  "(was mixed_ua_composite_graph100); math steps intent math, not chat, since 9 Nov 2026",
     "graphs_mixed_100_test.jsonl": "same build as graphs_mixed_100_dev, held out, frozen; run once "
-                                   "(was mixed_ua_composite_test100)",
+                                   "(was mixed_ua_composite_test100); math steps intent math, not chat, since 9 Nov 2026 (label only)",
     "nodes_mixed_600_train.jsonl": "600 single nodes, training labels for the learned routers; "
-                                   "545 written + 40 ZNO + 15 UAlign (was mixed_ua_nodes_train)",
-    "nodes_mixed_600_test.jsonl": "600 single nodes, held out for testing the routers; same build as nodes_mixed_600_train",
+                                   "545 written + 40 ZNO + 15 UAlign (was mixed_ua_nodes_train); label math, not chat, since 9 Nov 2026",
+    "nodes_mixed_600_test.jsonl": "600 single nodes, held out for testing the routers; same build as nodes_mixed_600_train; "
+                                  "label math, not chat, since 9 Nov 2026 (label only)",
     "tasks_public_4401.jsonl": "4401 single-skill tasks, claim suite with dev 1542 / test 2859 inside; "
                                "all from public datasets except 32 hand-written chat items (was mixed_ua_v7)",
     "tasks_mixed_192.jsonl": "192 single-skill tasks, development suite for wiring checks; "

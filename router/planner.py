@@ -25,6 +25,7 @@ PLANNER_PROFILES = (
     "hybrid_gated_lapa",
     "hybrid_gated_aya",
     "hybrid_gated_mamay12",
+    "hybrid_gated_mamay27",
 )
 
 # Gated profiles and the model that writes the plan (None = PLANNER_MODEL).
@@ -33,10 +34,11 @@ GATED_PLANNERS: dict[str, str | None] = {
     "hybrid_gated_lapa": "lapa",
     "hybrid_gated_aya": "aya",
     "hybrid_gated_mamay12": "mamay12",
+    "hybrid_gated_mamay27": "mamay27",
 }
 
 SYSTEM_INSTRUCTION_MINIMAL = """Ти - планувальник, який розподіляє частини запиту від користувача між найпідходящими моделями. Кількість питань при розбитті вирішуєш ти. Кожен крок має один з intent:
-translate, knowledge, instruct, code, alignment, chat.
+translate, knowledge, instruct, code, alignment, math, chat.
 
 Поверни ЛИШЕ JSON у форматі:
 {"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."}, ...]}
@@ -47,12 +49,12 @@ translate, knowledge, instruct, code, alignment, chat.
 """
 
 SYSTEM_INSTRUCTION_GATED = """Ти - планувальник, який розподіляє частини запиту від користувача між найпідходящими моделями. Кількість кроків при розбитті вирішуєш ти (не більше 4). Кожен крок має один з intent:
-translate, knowledge, instruct, code, alignment, chat.
+translate, knowledge, instruct, code, alignment, math, chat.
 
 Виріши, чи запит — ОДИН крок.
 Один крок — це один виклик однієї навички (одного intent нижче):
 - вимога до форми відповіді (JSON, регістр, кількість рядків чи слів) — це частина кроку, а не окремий крок;
-- один intent — один крок (текстова задача з кількома обчисленнями — один крок, intent - chat);
+- один intent — один крок (текстова задача з кількома обчисленнями — один крок, intent - math);
 - новий крок потрібен лише тоді, коли частина запиту потребує іншого intent спеціаліста;
 
 Якщо запит — один крок, поверни рівно: {"steps":[]}
@@ -60,14 +62,15 @@ translate, knowledge, instruct, code, alignment, chat.
 {"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."},
 {"id":"step2","intent":"...","depends_on":["step1"],"prompt":"... {{step1.content}}"}]}
 
-Дозволені intent (лише ці шість слів, інших не вигадуй):
+Дозволені intent (лише ці сім слів, інших не вигадуй):
 - translate: ТІЛЬКИ переклад між мовами;
 - knowledge: відповідь на факт чи тест, витяг або класифікація фактів із наданого тексту;
 - instruct: пояснення, написання, резюме чи переформатування (JSON, Markdown,
   задана кількість рядків чи речень);
 - code: написання, виправлення або перевірка коду;
 - alignment: ТІЛЬКИ моральна чи соціальна оцінка цифрою 0/1/2;
-- chat: звичайна розмова або текстова задача з числами.
+- math: задача, де треба порахувати (гроші, відсотки, час, дати, одиниці виміру);
+- chat: звичайна розмова, порада, привітання.
 Останній крок, що формує відповідь у заданому форматі, — instruct (або code,
 якщо результат — код).
 Правила для кроків:
@@ -79,16 +82,17 @@ translate, knowledge, instruct, code, alignment, chat.
 """
 
 SYSTEM_INSTRUCTION = """Ти - планувальник, який розподіляє частини запиту від користувача між найпідходящими моделями. Кількість кроків при розбитті вирішуєш ти (від 1 до 4). Кожен крок має один з intent:
-translate, knowledge, instruct, code, alignment, chat.
+translate, knowledge, instruct, code, alignment, math, chat.
 
-Дозволені intent (лише ці шість слів, інших не вигадуй):
+Дозволені intent (лише ці сім слів, інших не вигадуй):
 - translate: ТІЛЬКИ переклад між мовами;
 - knowledge: відповідь на факт чи тест, витяг або класифікація фактів із наданого тексту;
 - instruct: пояснення, написання, резюме чи переформатування (JSON, Markdown,
   задана кількість рядків чи речень);
 - code: написання, виправлення або перевірка коду;
 - alignment: ТІЛЬКИ моральна чи соціальна оцінка цифрою 0/1/2;
-- chat: звичайна розмова або текстова задача з числами.
+- math: задача, де треба порахувати (гроші, відсотки, час, дати, одиниці виміру);
+- chat: звичайна розмова, порада, привітання.
 
 Поверни ЛИШЕ JSON у форматі:
 {"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."},
@@ -104,16 +108,17 @@ translate, knowledge, instruct, code, alignment, chat.
 """
 
 SYSTEM_INSTRUCTION_FEWSHOT = """Ти - планувальник, який розподіляє частини запиту від користувача між найпідходящими моделями. Кількість кроків при розбитті вирішуєш ти (від 1 до 4). Кожен крок має один з intent:
-translate, knowledge, instruct, code, alignment, chat.
+translate, knowledge, instruct, code, alignment, math, chat.
 
-Дозволені intent (лише ці шість слів, інших не вигадуй):
+Дозволені intent (лише ці сім слів, інших не вигадуй):
 - translate: ТІЛЬКИ переклад між мовами;
 - knowledge: відповідь на факт чи тест, витяг або класифікація фактів із наданого тексту;
 - instruct: пояснення, написання, резюме чи переформатування (JSON, Markdown,
   задана кількість рядків чи речень);
 - code: написання, виправлення або перевірка коду;
 - alignment: ТІЛЬКИ моральна чи соціальна оцінка цифрою 0/1/2;
-- chat: звичайна розмова або текстова задача з числами.
+- math: задача, де треба порахувати (гроші, відсотки, час, дати, одиниці виміру);
+- chat: звичайна розмова, порада, привітання.
 
 Поверни ЛИШЕ JSON у форматі:
 {"steps":[{"id":"step1","intent":"...","depends_on":[],"prompt":"..."},
@@ -176,7 +181,7 @@ def single_call_plan(prompt: str, router_profile: str = "v2") -> Plan:
 
 
 # Mamay-4B often names a step "classification" or "instruction". The plan is fine; only
-# the label is outside the six allowed intents, and validation used to reject the whole plan.
+# the label is outside the allowed intents, and validation used to reject the whole plan.
 _INTENT_ALIASES = {
     "translate": ("translat", "переклад"),
     "code": ("code", "coding", "program", "код"),
@@ -185,12 +190,13 @@ _INTENT_ALIASES = {
                   "знан", "витяг", "класиф", "аналіз"),
     "instruct": ("instruct", "format", "summar", "writ", "explain", "rewrite", "generat", "compos",
                  "інструк", "формат", "резюм", "поясн", "напис"),
+    "math": ("math", "calc", "arithm", "comput", "матем", "обчисл", "розрах", "порах"),
     "chat": ("chat", "convers", "розмов"),
 }
 
 
 def normalize_intents(raw: dict[str, Any]) -> dict[str, Any]:
-    """Map near-miss intent labels onto the allowed six; unknown labels become "chat"."""
+    """Map near-miss intent labels onto the allowed seven; unknown labels become "chat"."""
     steps = raw.get("steps")
     if not isinstance(steps, list):
         return raw

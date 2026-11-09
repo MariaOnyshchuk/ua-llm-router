@@ -50,10 +50,9 @@ _spec = importlib.util.spec_from_file_location("scorer", ROOT / "scripts" / "sco
 scorer = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(scorer)
 
-# The router has no math intent: math nodes run where word problems go today (chat → Aya).
-# Which specialist should get math is an open decision of the spec.
+# Math nodes carry their own intent since 9 Nov 2026 (before: "chat", routed to Aya).
 EXEC_INTENT = {"translate": "translate", "knowledge": "knowledge", "alignment": "alignment",
-               "instruct": "instruct", "code": "code", "math": "chat"}
+               "instruct": "instruct", "code": "code", "math": "math"}
 SKILLS = set(EXEC_INTENT)
 
 MARK = "\nНаприкінці напиши: Відповідь: <число>."

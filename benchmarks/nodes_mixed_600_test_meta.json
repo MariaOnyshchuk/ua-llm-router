@@ -97,7 +97,7 @@
   "teacher_check_n2": "not run",
   "human_review": "draft sample of 42 approved 1 Nov 2026; full set not reviewed yet",
   "selected_by_model_scores": false,
-  "sha256_16": "2dd49822418791a0",
-  "git_commit": "b8f22cbc93260e909c3ca667279a2509f2f25dd3",
-  "built_at": "2026-11-01T10:11:07+00:00"
+  "sha256_16": "f4a66b4cac9b57fd",
+  "git_commit": "2be90ffde4bfa893f9a59799240a7667c505e961",
+  "built_at": "2026-11-09T10:29:51+00:00"
 }
