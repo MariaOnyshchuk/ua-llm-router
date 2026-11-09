@@ -21,15 +21,17 @@ from router.client import async_chat  # noqa: E402
 from router.intent_rules import route_intent  # noqa: E402
 from router.orchestrator import Plan, execute_plan, plan_signature  # noqa: E402
 from router.planner import PLANNER_PROFILES, generate_plan  # noqa: E402
+from router.paper_planners import (DEMO_IDS, PAPER_PLANNER_MODELS, PAPER_PLANNERS, run_compiler, run_hgpt,
+                                    run_planner_v2)  # noqa: E402
 
 DIRECT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "mamay12", "mamay27")
 DEFAULT_SYSTEMS = ("mamay4", "lapa", "aya", "qwen7", "router_direct", "oracle", "hybrid")
-ORCHESTRATED = frozenset({"router_direct", "oracle", *PLANNER_PROFILES})
+ORCHESTRATED = frozenset({"router_direct", "oracle", *PLANNER_PROFILES, *PAPER_PLANNERS})
 # Learned (RouterBench-style) routing, router/artifacts/{knn,mlp}:
 #   router_knn / router_mlp      one call, the learned router picks the model for the request;
 #   <plan>+knn / <plan>+mlp      plan from `oracle` or a planner profile, every step routed by the
 #                                learned router on the step's own prompt.
-LEARNED_PROFILES = ("knn", "mlp", "knn_nodes", "mlp_nodes")
+LEARNED_PROFILES = ("knn", "mlp", "knn_nodes", "mlp_nodes", "knn_nodes_only", "mlp_nodes_only", "mlp_deep_nodes_only")
 LEARNED_DIRECT = {f"router_{k}": k for k in LEARNED_PROFILES}
 
 
@@ -43,7 +45,7 @@ def known_system(system: str) -> bool:
     if system in DIRECT_SYSTEMS or system in ORCHESTRATED or system in LEARNED_DIRECT:
         return True
     base, routing = split_routing(system)
-    return routing in LEARNED_PROFILES and (base == "oracle" or base in PLANNER_PROFILES)
+    return routing in LEARNED_PROFILES and (base == "oracle" or base in PLANNER_PROFILES or base in PAPER_PLANNERS)
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -75,16 +77,18 @@ def required_aliases(systems: list[str]) -> set[str]:
         if system in BACKENDS:
             required.add(system)
         base, _ = split_routing(system)
-        if system in LEARNED_DIRECT or base in {"router_direct", "oracle"} or base in PLANNER_PROFILES:
+        if system in LEARNED_DIRECT or base in {"router_direct", "oracle"} or base in PLANNER_PROFILES or base in PAPER_PLANNERS:
             required.update({"mamay4", "lapa", "aya"})
         if system in {"hybrid_mamay12", "hybrid_gated_mamay12"}:
             required.add("mamay12")
+        if base == "hybrid_gated_mamay27" or PAPER_PLANNER_MODELS.get(base) == "mamay27":
+            required.add("mamay27")
     return required
 
 
 def as_plan_item(item: dict[str, Any]) -> dict[str, Any]:
     """A single-skill node item (benchmarks/mixed_ua_nodes_{train,test}.jsonl) becomes a one-step plan, so the
-    same runner and scorer handle it. Its intent is the item's label (math is `chat`, as in graphs_mixed_100_dev)."""
+    same runner and scorer handle it. Its intent is the item's label (math items: `math` since 9 Nov 2026, `chat` before)."""
     if "oracle_plan" in item:
         return item
     step = {"id": "n1", "intent": item["label"], "depends_on": [], "prompt": item["prompt"],
@@ -184,6 +188,16 @@ async def run_item(
     elif split_routing(system)[0] == "oracle":
         plan = oracle
         execution = await execute_plan(plan, caller, profile=split_routing(system)[1])
+    elif split_routing(system)[0] in PAPER_PLANNERS:
+        base, routing = split_routing(system)
+        planner_profile = base
+        model_kw = {"planner_model": PAPER_PLANNER_MODELS[base]} if PAPER_PLANNER_MODELS[base] else {}
+        if base.startswith("planner_v2"):  # no demos
+            out = await run_planner_v2(prompt, caller, profile=routing, **model_kw)
+        else:
+            run_paper = run_hgpt if base.startswith("hgpt") else run_compiler
+            out = await run_paper(prompt, caller, profile=routing, demos=args.demo_items, **model_kw)
+        plan, planning, execution = out["plan"], out["planning"], out["execution"]
     elif split_routing(system)[0] in PLANNER_PROFILES:
         base, routing = split_routing(system)
         planner_profile = base
@@ -258,6 +272,12 @@ async def run(args: argparse.Namespace) -> None:
     )
     if not items:
         raise SystemExit("no items left after filters")
+    # Demonstrations of the paper planners (router/paper_planners.py) come from graph-dev; with
+    # --hold-out-demos those items are left out for every system, so all systems see the same items.
+    by_id = {str(item["id"]): item for item in items}
+    args.demo_items = [by_id[i] for i in DEMO_IDS if i in by_id]
+    if args.hold_out_demos:
+        items = [item for item in items if str(item["id"]) not in set(DEMO_IDS)]
 
     systems = [x.strip() for x in args.systems.split(",") if x.strip()]
     unknown = {s for s in systems if not known_system(s)}
@@ -343,6 +363,8 @@ def main() -> None:
         help="Comma-separated splits for v2 (train,dev,test). Empty = all.",
     )
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--hold-out-demos", action="store_true",
+                        help="leave out the demonstration items of the paper planners (router/paper_planners.DEMO_IDS)")
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=42)
