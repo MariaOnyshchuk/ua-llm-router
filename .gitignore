@@ -59,3 +59,7 @@ benchmarks/viewers/
 results/graphs_mixed_100_dev_lab/*.jsonl
 results/nodes_mixed_600_test_lab/*.jsonl
 results/graphs_mixed_100_dev_planners/*.jsonl
+
+# Local MLflow stores (scripts/mlflow_tracking.py): traces hold prompts and answers.
+mlflow.db
+**/mlflow/artifacts/

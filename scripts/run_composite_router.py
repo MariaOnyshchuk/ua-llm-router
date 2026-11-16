@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import json
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -20,7 +21,7 @@ from router.backends import BACKENDS  # noqa: E402
 from router.client import async_chat  # noqa: E402
 from router.intent_rules import route_intent  # noqa: E402
 from router.orchestrator import Plan, execute_plan, plan_signature  # noqa: E402
-from router.planner import PLANNER_PROFILES, generate_plan  # noqa: E402
+from router.planner import GATED_PLANNERS, PLANNER_MODEL, PLANNER_PROFILES, generate_plan  # noqa: E402
 from router.paper_planners import (DEMO_IDS, PAPER_PLANNER_MODELS, PAPER_PLANNERS, run_compiler, run_hgpt,
                                     run_planner_v2)  # noqa: E402
 
@@ -46,6 +47,21 @@ def known_system(system: str) -> bool:
         return True
     base, routing = split_routing(system)
     return routing in LEARNED_PROFILES and (base == "oracle" or base in PLANNER_PROFILES or base in PAPER_PLANNERS)
+
+
+def system_params(system: str) -> dict[str, str]:
+    """Planner, planner model and step router of a system name, for MLflow run parameters."""
+    base, routing = split_routing(system)
+    if system in DIRECT_SYSTEMS:
+        return {"planner": "none", "planner_model": "-", "router": "none (one model)"}
+    if system == "router_direct" or system in LEARNED_DIRECT:
+        return {"planner": "none", "planner_model": "-", "router": LEARNED_DIRECT.get(system, "v2")}
+    if base == "oracle":
+        return {"planner": "gold plan", "planner_model": "-", "router": routing}
+    model = PAPER_PLANNER_MODELS.get(base) or GATED_PLANNERS.get(base) or PLANNER_MODEL
+    if base.endswith("_mamay12"):
+        model = "mamay12"
+    return {"planner": base.replace(f"_{model}", ""), "planner_model": model, "router": routing}
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -313,11 +329,26 @@ async def run(args: argparse.Namespace) -> None:
                     f"s{args.seed}_rep{repeat}_{stamp}.jsonl"
                 )
                 path = out_dir / name
+                tracker = None
+                if args.mlflow:
+                    from mlflow_tracking import RunLogger  # noqa: PLC0415
+
+                    tracker = RunLogger(
+                        Path(args.mlflow), args.mlflow_experiment or bench_tag, path.stem,
+                        {**system_params(system), "system": system, "bench": bench.name,
+                         "split": args.split or "all", "n": len(items), "repeat": repeat,
+                         "temperature": args.temperature, "seed": args.seed, "max_tokens": args.max_tokens,
+                         "hold_out_demos": args.hold_out_demos, "out_dir": str(out_dir.relative_to(ROOT))
+                         if out_dir.is_relative_to(ROOT) else str(out_dir)},
+                    )
                 rows: list[dict[str, Any]] = []
                 with path.open("w", encoding="utf-8") as output:
                     for index, item in enumerate(items, 1):
+                        started_ns = time.time_ns()
                         row = await run_item(item, system, client, args)
                         row["repeat"] = repeat
+                        if tracker:
+                            tracker.item(row, started_ns, time.time_ns())
                         rows.append(row)
                         output.write(json.dumps(row, ensure_ascii=False) + "\n")
                         output.flush()
@@ -346,6 +377,12 @@ async def run(args: argparse.Namespace) -> None:
                     json.dumps(meta, ensure_ascii=False, indent=2),
                     encoding="utf-8",
                 )
+                if tracker:
+                    tracker.finish({
+                        "n": meta["n"], "failures": meta["failures"], "calls_per_item": meta["calls"] / max(1, meta["n"]),
+                        "latency_avg_ms": meta["latency_ms_total"] / max(1, meta["n"]),
+                        "gpu_seconds_per_item": meta["gpu_seconds_total"] / max(1, meta["n"]),
+                    })
                 print(f"wrote {path}")
 
 
@@ -372,6 +409,11 @@ def main() -> None:
     parser.add_argument("--timeout", type=float, default=180.0)
     parser.add_argument("--skip-health", action="store_true")
     parser.add_argument("--out-dir", default="results/week_10_composite")
+    parser.add_argument("--mlflow", default="", metavar="DIR",
+                        help="also log runs and per-item traces to a local MLflow store in DIR "
+                             "(e.g. logs/<group>/mlflow; holds prompts and answers, stays out of git)")
+    parser.add_argument("--mlflow-experiment", default="",
+                        help="MLflow experiment name (default: the benchmark tag, e.g. graphs_mixed_100_dev)")
     args = parser.parse_args()
     asyncio.run(run(args))
 

@@ -113,6 +113,9 @@ fi
 cd "${ROOT}"
 sha256sum "benchmarks/${BENCH}.jsonl" router/planner.py router/paper_planners.py router/intent_rules.py
 
+# MLFLOW=1 sbatch ...: also log runs and per-item traces to ${RAW_DIR}/mlflow (needs `pip install mlflow`).
+MLFLOW_FLAG=()
+if [[ "${MLFLOW:-0}" == "1" ]]; then MLFLOW_FLAG=(--mlflow "${RAW_DIR}/mlflow"); fi
 for planner in ${PLANNERS}; do
   system="${planner}"
   if [[ "${ROUTING}" != "v2" && "${planner}" != "mamay27" ]]; then
@@ -122,12 +125,16 @@ for planner in ${PLANNERS}; do
   if ! CUDA_VISIBLE_DEVICES="${RUNNER_GPU}" python scripts/run_composite_router.py \
       --bench "benchmarks/${BENCH}.jsonl" --systems "${system}" ${HOLD_FLAG} \
       --repeats 1 --temperature 0 --seed 42 --max-tokens 1024 \
-      --out-dir "${RAW_DIR}"; then
+      --out-dir "${RAW_DIR}" ${MLFLOW_FLAG[@]+"${MLFLOW_FLAG[@]}"}; then
     echo "[planners] ${system} failed" >&2
     continue
   fi
   newest=$(ls -t "${RAW_DIR}/${system}_composite_${BENCH}_"*.jsonl | head -1)
   python scripts/score_composite_results.py "${newest}" --out "${OUT_DIR}/scores_${system}.json"
+  if [[ ${#MLFLOW_FLAG[@]} -gt 0 ]]; then
+    python scripts/log_scores_mlflow.py "${MLFLOW_FLAG[@]}" --log "${newest}" \
+      --scores "${OUT_DIR}/scores_${system}.json" || echo "[planners] mlflow scores for ${system} not logged" >&2
+  fi
 done
 
 echo "[planners] finished"

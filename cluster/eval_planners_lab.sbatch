@@ -107,17 +107,24 @@ done
 RAW="logs/${BENCH}_lab"
 OUT="results/${BENCH}_lab"
 mkdir -p "${RAW}" "${OUT}"
+# MLFLOW=1 sbatch ...: also log runs and per-item traces to ${RAW}/mlflow (needs `pip install mlflow`).
+MLFLOW_FLAG=()
+if [[ "${MLFLOW:-0}" == "1" ]]; then MLFLOW_FLAG=(--mlflow "${RAW}/mlflow"); fi
 for system in ${SYSTEMS}; do
   echo "[planners] run ${system} $(date -u +%H:%M:%S)"
   if ! CUDA_VISIBLE_DEVICES="" python scripts/run_composite_router.py \
       --bench "benchmarks/${BENCH}.jsonl" --systems "${system}" \
       --repeats 1 --temperature 0 --seed 42 --max-tokens 1024 \
-      --out-dir "${RAW}" > "logs/planners-run-${system}-${SLURM_JOB_ID}.log" 2>&1; then
+      --out-dir "${RAW}" ${MLFLOW_FLAG[@]+"${MLFLOW_FLAG[@]}"} > "logs/planners-run-${system}-${SLURM_JOB_ID}.log" 2>&1; then
     echo "[planners] ${system} failed, see logs/planners-run-${system}-${SLURM_JOB_ID}.log" >&2
     continue
   fi
   newest=$(ls -t "${RAW}/${system}_composite_${BENCH}_"*.jsonl | head -1)
   python scripts/score_composite_results.py "${newest}" --out "${OUT}/scores_${system}.json"
+  if [[ ${#MLFLOW_FLAG[@]} -gt 0 ]]; then
+    python scripts/log_scores_mlflow.py "${MLFLOW_FLAG[@]}" --log "${newest}" \
+      --scores "${OUT}/scores_${system}.json" || echo "[planners] mlflow scores for ${system} not logged" >&2
+  fi
 done
 
 echo "[planners] finished"

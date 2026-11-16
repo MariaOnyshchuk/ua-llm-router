@@ -67,6 +67,7 @@ async def async_chat(
             "error": f"unknown alias {alias}",
         }
     base, model = BACKENDS[alias]
+    started_ns = time.time_ns()  # wall clock, for trace timelines (MLflow)
     started = time.perf_counter()
     try:
         resp = await client.post(
@@ -84,8 +85,9 @@ async def async_chat(
             "http_status": 0,
             "error": f"{type(exc).__name__}: {exc}",
             "hf": model,
+            "started_ns": started_ns,
         }
-    return _result(alias, model, resp, (time.perf_counter() - started) * 1000)
+    return {**_result(alias, model, resp, (time.perf_counter() - started) * 1000), "started_ns": started_ns}
 
 
 def sync_chat(
@@ -108,6 +110,7 @@ def sync_chat(
             "error": f"unknown alias {alias}",
         }
     base, model = BACKENDS[alias]
+    started_ns = time.time_ns()  # wall clock, for trace timelines (MLflow)
     started = time.perf_counter()
     try:
         resp = client.post(
@@ -125,5 +128,6 @@ def sync_chat(
             "http_status": 0,
             "error": f"{type(exc).__name__}: {exc}",
             "hf": model,
+            "started_ns": started_ns,
         }
-    return _result(alias, model, resp, (time.perf_counter() - started) * 1000)
+    return {**_result(alias, model, resp, (time.perf_counter() - started) * 1000), "started_ns": started_ns}
