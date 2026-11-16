@@ -54,3 +54,8 @@ results/**/*_[0-9]*T[0-9]*Z.jsonl
 
 # Generated HTML viewers (scripts/benchmarks/render_composite_viewer.py)
 benchmarks/viewers/
+
+# Item-level score rows and intent labels of the lab and planner runs stay local (decided 16 Nov 2026).
+results/graphs_mixed_100_dev_lab/*.jsonl
+results/nodes_mixed_600_test_lab/*.jsonl
+results/graphs_mixed_100_dev_planners/*.jsonl
